@@ -39,8 +39,12 @@ from io import BytesIO
 from datetime import datetime
 from typing import Optional
 from dotenv import load_dotenv
-from playwright.sync_api import sync_playwright, Page, BrowserContext, TimeoutError as PWTimeout
-import anthropic
+try:
+    from playwright.sync_api import sync_playwright, Page, BrowserContext, TimeoutError as PWTimeout
+    _PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    _PLAYWRIGHT_AVAILABLE = False
+    sync_playwright = Page = BrowserContext = PWTimeout = None
 
 # ---------------------------------------------------------------------------
 # Setup
@@ -783,6 +787,12 @@ def verify_candidate_certs(
           "verified_at": str,
         }
     """
+    if not _PLAYWRIGHT_AVAILABLE:
+        return {"kandidat": nama_kandidat, "total": len(sertifikat_list), "lulus": 0,
+                "gagal": 0, "perlu_periksa": len(sertifikat_list), "ringkasan": "PERLU PERIKSA",
+                "detail": [], "verified_at": datetime.now().isoformat(),
+                "error": "Playwright tidak tersedia di environment ini"}
+
     log.info(f"\nMulai verifikasi {len(sertifikat_list)} sertifikat untuk: {nama_kandidat or '(tanpa nama)'}")
     detail = []
 
@@ -895,6 +905,10 @@ def verify_batch(kode_list: list[str], output_file: str = "hasil_verifikasi.json
     Verifikasi daftar nomor sertifikat sekaligus dalam satu sesi browser.
     Lebih efisien daripada buka browser tiap nomor.
     """
+    if not _PLAYWRIGHT_AVAILABLE:
+        log.error("Playwright tidak tersedia — batch verification dilewati")
+        return []
+
     results = []
     log.info(f"Mulai verifikasi batch: {len(kode_list)} nomor sertifikat")
 
@@ -930,6 +944,10 @@ def verify_batch(kode_list: list[str], output_file: str = "hasil_verifikasi.json
 
 def verify_single(nomor_sertifikat: str) -> dict:
     """Verifikasi satu nomor sertifikat (convenience function)."""
+    if not _PLAYWRIGHT_AVAILABLE:
+        return {"status": "Error Jaringan", "error": "Playwright tidak tersedia",
+                "kode_pelaut": "", "nomor_sertifikat_input": nomor_sertifikat,
+                "verified_at": datetime.now().isoformat()}
     with sync_playwright() as pw:
         browser = _launch_browser(pw)
         context = browser.new_context(

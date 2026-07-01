@@ -1,0 +1,29 @@
+# Database (akan dibuat ulang di /tmp saat startup)
+maxy.db
+
+# File hasil & debug
+hasil_verifikasi.json
+debug_result.txt
+
+# Storage (video, kontrak, screenshot) — tidak dipakai di demo
+storage/videos/
+storage/cert_screenshots/
+storage/contracts/
+storage/tests/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Folder pengembangan
+new/
+
+# Env lokal
+.env
+
+# File besar lain
+*.webm
+*.pdf
+*.png

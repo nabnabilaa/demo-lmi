@@ -16,7 +16,7 @@ anthropic>=0.40
 
 # --- HTTP & verifikasi sertifikat (RPA) ---
 requests==2.33.0
-playwright==1.56.0          # jalankan: playwright install chromium
+# playwright==1.56.0        # VERCEL: dinonaktifkan — tidak ada browser di serverless
 
 # --- Ekstraksi CV (PDF) ---
 pypdf>=4.0
