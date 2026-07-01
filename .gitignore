@@ -9,3 +9,5 @@ storage/contracts/
 storage/tests/
 hasil_verifikasi.json
 debug_result.txt
+
+.vercel
