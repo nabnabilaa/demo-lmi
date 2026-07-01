@@ -1,0 +1,3114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAXY — Sistem Rekrutmen Lintas Maritim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   MAXY DESIGN SYSTEM
+   Candidate side  = "Boarding Pass" — pale harbour-fog page,
+                      cream ticket card, teal/amber/red signal lights.
+   HR side         = "Bridge Console" — dark hull navy, radar-style
+                      panels, mono readouts.
+   ============================================================ */
+
+:root{
+  /* ---- candidate (light / "harbour") ---- */
+  --page-bg:#EEF3F5;
+  --ticket:#FBF6EA;
+  --card:#FFFFFF;
+  --ink:#16222B;
+  --ink-soft:#56666F;
+  --ink-faint:#8B98A1;
+  --line:#DCE3E6;
+  --line-soft:#E8EDEF;
+
+  /* ---- hr (dark / "bridge") ---- */
+  --hull:#0C2233;
+  --hull-2:#0A1C2B;
+  --bridge:#14304A;
+  --bridge-2:#1C3E5C;
+  --bridge-line:#28496A;
+  --hr-text:#E7EEF2;
+  --hr-text-soft:#93A6B3;
+
+  /* ---- signal colours (shared meaning both sides) ---- */
+  --teal:#168E7F;
+  --teal-light:#E3F3F0;
+  --teal-dark:#2BB3A0;
+  --amber:#C8821F;
+  --amber-light:#FBF0DE;
+  --amber-dark:#EAAE4F;
+  --red:#BF4A3D;
+  --red-light:#FBEAE7;
+  --red-dark:#E1685A;
+  --green:#3C8C4A;
+  --green-light:#E7F4E9;
+  --green-dark:#57B868;
+  --gold:#A87B2C;
+  --gold-light:#F6EEDC;
+
+  --font-display:'Fraunces', serif;
+  --font-head:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+
+  --radius-s:6px;
+  --radius-m:10px;
+  --radius-l:16px;
+  --shadow-s:0 1px 2px rgba(16,30,40,.06), 0 1px 1px rgba(16,30,40,.04);
+  --shadow-m:0 6px 20px rgba(16,30,40,.10), 0 2px 6px rgba(16,30,40,.06);
+  --shadow-l:0 16px 40px rgba(8,16,24,.18);
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:var(--font-body);
+  background:var(--page-bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+body.theme-hr{ background:var(--hull); color:var(--hr-text); }
+
+h1,h2,h3,h4{ font-family:var(--font-head); margin:0; letter-spacing:-0.01em; }
+p{ margin:0; }
+button{ font-family:var(--font-body); }
+input,select,textarea{ font-family:var(--font-body); }
+a{ color:inherit; }
+::selection{ background:var(--teal); color:#fff; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+}
+
+/* ---------------- layout shells ---------------- */
+.topbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 28px;
+  background:var(--card); border-bottom:1px solid var(--line);
+}
+body.theme-hr .topbar{ background:var(--hull-2); border-bottom:1px solid var(--bridge-line); }
+
+.brand{ display:flex; align-items:center; gap:10px; }
+.brand-mark{
+  width:34px; height:34px; border-radius:9px;
+  background:linear-gradient(155deg, var(--teal), #0e5f54);
+  display:flex; align-items:center; justify-content:center;
+  flex:none;
+}
+.brand-word{ font-family:var(--font-display); font-weight:600; font-size:21px; letter-spacing:0.01em; }
+.brand-sub{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); letter-spacing:.02em; margin-top:-2px;}
+body.theme-hr .brand-sub{ color:var(--hr-text-soft); }
+
+.role-switch{ display:flex; gap:4px; background:var(--page-bg); padding:4px; border-radius:99px; border:1px solid var(--line); }
+body.theme-hr .role-switch{ background:var(--hull-2); border-color:var(--bridge-line); }
+.role-switch button{
+  border:none; background:transparent; cursor:pointer;
+  padding:8px 16px; border-radius:99px; font-size:13px; font-weight:600;
+  color:var(--ink-soft); display:flex; align-items:center; gap:7px;
+  transition:background .15s, color .15s;
+}
+body.theme-hr .role-switch button{ color:var(--hr-text-soft); }
+.role-switch button.active{ background:var(--ink); color:#fff; }
+body.theme-hr .role-switch button.active{ background:var(--teal-dark); color:#06201c; }
+
+.shell{ max-width:1180px; margin:0 auto; padding:36px 28px 80px; }
+.shell.narrow{ max-width:760px; }
+
+/* ---------------- typography helpers ---------------- */
+.eyebrow{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--teal); font-weight:600;
+}
+body.theme-hr .eyebrow{ color:var(--teal-dark); }
+.h1{ font-size:32px; line-height:1.15; font-weight:600; }
+.h2{ font-size:22px; line-height:1.25; font-weight:600; }
+.h3{ font-size:16px; line-height:1.3; font-weight:600; }
+.muted{ color:var(--ink-soft); }
+body.theme-hr .muted{ color:var(--hr-text-soft); }
+.small{ font-size:13px; }
+.mono{ font-family:var(--font-mono); }
+
+/* ---------------- buttons ---------------- */
+.btn{
+  appearance:none; border:none; cursor:pointer; font-weight:600; font-size:14px;
+  padding:11px 20px; border-radius:99px; display:inline-flex; align-items:center; gap:8px;
+  transition:transform .12s ease, box-shadow .12s ease, background .15s, opacity .15s;
+  white-space:nowrap;
+}
+.btn:active{ transform:scale(.97); }
+.btn-primary{ background:var(--ink); color:#fff; }
+.btn-primary:hover{ background:#26343f; }
+body.theme-hr .btn-primary{ background:var(--teal-dark); color:#06201c; }
+body.theme-hr .btn-primary:hover{ background:#39c4b0; }
+.btn-teal{ background:var(--teal); color:#fff; }
+.btn-teal:hover{ box-shadow:var(--shadow-m); }
+.btn-ghost{ background:transparent; color:var(--ink); border:1px solid var(--line); }
+body.theme-hr .btn-ghost{ color:var(--hr-text); border-color:var(--bridge-line); }
+.btn-ghost:hover{ background:var(--line-soft); }
+body.theme-hr .btn-ghost:hover{ background:var(--bridge); }
+.btn-danger{ background:var(--red-light); color:var(--red); }
+body.theme-hr .btn-danger{ background:rgba(225,104,90,.15); color:var(--red-dark); }
+.btn-danger:hover{ background:#f6d8d3; }
+.btn-success{ background:var(--green-light); color:var(--green); }
+body.theme-hr .btn-success{ background:rgba(87,184,104,.15); color:var(--green-dark); }
+.btn-block{ width:100%; justify-content:center; }
+.btn-sm{ padding:7px 14px; font-size:12.5px; }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn-icon{ width:38px; height:38px; padding:0; border-radius:50%; justify-content:center; }
+.btn-demo{ background:transparent; color:var(--hr-text-soft); border:1.5px dashed var(--bridge-line); font-size:12px; padding:8px 12px; }
+.btn-demo:hover{ border-color:var(--amber-dark); color:var(--amber-dark); }
+
+/* ---------------- badges / tags ---------------- */
+.tag{
+  display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700;
+  padding:4px 10px; border-radius:99px; letter-spacing:.02em; font-family:var(--font-mono);
+  text-transform:uppercase;
+}
+.tag-ai{ background:var(--teal-light); color:var(--teal); }
+body.theme-hr .tag-ai{ background:rgba(43,179,160,.16); color:var(--teal-dark); }
+.tag-rule{ background:var(--green-light); color:var(--green); }
+body.theme-hr .tag-rule{ background:rgba(87,184,104,.16); color:var(--green-dark); }
+.tag-hr{ background:var(--amber-light); color:var(--amber); }
+body.theme-hr .tag-hr{ background:rgba(234,174,79,.18); color:var(--amber-dark); }
+.tag-auto{ background:var(--line-soft); color:var(--ink-soft); }
+body.theme-hr .tag-auto{ background:var(--bridge-2); color:var(--hr-text-soft); }
+.tag-red{ background:var(--red-light); color:var(--red); }
+body.theme-hr .tag-red{ background:rgba(225,104,90,.16); color:var(--red-dark); }
+
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 12px; border-radius:99px; font-size:12.5px; font-weight:600;
+  border:1px solid var(--line); color:var(--ink-soft);
+}
+body.theme-hr .pill{ border-color:var(--bridge-line); color:var(--hr-text-soft); }
+.pill.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+body.theme-hr .pill.on{ background:var(--teal-dark); color:#06201c; border-color:var(--teal-dark); }
+
+/* ---------------- card ---------------- */
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius-l);
+  padding:24px; box-shadow:var(--shadow-s);
+}
+body.theme-hr .card{ background:var(--bridge); border-color:var(--bridge-line); box-shadow:none; }
+.card + .card{ margin-top:16px; }
+.card-flat{ background:var(--page-bg); border:1px solid var(--line-soft); border-radius:var(--radius-m); padding:16px; }
+body.theme-hr .card-flat{ background:var(--hull-2); border-color:var(--bridge-line); }
+
+.row{ display:flex; gap:16px; }
+.col{ flex:1; min-width:0; }
+.grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+@media (max-width:720px){ .grid-2,.grid-3,.row{ grid-template-columns:1fr; flex-direction:column; } }
+
+/* ---------------- forms ---------------- */
+.field{ margin-bottom:16px; }
+.field label{ display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft); margin-bottom:7px; }
+body.theme-hr .field label{ color:var(--hr-text-soft); }
+.field .hint{ font-size:11.5px; color:var(--ink-faint); margin-top:5px; }
+.input,.select,.textarea{
+  width:100%; padding:11px 13px; border-radius:var(--radius-s); border:1px solid var(--line);
+  background:var(--card); color:var(--ink); font-size:14px; outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+body.theme-hr .input, body.theme-hr .select, body.theme-hr .textarea{
+  background:var(--hull-2); border-color:var(--bridge-line); color:var(--hr-text);
+}
+.input:focus,.select:focus,.textarea:focus{ border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-light); }
+body.theme-hr .input:focus, body.theme-hr .select:focus, body.theme-hr .textarea:focus{ box-shadow:0 0 0 3px rgba(43,179,160,.18); }
+.textarea{ resize:vertical; min-height:90px; }
+.choice-group{ display:flex; flex-wrap:wrap; gap:8px; }
+.choice{
+  padding:9px 15px; border-radius:99px; border:1px solid var(--line); cursor:pointer;
+  font-size:13.5px; font-weight:600; color:var(--ink-soft); background:var(--card);
+  transition:all .12s;
+}
+body.theme-hr .choice{ background:var(--hull-2); border-color:var(--bridge-line); color:var(--hr-text-soft); }
+.choice.selected{ background:var(--ink); color:#fff; border-color:var(--ink); }
+body.theme-hr .choice.selected{ background:var(--teal-dark); color:#06201c; border-color:var(--teal-dark); }
+.file-drop{
+  border:1.5px dashed var(--line); border-radius:var(--radius-m); padding:26px; text-align:center;
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+.file-drop:hover{ border-color:var(--teal); background:var(--teal-light); }
+body.theme-hr .file-drop{ border-color:var(--bridge-line); }
+
+/* ---------------- BOARDING PASS STEPPER (signature element) ---------------- */
+.ticket{
+  position:relative; background:var(--ticket); border-radius:18px;
+  display:flex; box-shadow:var(--shadow-m); overflow:visible; margin-bottom:28px;
+  border:1px solid #ECE2C6;
+}
+.ticket-main{ flex:1; padding:20px 22px; position:relative; }
+.ticket-stub{
+  width:128px; flex:none; padding:20px 14px; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:6px; position:relative; text-align:center;
+}
+.ticket-perf{
+  width:0; border-left:2px dashed #D9CCA0; position:relative; flex:none; margin:14px 0;
+}
+.ticket-perf::before,.ticket-perf::after{
+  content:''; position:absolute; left:50%; width:22px; height:22px; background:var(--page-bg);
+  border-radius:50%; transform:translateX(-50%);
+}
+.ticket-perf::before{ top:-31px; }
+.ticket-perf::after{ bottom:-31px; }
+.ticket-route{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.ticket-route .city{ font-family:var(--font-mono); font-size:20px; font-weight:600; letter-spacing:.03em; }
+.ticket-route .arrow{ flex:1; height:1px; background:repeating-linear-gradient(90deg,#C7B98A 0 6px,transparent 6px 11px); position:relative; }
+.ticket-route .arrow::after{ content:'⚓'; position:absolute; right:0; top:-9px; font-size:13px; }
+.ticket-label{ font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:#9C8B57; }
+.ticket-stub .ticket-label{ color:#9C8B57; }
+.ticket-stub .big{ font-family:var(--font-mono); font-size:26px; font-weight:600; color:var(--ink); }
+
+.stepline{ display:flex; align-items:flex-start; gap:0; }
+.step{ flex:1; display:flex; flex-direction:column; align-items:center; position:relative; gap:8px; min-width:0; }
+.step .dot{
+  width:30px; height:30px; border-radius:50%; background:var(--card); border:2px solid var(--line);
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12px; font-weight:600;
+  color:var(--ink-faint); z-index:2; flex:none;
+}
+.step .bar{ position:absolute; top:15px; left:-50%; width:100%; height:2px; background:var(--line); z-index:1; }
+.step:first-child .bar{ display:none; }
+.step .lbl{ font-size:10.5px; font-weight:600; text-align:center; color:var(--ink-faint); line-height:1.25; padding:0 2px; }
+.step.done .dot{ background:var(--teal); border-color:var(--teal); color:#fff; }
+.step.done .bar{ background:var(--teal); }
+.step.done .lbl{ color:var(--ink-soft); }
+.step.current .dot{ background:var(--ink); border-color:var(--ink); color:#fff; box-shadow:0 0 0 4px var(--teal-light); }
+.step.current .lbl{ color:var(--ink); font-weight:700; }
+
+/* stamp (cert verified / passed) */
+.stamp{
+  display:inline-flex; align-items:center; gap:8px; border:2.5px solid currentColor; border-radius:10px;
+  padding:8px 14px; transform:rotate(-3deg); font-family:var(--font-mono); font-weight:700; font-size:12.5px;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--green);
+}
+.stamp.fail{ color:var(--red); }
+
+/* ---------------- progress / score bars ---------------- */
+.barline{ display:flex; align-items:center; gap:12px; margin-bottom:11px; }
+.barline .lbl{ width:128px; flex:none; font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+body.theme-hr .barline .lbl{ color:var(--hr-text-soft); }
+.barline .track{ flex:1; height:8px; border-radius:99px; background:var(--line-soft); overflow:hidden; }
+body.theme-hr .barline .track{ background:var(--hull-2); }
+.barline .fill{ height:100%; border-radius:99px; }
+.barline .val{ width:38px; flex:none; text-align:right; font-family:var(--font-mono); font-size:12.5px; font-weight:600; }
+
+.gauge-wrap{ display:flex; align-items:center; gap:20px; }
+.gauge-num{ font-family:var(--font-mono); font-size:34px; font-weight:600; }
+
+/* ---------------- stage processing animation ---------------- */
+.scanner{
+  display:flex; align-items:center; gap:14px; padding:18px; border-radius:var(--radius-m);
+  background:var(--teal-light); color:var(--teal); font-weight:600; font-size:13.5px;
+}
+body.theme-hr .scanner{ background:rgba(43,179,160,.12); color:var(--teal-dark); }
+.spin{ width:18px; height:18px; border-radius:50%; border:2.5px solid currentColor; border-top-color:transparent; animation:spin .8s linear infinite; flex:none;}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.dotflash span{ animation:flash 1.2s infinite; }
+.dotflash span:nth-child(2){ animation-delay:.2s; }
+.dotflash span:nth-child(3){ animation-delay:.4s; }
+@keyframes flash{ 0%,80%,100%{ opacity:.25; } 40%{ opacity:1; } }
+
+/* ---------------- kanban (HR) ---------------- */
+.kanban{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; align-items:start; }
+@media (max-width:980px){ .kanban{ grid-template-columns:1fr; } }
+.kcol{ background:var(--hull-2); border:1px solid var(--bridge-line); border-radius:var(--radius-l); padding:14px; min-height:200px; }
+.kcol-head{ display:flex; align-items:center; justify-content:space-between; padding:4px 6px 14px; }
+.kcol-head .t{ font-weight:700; font-size:13px; }
+.kcol-head .n{ font-family:var(--font-mono); font-size:12px; color:var(--hr-text-soft); background:var(--bridge-2); padding:2px 8px; border-radius:99px;}
+.kcard{
+  background:var(--bridge); border:1px solid var(--bridge-line); border-radius:var(--radius-m); padding:14px;
+  margin-bottom:10px; cursor:pointer; transition:transform .12s, border-color .12s;
+}
+.kcard:hover{ border-color:var(--teal-dark); transform:translateY(-2px); }
+.kcard .name{ font-weight:700; font-size:14px; margin-bottom:3px; }
+.kcard .pos{ font-size:12px; color:var(--hr-text-soft); margin-bottom:10px; }
+.kcard .meta{ display:flex; align-items:center; justify-content:space-between; }
+.kcard .score{ font-family:var(--font-mono); font-weight:700; font-size:15px; }
+
+/* ---------------- tabs ---------------- */
+.tabs{ display:flex; gap:4px; border-bottom:1px solid var(--line); margin-bottom:20px; overflow-x:auto; }
+body.theme-hr .tabs{ border-color:var(--bridge-line); }
+.tab{
+  padding:10px 16px; font-size:13px; font-weight:600; color:var(--ink-faint); cursor:pointer;
+  border-bottom:2px solid transparent; white-space:nowrap; display:flex; align-items:center; gap:6px;
+}
+body.theme-hr .tab{ color:var(--hr-text-soft); }
+.tab.active{ color:var(--ink); border-bottom-color:var(--teal); }
+body.theme-hr .tab.active{ color:var(--hr-text); border-bottom-color:var(--teal-dark); }
+
+/* ---------------- avatar ---------------- */
+.avatar{
+  width:44px; height:44px; border-radius:50%; background:var(--bridge-2); color:var(--hr-text);
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-family:var(--font-head);
+  flex:none; font-size:15px;
+}
+.avatar.lg{ width:60px; height:60px; font-size:19px; }
+
+/* ---------------- toast ---------------- */
+#toast-root{ position:fixed; bottom:22px; right:22px; z-index:200; display:flex; flex-direction:column; gap:10px; align-items:flex-end; }
+.toast{
+  background:var(--ink); color:#fff; padding:13px 18px; border-radius:11px; box-shadow:var(--shadow-l);
+  font-size:13.5px; font-weight:600; display:flex; align-items:center; gap:10px; max-width:360px;
+  animation:toastin .25s ease;
+}
+.toast.success{ background:#1d4d36; }
+.toast.info{ background:#143a52; }
+@keyframes toastin{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
+
+/* ---------------- modal ---------------- */
+#modal-root{ position:fixed; inset:0; z-index:150; display:none; align-items:center; justify-content:center; padding:24px; }
+#modal-root.open{ display:flex; }
+.modal-backdrop{ position:absolute; inset:0; background:rgba(10,18,26,.55); backdrop-filter:blur(2px); }
+.modal-box{
+  position:relative; background:var(--card); border-radius:18px; max-width:540px; width:100%;
+  max-height:86vh; overflow-y:auto; padding:0; box-shadow:var(--shadow-l); animation:modalin .2s ease;
+}
+@keyframes modalin{ from{ opacity:0; transform:translateY(10px) scale(.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
+.modal-head{ display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid var(--line); }
+.modal-body{ padding:22px; }
+.modal-close{ width:30px; height:30px; border-radius:50%; border:none; background:var(--line-soft); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+/* email envelope mock */
+.envelope{ border:1px solid var(--line); border-radius:var(--radius-m); overflow:hidden; }
+.envelope-head{ background:var(--page-bg); padding:14px 16px; border-bottom:1px solid var(--line); font-size:12.5px; }
+.envelope-head .r{ display:flex; gap:8px; margin-bottom:3px; }
+.envelope-head .k{ color:var(--ink-faint); width:46px; flex:none; }
+.envelope-body{ padding:18px 16px; font-size:13.5px; line-height:1.6; }
+.envelope-cta{ display:inline-block; margin-top:12px; background:var(--ink); color:#fff; padding:10px 18px; border-radius:8px; font-weight:600; font-size:13px; text-decoration:none; }
+
+/* video interview uses GDrive URL input — no camera CSS needed */
+
+/* ---------------- misc ---------------- */
+.divider{ height:1px; background:var(--line); margin:18px 0; border:none; }
+body.theme-hr .divider{ background:var(--bridge-line); }
+.flex-between{ display:flex; align-items:center; justify-content:space-between; }
+.icon{ display:inline-flex; flex:none; }
+.checklist-row{ display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid var(--line-soft); }
+body.theme-hr .checklist-row{ border-color:var(--bridge-line); }
+.checklist-row:last-child{ border-bottom:none; }
+.ckbox{
+  width:22px; height:22px; border-radius:6px; border:2px solid var(--line); flex:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all .12s;
+}
+body.theme-hr .ckbox{ border-color:var(--bridge-line); }
+.ckbox.checked{ background:var(--teal); border-color:var(--teal); color:#fff; }
+
+.empty{ text-align:center; padding:60px 20px; color:var(--ink-faint); }
+.empty .icon{ margin-bottom:14px; opacity:.5; }
+
+.landing-card{
+  border-radius:20px; padding:30px; cursor:pointer; transition:transform .15s, box-shadow .15s; position:relative; overflow:hidden;
+}
+.landing-card:hover{ transform:translateY(-4px); box-shadow:var(--shadow-l); }
+
+/* ---------------- AI insight pro/con ---------------- */
+.proscons{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width:720px){ .proscons{ grid-template-columns:1fr; } }
+.pc-col{ border-radius:var(--radius-m); padding:14px 16px; }
+.pc-col.pro{ background:var(--green-light); }
+body.theme-hr .pc-col.pro{ background:rgba(87,184,104,.12); }
+.pc-col.con{ background:var(--red-light); }
+body.theme-hr .pc-col.con{ background:rgba(225,104,90,.12); }
+.pc-col .t{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; margin-bottom:10px; font-family:var(--font-mono); display:flex; align-items:center; gap:6px; }
+.pc-col.pro .t{ color:var(--green); }
+.pc-col.con .t{ color:var(--red); }
+body.theme-hr .pc-col.pro .t{ color:var(--green-dark); }
+body.theme-hr .pc-col.con .t{ color:var(--red-dark); }
+.pc-item{ font-size:13px; line-height:1.5; padding:7px 0; display:flex; gap:8px; border-top:1px solid rgba(0,0,0,.05); }
+.pc-item:first-child{ border-top:none; }
+
+/* ---------------- contract paper ---------------- */
+.paper{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:34px; color:#16222B; }
+.paper-head{ display:flex; align-items:flex-start; justify-content:space-between; border-bottom:2px solid #16222B; padding-bottom:18px; margin-bottom:22px; }
+.paper-row{ display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px dashed var(--line-soft); font-size:13.5px; }
+.paper-row .k{ color:var(--ink-soft); }
+.paper-row .v{ font-weight:600; text-align:right; }
+.sigline{ margin-top:38px; display:flex; justify-content:space-between; gap:30px; }
+.sigline .box{ flex:1; text-align:center; }
+.sigline .ln{ border-top:1px solid #16222B; margin-top:50px; padding-top:8px; font-size:12px; color:var(--ink-soft); }
+
+@media print{
+  .topbar,.role-switch,#toast-root,.no-print{ display:none !important; }
+  body{ background:#fff !important; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="toast-root"></div>
+<div id="modal-root"><div class="modal-backdrop" onclick="closeModal()"></div><div class="modal-box" id="modal-box"></div></div>
+
+<div id="topbar"></div>
+<div id="app" class="shell"></div>
+
+<script>
+/* ============================================================
+   PART 1 — ICONS, DATA, PIPELINE DEFINITIONS
+   ============================================================ */
+
+function icon(name, size){
+  size = size || 18;
+  const P = {
+    anchor:'<circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21"/><path d="M5 13a7 7 0 0 0 14 0"/><path d="M3 13h4M17 13h4"/>',
+    building:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M9 16h2M13 16h2"/>',
+    file:'<path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 16.5h6"/>',
+    video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5 21 8v8l-5-2.5Z"/>',
+    shield:'<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"/><path d="m9 12 2 2 4-4"/>',
+    mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 6.5 8 6 8-6"/>',
+    user:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"/>',
+    grid:'<rect x="3" y="3" width="7.5" height="7.5" rx="1.3"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.3"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.3"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.3"/>',
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    check:'<path d="M5 13l4.5 4.5L19 8"/>',
+    x:'<path d="M6 6l12 12M18 6 6 18"/>',
+    chev:'<path d="m9 6 6 6-6 6"/>',
+    upload:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16"/>',
+    search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>',
+    award:'<circle cx="12" cy="9" r="5.5"/><path d="m8.5 13.5-1.7 7 5.2-2.7 5.2 2.7-1.7-7"/>',
+    clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    send:'<path d="M21 3 3 10.5l7.5 2.9L13.5 21Z"/><path d="M21 3 10.5 13.5"/>',
+    printer:'<path d="M6 8.5V4h12v4.5"/><rect x="4" y="8.5" width="16" height="7.5" rx="1.5"/><path d="M6 14.5h12V20H6Z"/>',
+    camera:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7 9.7 4h4.6L16 7"/><circle cx="12" cy="13.3" r="3.5"/>',
+    eye:'<path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z"/><circle cx="12" cy="12" r="2.8"/>',
+    bars:'<path d="M5 19V10M11 19V5M17 19v-7"/>',
+    folder:'<path d="M3 7a1.5 1.5 0 0 1 1.5-1.5h4l2 2H19A1.5 1.5 0 0 1 20.5 9v8A1.5 1.5 0 0 1 19 18.5H4.5A1.5 1.5 0 0 1 3 17Z"/>',
+    plane:'<path d="M3 13.5 21 6l-7 17-2.5-7L3 13.5Z"/>',
+    info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>',
+    sparkle:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>',
+  };
+  const body = P[name] || P.info;
+  return '<svg class="icon" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+body+'</svg>';
+}
+
+/* ---------------- reference data ---------------- */
+
+const MARITIME_CERTS = ['STCW Basic Safety Training','BST Refreshment','CoC Class I','CoC Class II','CoP (Certificate of Proficiency)','ETO Certificate','Tanker Familiarization (PSC/PST)'];
+const BACKOFFICE_TOOLS = ['Excel / Spreadsheet','SAP','Accounting Software','Adobe Suite','Project Management Tools','Bahasa Inggris Aktif'];
+const VESSEL_TYPES = ['Product / Chemical Tanker','Crude Oil Tanker','Bulk Carrier','Container Ship','Offshore Support Vessel','Tug & Barge'];
+
+const JOBS = [
+  { id:'mar-ab', track:'maritime', title:'Able Seaman (AB)', vesselHint:'Product Tanker', minExp:2, gtMin:0, ocimf:false, salaryMaxUsd:1100, certsRequired:['STCW Basic Safety Training','CoP (Certificate of Proficiency)'] },
+  { id:'mar-2nd-eng', track:'maritime', title:'2nd Engineer', vesselHint:'Bulk Carrier', minExp:3, gtMin:5000, ocimf:false, salaryMaxUsd:3800, certsRequired:['STCW Basic Safety Training','CoC Class II'] },
+  { id:'mar-chief-officer', track:'maritime', title:'Chief Officer', vesselHint:'Crude Oil Tanker', minExp:4, gtMin:8000, ocimf:true, salaryMaxUsd:5200, certsRequired:['STCW Basic Safety Training','CoC Class I'] },
+  { id:'bo-finance', track:'backoffice', title:'Finance Staff', dept:'Finance — Jakarta HQ', minExp:1, eduMin:'D3', minAge:21, maxAge:35, salaryMaxIdr:7000000, toolsRequired:['Excel / Spreadsheet','Accounting Software'] },
+  { id:'bo-hr', track:'backoffice', title:'HR Recruitment Officer', dept:'Human Resources — Jakarta HQ', minExp:2, eduMin:'S1', minAge:23, maxAge:38, salaryMaxIdr:8500000, toolsRequired:['Excel / Spreadsheet'] },
+  { id:'bo-opsadmin', track:'backoffice', title:'Operation Admin', dept:'Operations — Surabaya Branch', minExp:0, eduMin:'SMA/SMK', minAge:19, maxAge:30, salaryMaxIdr:5500000, toolsRequired:['Excel / Spreadsheet'] },
+];
+
+const MARITIME_QUIZ = [
+  { id:'q1', text:'Apakah CoC/CoP Anda untuk posisi ini saat ini berstatus AKTIF (belum kadaluarsa)?', type:'yesno', gate:true },
+  { id:'q2', text:'Kapan Anda dapat bergabung jika diterima?', type:'choice', options:['Segera (≤1 minggu)','2 minggu','1 bulan','Lebih dari 1 bulan'] },
+  { id:'q3', text:'Berapa ekspektasi gaji Anda? (USD / bulan)', type:'number', unit:'USD' },
+  { id:'q4', text:'Apakah Anda bersedia ditempatkan sesuai jenis kapal & area pelayaran perusahaan?', type:'yesno', gate:true },
+];
+
+const DISC_QUESTIONS = [
+  { id:'d1', text:'Saat menghadapi tenggat waktu yang ketat, saya cenderung…', options:[
+    {t:'Langsung mengambil alih & memberi arahan tegas', k:'D'},
+    {t:'Mengajak tim berdiskusi santai mencari solusi', k:'I'},
+    {t:'Tetap tenang & mengikuti proses yang sudah ada', k:'S'},
+    {t:'Membuat daftar prioritas yang rinci & teliti', k:'C'} ]},
+  { id:'d2', text:'Rekan kerja akan menggambarkan saya sebagai orang yang…', options:[
+    {t:'Tegas & berorientasi hasil', k:'D'},
+    {t:'Antusias & mudah bergaul', k:'I'},
+    {t:'Sabar & dapat diandalkan', k:'S'},
+    {t:'Teliti & sistematis', k:'C'} ]},
+  { id:'d3', text:'Dalam sebuah rapat, saya biasanya…', options:[
+    {t:'Mendorong agar keputusan cepat diambil', k:'D'},
+    {t:'Aktif berbicara & melontarkan ide', k:'I'},
+    {t:'Mendengarkan & mendukung pendapat tim', k:'S'},
+    {t:'Memperhatikan detail & data pendukung', k:'C'} ]},
+  { id:'d4', text:'Saat menerima kritik atas pekerjaan saya, saya…', options:[
+    {t:'Menerimanya & langsung bertindak memperbaiki', k:'D'},
+    {t:'Membicarakannya secara terbuka & santai', k:'I'},
+    {t:'Mempertimbangkannya secara hati-hati', k:'S'},
+    {t:'Menganalisis validitas kritik tersebut', k:'C'} ]},
+];
+const DISC_LABEL = {D:'Dominance — Tegas & Berorientasi Hasil', I:'Influence — Persuasif & Komunikatif', S:'Steadiness — Stabil & Kooperatif', C:'Conscientiousness — Teliti & Sistematis'};
+
+const IQ_QUESTIONS = [
+  { id:'iq1', text:'Lanjutkan deret angka berikut: 2, 4, 8, 16, …?', options:['24','30','32','36'], answer:'32' },
+  { id:'iq2', text:'KAPAL : PELAUT = PESAWAT : ?', options:['Penumpang','Pilot','Bandara','Tiket'], answer:'Pilot' },
+  { id:'iq3', text:'Manakah yang TIDAK termasuk satu kelompok dengan yang lain?', options:['Sextant','Kompas','Radar','Jangkar'], answer:'Jangkar' },
+];
+
+const VIDEO_QUESTIONS = {
+  maritime:[
+    'Ceritakan pengalaman Anda menangani situasi darurat atau insiden di atas kapal.',
+    'Bagaimana Anda berkoordinasi dengan kru dari latar belakang berbeda saat watchkeeping?'
+  ],
+  backoffice:[
+    'Ceritakan pengalaman Anda menyelesaikan masalah teknis/administratif yang menantang.',
+    'Bagaimana cara Anda mengatur prioritas saat menghadapi beberapa tenggat waktu sekaligus?'
+  ]
+};
+
+const AVAILABILITY_OPTIONS = ['Segera (≤1 minggu)','2 minggu','1 bulan','Lebih dari 1 bulan'];
+const MARITIME_STEPS = ['Registrasi','CV Screening','Kuis Kualifikasi','Video Interview','Verifikasi Sertifikat','Selesai'];
+const BACKOFFICE_STEPS = ['Registrasi','CV Screening','Form + Tes','Video Interview','Selesai'];
+
+const MARITIME_WEIGHTS = [['CV Matching','cv',0.40,'#2A8FD8'],['Video Analysis','video',0.30,'#D43F8D'],['Kuis Kualifikasi','quiz',0.20,'#3C8C4A'],['Sertifikasi','cert',0.10,'#C8821F']];
+const BACKOFFICE_WEIGHTS = [['CV & Competency','cv',0.25,'#2A8FD8'],['Personality Test','personality',0.20,'#3C8C4A'],['IQ Test','iq',0.15,'#C8821F'],['Video Qs Analysis','video',0.25,'#D43F8D'],['Custom Form','form',0.15,'#8B5CF6']];
+
+const HR_STEPS_MARITIME = ['Review HR','Interview HR & User','Background Check','Medical Check-Up','Keputusan Final'];
+const HR_STEPS_BACKOFFICE = ['Review HR','Interview User/Manager','Background Check','Keputusan Final'];
+
+function jobById(id){ return JOBS.find(j=>j.id===id); }
+function fmtIDR(n){ return 'Rp'+Number(n).toLocaleString('id-ID'); }
+function fmtDate(d){ d = new Date(d); return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDateTime(d){ d = new Date(d); return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})+' · '+d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}); }
+function uid(prefix){ return prefix+'_'+Math.random().toString(36).slice(2,9); }
+function clamp(n,a,b){ return Math.max(a,Math.min(b,n)); }
+
+/* ============================================================
+   PART 2 — STATE, SEED DATA, SCORING, CORE UTILS
+   ============================================================ */
+
+let STATE = {
+  role:'candidate',
+  view:'landing',
+  draft:{},
+  activeId:null,
+  statusEmail:'',
+  hrOpenId:null,
+  hrDetailTab:'profil',
+  hrFilter:'all',
+  hrSearch:'',
+  vq:{ index:0, mode:null, recording:false, seconds:0, timer:null, stream:null, recorder:null, chunks:[], answers:[] },
+};
+
+let CANDIDATES = [];
+let candidateCounter = 1;
+
+function daysAgo(n){ return new Date(Date.now()-n*86400000); }
+
+function calcCvMatchMaritime(job, f){
+  let score=50;
+  score += f.expYears>=job.minExp ? 20 : Math.max(0,20-(job.minExp-f.expYears)*8);
+  score += (!job.gtMin || f.gt>=job.gtMin) ? 10 : 4;
+  score += (!job.ocimf || f.ocimf) ? 10 : -4;
+  const have = f.certs||[];
+  const matched = job.certsRequired.filter(c=>have.includes(c)).length;
+  score += (matched/job.certsRequired.length)*10;
+  return Math.round(clamp(score,0,100));
+}
+function calcCvMatchBackoffice(job, f){
+  let score=45;
+  const rank={'SMA/SMK':1,'D3':2,'S1':3,'S2':4};
+  score += rank[f.edu]>=rank[job.eduMin] ? 18 : -8;
+  score += (f.age>=job.minAge && f.age<=job.maxAge) ? 12 : -4;
+  score += f.expYears>=job.minExp ? 15 : Math.max(0,15-(job.minExp-f.expYears)*6);
+  const have=f.tools||[];
+  const matched=job.toolsRequired.filter(t=>have.includes(t)).length;
+  score += (matched/job.toolsRequired.length)*10;
+  return Math.round(clamp(score,0,100));
+}
+function calcQualScoreMaritime(job, ans){
+  const gatesPass = ans.q1==='Ya' && ans.q4==='Ya' && (ans._expYears===undefined || ans._expYears>=job.minExp);
+  let score = gatesPass ? 50 : 15;
+  const avail = {'Segera (≤1 minggu)':25,'2 minggu':20,'1 bulan':12,'Lebih dari 1 bulan':5}[ans.q2] || 10;
+  score += avail;
+  const salaryNum = Number(ans.q3)||0;
+  if(salaryNum<=job.salaryMaxUsd) score+=25; else if(salaryNum<=job.salaryMaxUsd*1.1) score+=15; else score+=5;
+  return {passFail:gatesPass, score:Math.round(clamp(score,0,100))};
+}
+function calcDisc(answers){
+  const tally={D:0,I:0,S:0,C:0};
+  Object.values(answers).forEach(k=>{ if(tally[k]!==undefined) tally[k]++; });
+  let type='S', max=-1;
+  Object.keys(tally).forEach(k=>{ if(tally[k]>max){ max=tally[k]; type=k; } });
+  const fitScore = 72 + max*6;
+  return {tally, type, label:DISC_LABEL[type], fitScore:Math.round(clamp(fitScore,0,98))};
+}
+function calcIq(answers){
+  let correct=0;
+  IQ_QUESTIONS.forEach(q=>{ if(answers[q.id]===q.answer) correct++; });
+  const score = 40 + correct*20;
+  return {correct, total:IQ_QUESTIONS.length, score:clamp(score,0,100)};
+}
+function calcFormScore(bundle, job){
+  let s=15;
+  if((bundle.story||'').trim().length>40) s+=18; else if((bundle.story||'').trim().length>0) s+=8;
+  if((bundle.tools||[]).length>=2) s+=17; else if((bundle.tools||[]).length===1) s+=8;
+  const avail = {'Segera (≤1 minggu)':25,'2 minggu':20,'1 bulan':12,'Lebih dari 1 bulan':5}[bundle.availabilityJoin]||10;
+  s += avail;
+  const salary = bundle.salaryExpIdr||0;
+  if(job && salary){
+    const maxIdr = job.salaryMaxIdr||0;
+    if(maxIdr){ s += salary<=maxIdr?25:(salary<=maxIdr*1.1?15:5); } else s+=10;
+  } else s+=10;
+  return Math.round(clamp(s,0,100));
+}
+function certSubscore(status){ return {valid:100, expired:45, error:60, not_found:15}[status] ?? 50; }
+
+function recompute(c){
+  if(c.track==='maritime'){
+    c.composite = Math.round((c.cv.matchScore||0)*0.40 + (c.video.aiScore||0)*0.30 + (c.quiz.qualScore||0)*0.20 + certSubscore(c.cert.status)*0.10);
+  } else {
+    c.composite = Math.round((c.cv.matchScore||0)*0.25 + (c.bundle.disc.fitScore||0)*0.20 + (c.bundle.iq.score||0)*0.15 + (c.video.aiScore||0)*0.25 + (c.bundle.formScore||0)*0.15);
+  }
+}
+
+function aiRecommendation(score){
+  if(score>=80) return {label:'Direkomendasikan Lanjut', cls:'tag-rule'};
+  if(score>=60) return {label:'Pertimbangkan dengan Catatan', cls:'tag-hr'};
+  return {label:'Belum Memenuhi Kriteria', cls:'tag-red'};
+}
+
+function hrColumn(c){
+  if(c.hr.final) return 'decision';
+  if(c.hr.stage1==='advance') return 'interview';
+  if(c.selfServeDone) return 'review';
+  return 'screening';
+}
+
+function blankCandidate(track, job){
+  return {
+    id:'c'+(candidateCounter++), track, jobId:job.id, jobTitle:job.title,
+    name:'', email:'', phone:'', appliedAt:new Date(),
+    cv:{ fileName:null, objectUrl:null, fields:{}, matchScore:0 },
+    quiz:{ answers:{}, passFail:null, qualScore:0 },
+    bundle:{ story:'', tools:[], availabilityJoin:null, salaryExpIdr:null, disc:{answers:{}, tally:{D:0,I:0,S:0,C:0}, type:null, label:'', fitScore:0}, iq:{answers:{}, correct:0, score:0}, formScore:0 },
+    video:{ answers:[], aiScore:0 },
+    cert:{ status:null, number:null, validUntil:null },
+    composite:0, selfServeDone:false,
+    emailLog:[],
+    hr:{ stage1:null, stage1At:null, stage1Notes:'',
+         interview:{ scheduledAt:null, mode:'Online', location:'', done:false, eval:{komunikasi:0,teknis:0,sikap:0,notes:''} },
+         bgCheck:{ ref1Name:'', ref1Result:'', ref2Name:'', ref2Result:'', lastTenure:'', resignReason:'', rehire:'', done:false },
+         mcu:{ uploaded:false, validUntil:null, fitForDuty:null, done:false },
+         final:null, finalAt:null, finalNotes:'' },
+    contractGenerated:false,
+  };
+}
+
+function logEmail(c, subject, body, channel){
+  c.emailLog.push({subject, body, sentAt:new Date(), channel:channel||'Email & WhatsApp'});
+}
+
+/* ---------------- seed candidates so HR console isn't empty ---------------- */
+function seedCandidates(){
+  // 1: interview scheduled in 2 days (maritime crew)
+  let c1 = blankCandidate('maritime', jobById('mar-ab'));
+  Object.assign(c1, {name:'Budi Santoso', email:'budi.santoso@gmail.com', phone:'0812-3456-7890', appliedAt:daysAgo(4)});
+  c1.cv.fields = {vessel:'Product / Chemical Tanker', expYears:3, gt:12000, ocimf:false, certs:['STCW Basic Safety Training','CoP (Certificate of Proficiency)']};
+  c1.cv.fileName='CV_Budi_Santoso.pdf'; c1.cv.matchScore=calcCvMatchMaritime(jobById('mar-ab'), c1.cv.fields);
+  c1.cv.summary='Kandidat dengan 3 tahun pengalaman di Product/Chemical Tanker dan GT 12.000, memiliki sertifikat STCW Basic Safety Training serta CoP yang masih aktif. Profil sesuai kebutuhan posisi Able Seaman dan siap bergabung dalam waktu dekat.';
+  c1.quiz.answers={q1:'Ya',q2:'Segera (≤1 minggu)',q3:'950',q4:'Ya', _expYears:3};
+  let qr1=calcQualScoreMaritime(jobById('mar-ab'), c1.quiz.answers); c1.quiz.passFail=qr1.passFail; c1.quiz.qualScore=qr1.score;
+  c1.video.answers=[{question:VIDEO_QUESTIONS.maritime[0],mode:'sim',durationSec:52,transcript:'(Simulasi) Kandidat menjelaskan pengalaman menangani kebocoran kecil di ruang mesin dengan mengikuti SOP darurat & berkoordinasi dengan Mualim Jaga.',summary:'Penyampaian tenang & terstruktur, menekankan keselamatan & prosedur.'},{question:VIDEO_QUESTIONS.maritime[1],mode:'sim',durationSec:48,transcript:'(Simulasi) Kandidat menjelaskan cara berkomunikasi lintas budaya dengan kru campuran menggunakan istilah maritim standar.',summary:'Komunikasi jelas, kosakata teknis cukup kaya.'}];
+  c1.video.aiScore=81;
+  c1.cert={status:'valid', number:'PLT-2291-0457', validUntil:daysAgo(-540)};
+  c1.selfServeDone=true; recompute(c1);
+  c1.hr.stage1='advance'; c1.hr.stage1At=daysAgo(2); c1.hr.stage1Notes='Profil & sertifikat sesuai kebutuhan — lanjut ke interview.';
+  c1.hr.interview.scheduledAt=daysAgo(-2); c1.hr.interview.mode='Online'; c1.hr.interview.location='Google Meet';
+  logEmail(c1,'Link Asesmen Anda — Lintas Maritim Crewing','Email berisi tautan asesmen unik dikirim otomatis setelah pendaftaran.');
+  logEmail(c1,'Asesmen Anda Telah Lengkap','Konfirmasi seluruh tahapan asesmen mandiri telah selesai diterima sistem.');
+  logEmail(c1,'Undangan Interview — Lintas Maritim Crewing','Interview Anda telah dijadwalkan. Tim HR akan menghubungi Anda dengan detail lengkap.');
+  CANDIDATES.push(c1);
+
+  // 2: interview done, awaiting background check (backoffice)
+  let c2 = blankCandidate('backoffice', jobById('bo-finance'));
+  Object.assign(c2, {name:'Dewi Anggraini', email:'dewi.anggraini@gmail.com', phone:'0813-2211-9087', appliedAt:daysAgo(7)});
+  c2.cv.fields={edu:'S1', age:27, expYears:2, tools:['Excel / Spreadsheet','Accounting Software','SAP']};
+  c2.cv.fileName='CV_Dewi_Anggraini.pdf'; c2.cv.matchScore=calcCvMatchBackoffice(jobById('bo-finance'), c2.cv.fields);
+  c2.bundle.story='Pernah memimpin rekonsiliasi laporan keuangan bulanan untuk 3 cabang sekaligus tepat waktu.';
+  c2.bundle.tools=['Excel / Spreadsheet','Accounting Software'];
+  c2.bundle.availabilityJoin='Segera (≤1 minggu)'; c2.bundle.salaryExpIdr=6500000;
+  c2.bundle.formScore=calcFormScore(c2.bundle, jobById('bo-finance'));
+  c2.bundle.disc.answers={d1:'C',d2:'C',d3:'S',d4:'C'}; c2.bundle.disc = Object.assign(c2.bundle.disc, calcDisc(c2.bundle.disc.answers));
+  c2.bundle.iq.answers={iq1:'32',iq2:'Pilot',iq3:'Jangkar'}; c2.bundle.iq=Object.assign(c2.bundle.iq, calcIq(c2.bundle.iq.answers));
+  c2.video.answers=[{question:VIDEO_QUESTIONS.backoffice[0],mode:'sim',durationSec:44,transcript:'(Simulasi) Menjelaskan proses audit internal yang dipercepat lewat penyusunan checklist baru.',summary:'Terstruktur & berorientasi proses.'},{question:VIDEO_QUESTIONS.backoffice[1],mode:'sim',durationSec:39,transcript:'(Simulasi) Menjelaskan penggunaan matriks prioritas untuk banyak tenggat waktu.',summary:'Pendekatan sistematis, percaya diri sedang.'}];
+  c2.video.aiScore=85;
+  c2.cv.summary='Kandidat S1 usia 27 tahun dengan 2 tahun pengalaman keuangan, menguasai Excel dan Accounting Software serta SAP. Pencapaian memimpin rekonsiliasi laporan 3 cabang menunjukkan kapabilitas yang melebihi requirement minimum posisi Finance Staff.';
+  c2.selfServeDone=true; recompute(c2);
+  c2.hr.stage1='advance'; c2.hr.stage1At=daysAgo(5); c2.hr.stage1Notes='DISC-C sangat sesuai posisi Finance. Pengalaman melebihi minimum.';
+  c2.hr.interview={ scheduledAt:daysAgo(2), mode:'Online', location:'Google Meet', done:true, eval:{komunikasi:4,teknis:4,sikap:4,notes:'Teliti dan sistematis. Menjelaskan proses rekonsiliasi dengan sangat baik dan terstruktur.'} };
+  logEmail(c2,'Link Asesmen Anda — Rekrutmen Lintas Maritim','Email berisi tautan asesmen unik dikirim otomatis setelah pendaftaran.');
+  logEmail(c2,'Selamat! Anda Lolos ke Tahap Interview','Profil Anda lolos review HR — interview dijadwalkan.');
+  logEmail(c2,'Terima Kasih atas Partisipasi Anda','Interview selesai — hasil evaluasi sedang diproses tim HR.');
+  CANDIDATES.push(c2);
+
+  // 3: passed stage1, interview scheduled not done (maritime, senior role)
+  let c3 = blankCandidate('maritime', jobById('mar-chief-officer'));
+  Object.assign(c3, {name:'Agus Setiawan', email:'agus.setiawan@gmail.com', phone:'0815-7788-2231', appliedAt:daysAgo(6)});
+  c3.cv.fields={vessel:'Crude Oil Tanker', expYears:6, gt:15000, ocimf:true, certs:['STCW Basic Safety Training','CoC Class I']};
+  c3.cv.fileName='CV_Agus_Setiawan.pdf'; c3.cv.matchScore=calcCvMatchMaritime(jobById('mar-chief-officer'), c3.cv.fields);
+  c3.quiz.answers={q1:'Ya',q2:'2 minggu',q3:'4800',q4:'Ya', _expYears:6}; let qr3=calcQualScoreMaritime(jobById('mar-chief-officer'),c3.quiz.answers); c3.quiz.passFail=qr3.passFail; c3.quiz.qualScore=qr3.score;
+  c3.video.answers=[{question:VIDEO_QUESTIONS.maritime[0],mode:'sim',durationSec:61,transcript:'(Simulasi) Memimpin penanganan kebakaran kecil di galley dengan tim pemadam kapal.',summary:'Kepemimpinan kuat, komunikasi tegas & jelas.'},{question:VIDEO_QUESTIONS.maritime[1],mode:'sim',durationSec:57,transcript:'(Simulasi) Membina kru multinasional lewat briefing harian dua bahasa.',summary:'Sangat komunikatif & berpengalaman lintas budaya.'}];
+  c3.video.aiScore=90;
+  c3.cert={status:'valid', number:'PLT-1187-9034', validUntil:daysAgo(-210)};
+  c3.cv.summary='Kandidat Chief Officer berpengalaman 6 tahun di Crude Oil Tanker GT 15.000 dengan sertifikasi OCIMF dan CoC Class I aktif. Profil sangat kuat untuk posisi ini — pengalaman lintas budaya dan rekam jejak kepemimpinan kru menonjol.';
+  c3.selfServeDone=true; recompute(c3);
+  c3.hr.stage1='advance'; c3.hr.stage1At=daysAgo(4); c3.hr.stage1Notes='Profil sangat kuat, lanjutkan ke interview kapten.';
+  c3.hr.interview.scheduledAt=daysAgo(-1); c3.hr.interview.mode='Online'; c3.hr.interview.location='Google Meet';
+  logEmail(c3,'Link Asesmen Anda — Lintas Maritim Crewing','Email berisi tautan asesmen unik dikirim otomatis setelah pendaftaran.');
+  logEmail(c3,'Selamat! Anda Lolos ke Tahap Interview','Notifikasi kelulusan tahap screening & jadwal interview dikirim ke kandidat.');
+  CANDIDATES.push(c3);
+
+  // 4: ready for final decision (backoffice) — interview + bgcheck done
+  let c4 = blankCandidate('backoffice', jobById('bo-hr'));
+  Object.assign(c4, {name:'Maya Putri Lestari', email:'maya.putri@gmail.com', phone:'0817-4455-1029', appliedAt:daysAgo(9)});
+  c4.cv.fields={edu:'S1', age:29, expYears:3, tools:['Excel / Spreadsheet']};
+  c4.cv.fileName='CV_Maya_Putri.pdf'; c4.cv.matchScore=calcCvMatchBackoffice(jobById('bo-hr'), c4.cv.fields);
+  c4.bundle.story='Mengelola end-to-end recruitment untuk 40+ posisi back office dalam setahun terakhir.';
+  c4.bundle.tools=['Excel / Spreadsheet'];
+  c4.bundle.availabilityJoin='2 minggu'; c4.bundle.salaryExpIdr=8000000;
+  c4.bundle.formScore=calcFormScore(c4.bundle, jobById('bo-hr'));
+  c4.bundle.disc.answers={d1:'I',d2:'I',d3:'I',d4:'S'}; c4.bundle.disc=Object.assign(c4.bundle.disc, calcDisc(c4.bundle.disc.answers));
+  c4.bundle.iq.answers={iq1:'32',iq2:'Pilot',iq3:'Sextant'}; c4.bundle.iq=Object.assign(c4.bundle.iq, calcIq(c4.bundle.iq.answers));
+  c4.video.answers=[{question:VIDEO_QUESTIONS.backoffice[0],mode:'sim',durationSec:50,transcript:'(Simulasi) Menyelesaikan keluhan kandidat lewat komunikasi proaktif.',summary:'Empatik & solutif.'},{question:VIDEO_QUESTIONS.backoffice[1],mode:'sim',durationSec:46,transcript:'(Simulasi) Menjadwalkan ulang interview lewat kalender bersama.',summary:'Terorganisir & ramah.'}];
+  c4.video.aiScore=88;
+  c4.cv.summary='Kandidat HR Recruitment Officer S1 usia 29 tahun dengan 3 tahun pengalaman end-to-end rekrutmen, profil DISC dominan Influence menunjukkan kemampuan komunikasi dan persuasi yang tinggi. Pengalaman mengelola 40+ posisi dalam setahun sangat relevan dengan kebutuhan posisi ini.';
+  c4.selfServeDone=true; recompute(c4);
+  c4.hr.stage1='advance'; c4.hr.stage1At=daysAgo(7); c4.hr.stage1Notes='Pengalaman rekrutmen sangat relevan.';
+  c4.hr.interview={ scheduledAt:daysAgo(3), mode:'Offline', location:'Kantor HQ Jakarta', done:true, eval:{komunikasi:4,teknis:4,sikap:5,notes:'Sangat percaya diri, paham proses end-to-end.'} };
+  c4.hr.bgCheck={ ref1Name:'Citra (Atasan Langsung)', ref1Result:'Positif — kinerja baik', ref2Name:'HRD Perusahaan Sebelumnya', ref2Result:'Positif — eligible rehire', lastTenure:'2 tahun 4 bulan', resignReason:'Mencari jenjang karir lebih luas', rehire:'Ya', done:true };
+  logEmail(c4,'Link Asesmen Anda — Rekrutmen Lintas Maritim','Email berisi tautan asesmen unik dikirim otomatis setelah pendaftaran.');
+  logEmail(c4,'Selamat! Anda Lolos ke Tahap Interview','Notifikasi kelulusan tahap screening & jadwal interview dikirim ke kandidat.');
+  CANDIDATES.push(c4);
+
+  // 5: hired (maritime) with contract
+  let c5 = blankCandidate('maritime', jobById('mar-2nd-eng'));
+  Object.assign(c5, {name:'Eko Prasetyo', email:'eko.prasetyo@gmail.com', phone:'0819-3300-6612', appliedAt:daysAgo(15)});
+  c5.cv.fields={vessel:'Bulk Carrier', expYears:4, gt:9000, ocimf:false, certs:['STCW Basic Safety Training','CoC Class II']};
+  c5.cv.matchScore=calcCvMatchMaritime(jobById('mar-2nd-eng'), c5.cv.fields); c5.cv.fileName='CV_Eko_Prasetyo.pdf';
+  c5.quiz.answers={q1:'Ya',q2:'Segera (≤1 minggu)',q3:'3400',q4:'Ya',_expYears:4}; let qr5=calcQualScoreMaritime(jobById('mar-2nd-eng'),c5.quiz.answers); c5.quiz.passFail=qr5.passFail; c5.quiz.qualScore=qr5.score;
+  c5.video.answers=[{question:VIDEO_QUESTIONS.maritime[0],mode:'sim',durationSec:55,transcript:'(Simulasi) Menangani overheat mesin utama dengan prosedur shutdown darurat.',summary:'Teknis kuat & tenang di bawah tekanan.'},{question:VIDEO_QUESTIONS.maritime[1],mode:'sim',durationSec:50,transcript:'(Simulasi) Mentoring junior engineer dari berbagai negara.',summary:'Kepemimpinan baik & sabar.'}];
+  c5.video.aiScore=87;
+  c5.cert={status:'valid', number:'PLT-5523-1190', validUntil:daysAgo(-380)};
+  c5.cv.summary='Kandidat 2nd Engineer dengan 4 tahun pengalaman di Bulk Carrier GT 9.000, memegang sertifikat CoC Class II yang masih aktif. Rekam jejak teknis sangat solid dan kemampuan mentoring kru junior menjadi nilai tambah yang signifikan.';
+  c5.selfServeDone=true; recompute(c5);
+  c5.hr.stage1='advance'; c5.hr.stage1At=daysAgo(13);
+  c5.hr.interview={ scheduledAt:daysAgo(10), mode:'Online', location:'Google Meet', done:true, eval:{komunikasi:4,teknis:5,sikap:4,notes:'Solid secara teknis.'} };
+  c5.hr.bgCheck={ ref1Name:'Kapten MV. Borneo Star', ref1Result:'Positif', ref2Name:'-', ref2Result:'-', lastTenure:'1 tahun 8 bulan', resignReason:'Kontrak selesai', rehire:'Ya', done:true };
+  c5.hr.mcu={ uploaded:true, validUntil:daysAgo(-150), fitForDuty:'Fit for Duty', done:true };
+  c5.hr.final='hired'; c5.hr.finalAt=daysAgo(2); c5.hr.finalNotes='Siap join, MCU & sertifikat lengkap.'; c5.contractGenerated=true;
+  logEmail(c5,'Selamat! Anda Lolos ke Tahap Interview','Notifikasi kelulusan tahap screening dikirim ke kandidat.');
+  logEmail(c5,'Selamat Bergabung dengan Lintas Maritim!','Notifikasi keputusan akhir Diterima beserta info kontrak kerja dikirim ke kandidat.');
+  CANDIDATES.push(c5);
+
+  // 6: rejected (backoffice)
+  let c6 = blankCandidate('backoffice', jobById('bo-opsadmin'));
+  Object.assign(c6, {name:'Rina Wijaya', email:'rina.wijaya@gmail.com', phone:'0821-9012-4456', appliedAt:daysAgo(11)});
+  c6.cv.fields={edu:'SMA/SMK', age:24, expYears:0, tools:['Excel / Spreadsheet']};
+  c6.cv.matchScore=calcCvMatchBackoffice(jobById('bo-opsadmin'), c6.cv.fields); c6.cv.fileName='CV_Rina_Wijaya.pdf';
+  c6.bundle.story='Magang administrasi 6 bulan.'; c6.bundle.tools=['Excel / Spreadsheet'];
+  c6.bundle.availabilityJoin='Segera (≤1 minggu)'; c6.bundle.salaryExpIdr=5000000;
+  c6.bundle.formScore=calcFormScore(c6.bundle, jobById('bo-opsadmin'));
+  c6.bundle.disc.answers={d1:'S',d2:'S',d3:'S',d4:'I'}; c6.bundle.disc=Object.assign(c6.bundle.disc, calcDisc(c6.bundle.disc.answers));
+  c6.bundle.iq.answers={iq1:'30',iq2:'Bandara',iq3:'Jangkar'}; c6.bundle.iq=Object.assign(c6.bundle.iq, calcIq(c6.bundle.iq.answers));
+  c6.video.answers=[{question:VIDEO_QUESTIONS.backoffice[0],mode:'sim',durationSec:33,transcript:'(Simulasi) Pengalaman magang menyusun arsip dokumen.',summary:'Cukup jelas, pengalaman masih terbatas.'},{question:VIDEO_QUESTIONS.backoffice[1],mode:'sim',durationSec:30,transcript:'(Simulasi) Menjelaskan cara membuat to-do list harian.',summary:'Dasar, perlu pengembangan lebih lanjut.'}];
+  c6.video.aiScore=68;
+  c6.cv.summary='Kandidat SMA/SMK usia 24 tahun dengan pengalaman magang 6 bulan di bidang administrasi, menguasai Excel. Profil masih entry-level dan pengalaman operasional terbatas — perlu pertimbangan terhadap requirement minimum posisi Operation Admin.';
+  c6.selfServeDone=true; recompute(c6);
+  c6.hr.stage1='advance'; c6.hr.stage1At=daysAgo(9);
+  c6.hr.interview={ scheduledAt:daysAgo(6), mode:'Offline', location:'Kantor Surabaya', done:true, eval:{komunikasi:3,teknis:2,sikap:3,notes:'Pengalaman & tools masih kurang untuk kebutuhan saat ini.'} };
+  c6.hr.bgCheck={ ref1Name:'Pembimbing Magang', ref1Result:'Positif namun terbatas', ref2Name:'-', ref2Result:'-', lastTenure:'6 bulan (magang)', resignReason:'Selesai program magang', rehire:'Pertimbangan', done:true };
+  c6.hr.final='rejected'; c6.hr.finalAt=daysAgo(3); c6.hr.finalNotes='Kompetensi teknis belum memenuhi kebutuhan posisi saat ini.';
+  logEmail(c6,'Update Status Lamaran Anda','Notifikasi keputusan akhir dikirim ke kandidat.');
+  CANDIDATES.push(c6);
+
+  // 7: talent pool (maritime)
+  let c7 = blankCandidate('maritime', jobById('mar-ab'));
+  Object.assign(c7, {name:'Hendra Gunawan', email:'hendra.gunawan@gmail.com', phone:'0822-6671-3340', appliedAt:daysAgo(20)});
+  c7.cv.fields={vessel:'Container Ship', expYears:1, gt:8000, ocimf:false, certs:['STCW Basic Safety Training']};
+  c7.cv.matchScore=calcCvMatchMaritime(jobById('mar-ab'), c7.cv.fields); c7.cv.fileName='CV_Hendra_Gunawan.pdf';
+  c7.quiz.answers={q1:'Ya',q2:'1 bulan',q3:'1050',q4:'Ya',_expYears:1}; let qr7=calcQualScoreMaritime(jobById('mar-ab'),c7.quiz.answers); c7.quiz.passFail=qr7.passFail; c7.quiz.qualScore=qr7.score;
+  c7.video.answers=[{question:VIDEO_QUESTIONS.maritime[0],mode:'sim',durationSec:40,transcript:'(Simulasi) Pengalaman terbatas namun memahami SOP dasar darurat.',summary:'Cukup baik untuk level junior.'},{question:VIDEO_QUESTIONS.maritime[1],mode:'sim',durationSec:35,transcript:'(Simulasi) Masih belajar berkoordinasi lintas kru.',summary:'Potensial, perlu jam terbang.'}];
+  c7.video.aiScore=74;
+  c7.cert={status:'expired', number:'PLT-7790-2241', validUntil:daysAgo(40)};
+  c7.cv.summary='Kandidat junior AB dengan 1 tahun pengalaman di Container Ship, memiliki STCW Basic Safety Training namun sertifikat sudah kadaluarsa 40 hari lalu. Potensial untuk dipertimbangkan kembali setelah sertifikat diperbarui.';
+  c7.selfServeDone=true; recompute(c7);
+  c7.hr.stage1='pool'; c7.hr.stage1At=daysAgo(18); c7.hr.stage1Notes='Potensial tapi sertifikat perlu diperbarui & belum ada posisi cocok saat ini.';
+  c7.hr.final='pool'; c7.hr.finalAt=daysAgo(17); c7.hr.finalNotes='Simpan untuk kebutuhan AB di kuartal berikutnya.';
+  logEmail(c7,'Update Status Lamaran Anda','Notifikasi masuk Talent Pool dikirim ke kandidat.');
+  CANDIDATES.push(c7);
+
+  candidateCounter = 8;
+}
+
+/* ---------------- core utils ---------------- */
+function $(id){ return document.getElementById(id); }
+function escapeHtml(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function toast(msg, type, icoName){
+  const root = $('toast-root');
+  const el = document.createElement('div');
+  el.className = 'toast'+(type?(' '+type):'');
+  el.innerHTML = (icoName?icon(icoName,16):'') + '<span>'+msg+'</span>';
+  root.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 3600);
+}
+
+function openModal(html){
+  $('modal-box').innerHTML = html;
+  $('modal-root').classList.add('open');
+}
+function closeModal(){ $('modal-root').classList.remove('open'); $('modal-box').innerHTML=''; }
+
+function setRole(role){
+  STATE.role = role;
+  STATE.view = role==='candidate' ? 'landing' : 'hr-board';
+  document.body.className = role==='hr' ? 'theme-hr' : '';
+  renderAll();
+  window.scrollTo(0,0);
+}
+
+function nav(view, params){
+  STATE.view = view;
+  if(params) Object.assign(STATE, params);
+  renderAll();
+  window.scrollTo(0,0);
+}
+
+function renderAll(){
+  renderTopbar();
+  $('app').innerHTML = renderView();
+}
+
+function delayThen(ms, fn){ setTimeout(fn, ms); }
+
+/* ============================================================
+   PART 3 — TOPBAR, ROUTER, SHARED RENDER HELPERS
+   ============================================================ */
+
+function renderTopbar(){
+  $('topbar').innerHTML = `
+    <div class="topbar">
+      <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--hr-text-soft);font-size:12px;font-family:var(--font-mono);border:1px solid var(--bridge-line);border-radius:99px;padding:5px 12px;background:var(--hull-2);flex-shrink:0;margin-right:8px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+        Demo Home
+      </a>
+      <div class="brand" style="cursor:pointer" onclick="nav('hr-board')">
+        <div class="brand-mark">${icon('anchor',18)}</div>
+        <div>
+          <div class="brand-word">MAXY</div>
+          <div class="brand-sub">LINTAS MARITIM &middot; HR CONSOLE</div>
+        </div>
+      </div>
+    </div>`;
+  document.title = 'MAXY — Bridge Console (HR)';
+}
+
+function activeCandidate(){ return CANDIDATES.find(c=>c.id===STATE.activeId) || null; }
+
+function renderView(){
+  try{
+    if(STATE.role==='hr'){
+      return STATE.view==='hr-detail' ? renderHrDetail() : renderHrBoard();
+    }
+    switch(STATE.view){
+      case 'landing': return renderLanding();
+      case 'jobs': return renderJobs();
+      case 'apply': return renderApply();
+      case 'processing': return renderProcessing();
+      case 'stageA': return renderStageA();
+      case 'stageB': return renderStageB();
+      case 'stageC': return renderStageC();
+      case 'stageD': return renderStageD();
+      case 'complete': return renderComplete();
+      case 'inbox': return renderInbox();
+      default: return renderLanding();
+    }
+  }catch(err){
+    console.error(err);
+    return '<div class="empty">'+icon('info',34)+'<div class="h3" style="margin-top:12px;">Terjadi kendala menampilkan halaman ini</div><p class="muted small" style="margin-top:6px;">'+escapeHtml(err.message)+'</p><button class="btn btn-primary" style="margin-top:18px;" onclick="nav(\'landing\')">Kembali ke Beranda</button></div>';
+  }
+}
+
+/* ---- small shared atoms ---- */
+function trackTag(track){
+  return track==='maritime'
+    ? '<span class="tag" style="background:var(--teal-light);color:var(--teal)">'+icon('anchor',11)+' Maritime Crew</span>'
+    : '<span class="tag" style="background:#EDE9FE;color:#6D4FC2">'+icon('building',11)+' Back Office</span>';
+}
+function stageTag(t,label){
+  const map = {ai:'tag-ai', rule:'tag-rule', hr:'tag-hr', auto:'tag-auto'};
+  const ic = {ai:'sparkle', rule:'check', hr:'user', auto:'bars'}[t];
+  return '<span class="tag '+(map[t]||'tag-auto')+'">'+icon(ic,11)+' '+label+'</span>';
+}
+function scoreColor(n){ return n>=80?'var(--green)':(n>=60?'var(--amber)':'var(--red)'); }
+function initials(name){
+  if(!name) return '?';
+  const p = name.trim().split(/\s+/);
+  return (p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();
+}
+function fmtSeconds(n){ n=Math.round(n||0); const m=Math.floor(n/60), s=n%60; return m? (m+':'+String(s).padStart(2,'0')) : (s+'s'); }
+
+function renderStepline(steps, currentIndex){
+  return '<div class="stepline">'+steps.map((s,i)=>{
+    let cls='step'+(i<currentIndex?' done':(i===currentIndex?' current':''));
+    const dot = i<currentIndex ? icon('check',14) : (i+1);
+    return '<div class="'+cls+'"><span class="bar"></span><div class="dot">'+dot+'</div><div class="lbl">'+escapeHtml(s)+'</div></div>';
+  }).join('')+'</div>';
+}
+function renderPipeline(steps){
+  return '<div class="stepline">'+steps.map(s=>{
+    let cls='step'+(s.status==='done'?' done':(s.status==='current'?' current':''));
+    const dot = s.status==='done'?icon('check',14):(s.status==='current'?icon('clock',13):'&middot;');
+    return '<div class="'+cls+'"><span class="bar"></span><div class="dot">'+dot+'</div><div class="lbl">'+escapeHtml(s.label)+'</div></div>';
+  }).join('')+'</div>';
+}
+function renderTicketHeader(c, currentIndex, stub){
+  const steps = c.track==='maritime' ? MARITIME_STEPS : BACKOFFICE_STEPS;
+  return `<div class="ticket">
+    <div class="ticket-main">
+      <div class="ticket-route">
+        <span class="city">${escapeHtml((c.name||'KANDIDAT').toUpperCase())}</span>
+        <span class="arrow"></span>
+        <span class="city">${escapeHtml(c.jobTitle.toUpperCase())}</span>
+      </div>
+      ${renderStepline(steps, currentIndex)}
+    </div>
+    <div class="ticket-perf"></div>
+    <div class="ticket-stub">
+      <div class="ticket-label">${stub?stub.label:'TAHAP'}</div>
+      <div class="big">${stub?stub.value:(currentIndex+1)+'/'+steps.length}</div>
+      <div class="ticket-label" style="font-size:9px;">${escapeHtml(c.jobId.toUpperCase())}</div>
+    </div>
+  </div>`;
+}
+function weightCaption(weights){ return weights.map(([label,,w])=>escapeHtml(label)+' '+Math.round(w*100)+'%').join(' &middot; '); }
+function renderScoreBars(weights, subscores){
+  return weights.map(([label,key,w,color])=>{
+    const val = Math.round(subscores[key]||0);
+    return `<div class="barline">
+      <div class="lbl">${escapeHtml(label)}</div>
+      <div class="track"><div class="fill" style="width:${val}%;background:${color}"></div></div>
+      <div class="val">${val}</div>
+    </div>`;
+  }).join('');
+}
+function subscoresFor(c){
+  if(c.track==='maritime') return { cv:c.cv.matchScore, video:c.video.aiScore, quiz:c.quiz.qualScore, cert:certSubscore(c.cert.status) };
+  return { cv:c.cv.matchScore, personality:c.bundle.disc.fitScore, iq:c.bundle.iq.score, video:c.video.aiScore, form:c.bundle.formScore };
+}
+
+function aiInsight(c){
+  const pros=[], cons=[];
+  if(c.cv.matchScore>=78) pros.push('Kecocokan CV tinggi terhadap requirement posisi ('+c.cv.matchScore+'/100).');
+  else if(c.cv.matchScore<60) cons.push('Kecocokan CV di bawah rata-rata terhadap requirement posisi ('+c.cv.matchScore+'/100).');
+  if(c.video.aiScore>=82) pros.push('Komunikasi & kepercayaan diri sangat baik pada video interview.');
+  else if(c.video.aiScore>0 && c.video.aiScore<65) cons.push('Skor analisis komunikasi pada video interview relatif rendah.');
+  if(c.track==='maritime'){
+    if(c.quiz.passFail===false) cons.push('Tidak memenuhi salah satu syarat mutlak pada Kuis Kualifikasi.');
+    if(c.quiz.passFail===true) pros.push('Memenuhi seluruh syarat mutlak (gate) pada Kuis Kualifikasi.');
+    if(c.cert.status==='valid') pros.push('Sertifikat pelaut terverifikasi AKTIF di pelaut.dephub.go.id.');
+    if(c.cert.status==='expired') cons.push('Sertifikat pelaut sudah KADALUARSA — perlu pembaruan sebelum onboarding.');
+    if(c.cert.status==='not_found') cons.push('Nomor sertifikat tidak ditemukan pada database Kemenhub — perlu verifikasi manual.');
+    if(c.cert.status==='error') cons.push('Verifikasi sertifikat gagal karena gangguan jaringan — perlu dicoba ulang.');
+    const job=jobById(c.jobId); const salary=Number(c.quiz.answers.q3)||0;
+    if(salary>job.salaryMaxUsd) cons.push('Ekspektasi gaji (USD '+salary+') di atas budget posisi (maks USD '+job.salaryMaxUsd+').');
+  } else {
+    if(c.bundle.disc.type) pros.push('Profil DISC dominan: '+c.bundle.disc.label+'.');
+    if(c.bundle.iq.score<55) cons.push('Skor tes IQ di bawah ambang yang disarankan untuk posisi ini.');
+    if((c.bundle.tools||[]).length>=2) pros.push('Menguasai lebih dari satu tools yang relevan dengan posisi.');
+  }
+  if(pros.length===0) pros.push('Profil memenuhi syarat dasar untuk posisi ini.');
+  if(cons.length===0) cons.push('Tidak ada catatan signifikan dari sistem.');
+  return {pros, cons};
+}
+
+function buildPipeline(c){
+  const isMaritime = c.track==='maritime';
+  const interviewLabel = isMaritime ? 'Interview HR & User' : 'Interview User/Manager';
+  const stage1Done = c.hr.stage1!=null;
+  const earlyEnd = !!c.hr.final && c.hr.stage1!=='advance';
+  const steps=[{label:'Asesmen Mandiri', status:'done'}];
+  steps.push({label:'Review HR', status: stage1Done?'done':'current'});
+  if(earlyEnd){
+    steps.push({label:interviewLabel, status:'skip'});
+    steps.push({label:'Background Check', status:'skip'});
+    if(isMaritime) steps.push({label:'Medical Check-Up', status:'skip'});
+    steps.push({label:'Keputusan Final', status:'done'});
+    return steps;
+  }
+  if(!stage1Done){
+    steps.push({label:interviewLabel, status:'upcoming'});
+    steps.push({label:'Background Check', status:'upcoming'});
+    if(isMaritime) steps.push({label:'Medical Check-Up', status:'upcoming'});
+    steps.push({label:'Keputusan Final', status:'upcoming'});
+    return steps;
+  }
+  steps.push({label:interviewLabel, status: c.hr.interview.done?'done':'current'});
+  steps.push({label:'Background Check', status: !c.hr.interview.done?'upcoming':(c.hr.bgCheck.done?'done':'current')});
+  if(isMaritime){
+    steps.push({label:'Medical Check-Up', status: !c.hr.bgCheck.done?'upcoming':(c.hr.mcu.done?'done':'current')});
+    steps.push({label:'Keputusan Final', status: c.hr.final?'done':(c.hr.mcu.done?'current':'upcoming')});
+  } else {
+    steps.push({label:'Keputusan Final', status: c.hr.final?'done':(c.hr.bgCheck.done?'current':'upcoming')});
+  }
+  return steps;
+}
+
+function statusMessage(c){
+  const isMaritime = c.track==='maritime';
+  if(c.hr.final==='hired') return {tone:'success', title:'Selamat! Anda Diterima', body:'Tim HR telah memutuskan untuk melanjutkan proses onboarding Anda. Kontrak kerja (PKWT) telah diterbitkan — silakan periksa bagian Dokumen Kontrak di bawah.'};
+  if(c.hr.final==='rejected') return {tone:'danger', title:'Lamaran Belum Berhasil Kali Ini', body:'Setelah melalui seluruh tahapan penilaian, tim HR memutuskan untuk tidak melanjutkan lamaran Anda pada posisi ini. Terima kasih atas waktu Anda — profil tetap kami simpan untuk peluang mendatang.'};
+  if(c.hr.final==='pool') return {tone:'warn', title:'Anda Masuk Talent Pool', body:'Profil Anda dinilai potensial, namun belum ada posisi yang cocok saat ini. Kami akan menghubungi Anda lebih dulu saat ada lowongan yang sesuai.'};
+  if(!c.hr.stage1) return {tone:'info', title:'Sedang Ditinjau Tim HR', body:'Seluruh hasil asesmen mandiri Anda sudah lengkap & sedang ditinjau oleh recruiter kami. Estimasi waktu review 2–3 hari kerja.'};
+  if(!c.hr.interview.done){
+    if(c.hr.interview.scheduledAt) return {tone:'info', title:'Interview Telah Dijadwalkan', body:'Selamat, Anda lolos tahap screening awal. Interview dijadwalkan pada '+fmtDateTime(c.hr.interview.scheduledAt)+' via '+c.hr.interview.mode+(c.hr.interview.location?' ('+c.hr.interview.location+')':'')+'.'};
+    return {tone:'info', title:'Lolos Tahap Screening Awal', body:'Tim HR akan segera menghubungi Anda untuk menjadwalkan sesi interview.'};
+  }
+  if(!c.hr.bgCheck.done) return {tone:'info', title:'Interview Selesai', body:'Tim HR sedang melakukan pengecekan latar belakang & referensi kerja Anda.'};
+  if(isMaritime && !c.hr.mcu.done) return {tone:'info', title:'Pengecekan Latar Belakang Selesai', body:'Mohon siapkan & unggah hasil Medical Check-Up (MCU) terbaru Anda yang masih berlaku saat dihubungi HR.'};
+  return {tone:'info', title:'Seluruh Tahapan Selesai', body:'Keputusan akhir sedang difinalisasi oleh tim HR. Anda akan menerima notifikasi segera setelah keputusan diambil.'};
+}
+function toneColor(t){ return {success:'var(--green)', danger:'var(--red)', warn:'var(--amber)', info:'var(--teal)'}[t]||'var(--teal)'; }
+function toneBg(t){ return {success:'var(--green-light)', danger:'var(--red-light)', warn:'var(--amber-light)', info:'var(--teal-light)'}[t]||'var(--teal-light)'; }
+
+</script>
+
+<script>
+/* ============================================================
+   PART 4 — CANDIDATE FLOW: views, actions, camera module
+   ============================================================ */
+
+function iconBack(size){ return '<span style="display:inline-flex;transform:scaleX(-1)">'+icon('chev',size||14)+'</span>'; }
+function mmss(n){ n=Math.round(n||0); const m=Math.floor(n/60), s=n%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+function emptyNoCandidate(){
+  return `<div class="empty">${icon('info',32)}<div class="h3" style="margin-top:12px;">Belum ada lamaran aktif</div><p class="small" style="margin-top:6px;">Mulai dengan memilih posisi yang ingin Anda lamar.</p><button class="btn btn-primary" style="margin-top:18px;" onclick="nav('landing')">Mulai Lamaran</button></div>`;
+}
+function resumeView(c){
+  if(!c) return 'landing';
+  if(c.selfServeDone) return 'complete';
+  if(!c.cv.fileName) return 'stageA';
+  if(c.track==='maritime'){
+    if(c.quiz.passFail===null) return 'stageB';
+    if(!c.video.aiScore) return 'stageC';
+    return 'stageD';
+  }
+  if(!c.bundle.disc.type) return 'stageB';
+  return 'stageC';
+}
+function sendNotification(c, subject, body, channel){
+  logEmail(c, subject, body, channel);
+  toast('Notifikasi terkirim: '+subject, 'success', 'mail');
+}
+
+/* ---------------- landing / jobs / apply ---------------- */
+function renderLanding(){
+  // Cek apakah kandidat punya sesi aktif (demo internal)
+  const active = activeCandidate();
+  if(active){
+    // Kandidat demo aktif — biarkan lanjutkan
+    return `<div style="max-width:540px;margin:0 auto;">
+      <div class="eyebrow">${icon('anchor',12)} Portal Kandidat · Lintas Maritim</div>
+      <h1 class="h1" style="margin-top:10px;">Selamat datang kembali</h1>
+      <p class="muted" style="margin-top:10px;line-height:1.6;">Anda memiliki asesmen yang sedang berlangsung untuk posisi <b>${escapeHtml(active.jobTitle)}</b>.</p>
+      <div class="card" style="margin-top:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="avatar" style="background:var(--ink);color:#fff;">${initials(active.name)}</div>
+          <div>
+            <div style="font-weight:700;">${escapeHtml(active.name)}</div>
+            <div class="small muted">${active.selfServeDone ? 'Asesmen selesai — menunggu tim HR' : 'Asesmen mandiri belum selesai'}</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="nav('${resumeView(active)}')">Lanjutkan ${icon('chev',14)}</button>
+      </div>
+    </div>`;
+  }
+
+  // Halaman default: kandidat belum punya sesi
+  return `<div style="max-width:600px;margin:0 auto;">
+    <div class="eyebrow">${icon('anchor',12)} MAXY · PT Lintas Maritim Indonesia</div>
+    <h1 class="h1" style="margin-top:10px;max-width:520px;line-height:1.15;">Asesmen kandidat dimulai dari link unik Anda</h1>
+    <p class="muted" style="margin-top:14px;max-width:500px;line-height:1.65;">
+      Pendaftaran dilakukan di <b>portal rekrutmen klien</b> (crewing.lintasmaritim.com atau rekrutmen.lintasmaritim.com).
+      Setelah mendaftar, Anda akan menerima <b>tautan asesmen unik</b> via WhatsApp dan Email — bukan di halaman ini.
+    </p>
+
+    <div class="card" style="margin-top:28px;border-left:3px solid var(--teal);">
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--teal-light);flex-shrink:0;display:flex;align-items:center;justify-content:center;">${icon('send',18)}</div>
+        <div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:6px;">Sudah mendaftar dan punya link asesmen?</div>
+          <p class="small muted" style="line-height:1.6;">Buka tautan <code style="background:var(--teal-light);color:#0e5f54;padding:2px 6px;border-radius:4px;font-size:11px;">/a/KODE-ANDA</code> dari WA atau Email yang Anda terima. Atau masukkan kode di bawah:</p>
+          <div style="display:flex;gap:10px;margin-top:14px;align-items:center;">
+            <input class="input" id="tok-input" placeholder="Tempel kode asesmen Anda di sini…" style="flex:1;font-family:var(--font-mono);font-size:13px;">
+            <button class="btn btn-primary btn-sm" onclick="openTokenPortal()">${icon('chev',14)} Buka</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;background:var(--teal-light);border-color:var(--teal-light);">
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#0e5f54;">${icon('sparkle',14)} Cara Kerja MAXY</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${[
+          ['1','Daftar di portal klien','Isi formulir di crewing.lintasmaritim.com atau rekrutmen.lintasmaritim.com'],
+          ['2','MAXY analisis otomatis','Sistem langsung menganalisis profil Anda — Anda tidak perlu melakukan apapun'],
+          ['3','Terima link asesmen','Link unik dikirim via WhatsApp & Email dalam hitungan menit'],
+          ['4','Buka link & asesmen mandiri','Quiz kualifikasi dan video interview asinkronus — dari browser, kapan saja'],
+          ['5','Tim HR meninjau','Hasil ditampilkan di dashboard HR — Anda akan dihubungi untuk tahap berikutnya']
+        ].map(([n,t,d]) => `
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="width:24px;height:24px;border-radius:99px;background:#fff;border:1.5px solid #C8E6DF;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0e5f54;">${n}</div>
+            <div><div class="small" style="font-weight:700;color:#0e5f54;">${t}</div><div style="font-size:12px;color:#3C7A60;margin-top:2px;">${d}</div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:14px 18px;background:var(--amber-light);border-radius:10px;border:1px solid #EED79A;font-size:13px;line-height:1.6;color:#7A5208;">
+      ${icon('info',14)} <b>Belum mendaftar?</b> Kunjungi <b>crewing.lintasmaritim.com</b> (maritime crew) atau <b>rekrutmen.lintasmaritim.com</b> (back office) untuk mendaftar. Jangan mendaftar di halaman ini.
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn btn-ghost btn-sm" onclick="setRole('hr')">${icon('grid',13)} Masuk sebagai HR</button>
+    </div>
+  </div>`;
+}
+
+function openTokenPortal(){
+  const tok = document.getElementById('tok-input')?.value?.trim();
+  if(!tok){ toast('Masukkan kode asesmen terlebih dahulu.','','info'); return; }
+  window.open('/a/'+tok, '_blank');
+}
+
+function jobCard(j){
+  const subtitle = j.track==='maritime' ? (j.vesselHint+' &middot; Min. '+j.minExp+' th pengalaman') : j.dept;
+  const chips = j.track==='maritime'
+    ? [(j.gtMin?('GT ≥ '+j.gtMin.toLocaleString('id-ID')):null), (j.ocimf?'OCIMF':null)].concat(j.certsRequired).filter(Boolean)
+    : ['Min. '+j.eduMin, j.minAge+'–'+j.maxAge+' th'].concat(j.toolsRequired);
+  const salary = j.track==='maritime' ? ('Hingga USD '+j.salaryMaxUsd.toLocaleString('en-US')+'/bulan') : ('Hingga '+fmtIDR(j.salaryMaxIdr)+'/bulan');
+  return `<div class="card" style="margin-bottom:14px;">
+    <div class="flex-between" style="align-items:flex-start;gap:12px;">
+      <div><div class="h3">${escapeHtml(j.title)}</div><div class="small muted" style="margin-top:4px;">${escapeHtml(subtitle)}</div></div>
+      <div class="mono small" style="font-weight:700;color:var(--teal);white-space:nowrap;">${escapeHtml(salary)}</div>
+    </div>
+    <div class="choice-group" style="margin-top:14px;">${chips.map(c=>'<span class="pill">'+escapeHtml(c)+'</span>').join('')}</div>
+    <div class="divider"></div>
+    <div class="flex-between">
+      <span class="small muted">${icon('file',13)} CV, kuis, video interview${j.track==='maritime'?', verifikasi sertifikat':''}</span>
+      <button class="btn btn-primary btn-sm" onclick="nav('apply',{draft:Object.assign({},STATE.draft,{jobId:'${j.id}'})})">Lamar Sekarang</button>
+    </div>
+  </div>`;
+}
+function renderJobs(){
+  const track = STATE.draft.track || 'maritime';
+  const jobs = JOBS.filter(j=>j.track===track);
+  return `<div style="max-width:740px;margin:0 auto;">
+    <button class="btn btn-ghost btn-sm" onclick="nav('landing')">${iconBack(14)} Kembali</button>
+    <div class="eyebrow" style="margin-top:18px;">${track==='maritime'?'Maritime Crew':'Back Office'} &middot; Lowongan Tersedia</div>
+    <h1 class="h1" style="margin-top:8px;font-size:26px;">Pilih posisi yang Anda lamar</h1>
+    <div style="margin-top:24px;">${jobs.map(jobCard).join('')}</div>
+  </div>`;
+}
+function renderApply(){
+  const job = jobById(STATE.draft.jobId);
+  if(!job) return `<div class="empty">${icon('info',30)}<div class="h3" style="margin-top:10px;">Pilih posisi terlebih dahulu</div><button class="btn btn-primary" style="margin-top:16px;" onclick="nav('landing')">Kembali ke Beranda</button></div>`;
+  return `<div style="max-width:540px;margin:0 auto;">
+    <button class="btn btn-ghost btn-sm" onclick="nav('jobs',{draft:{track:'${job.track}'}})">${iconBack(14)} Kembali</button>
+    <div class="card" style="margin-top:18px;">
+      <div class="eyebrow">Portal Klien &middot; ${job.track==='maritime'?'crewing.lintasmaritim.com':'rekrutmen.lintasmaritim.com'}</div>
+      <div class="h2" style="margin-top:8px;">Lamar: ${escapeHtml(job.title)}</div>
+      <p class="small muted" style="margin-top:6px;">Lengkapi data diri untuk membuat profil kandidat. Tautan asesmen unik dikirim ke email & WhatsApp Anda.</p>
+      <div class="divider"></div>
+      <div class="field"><label>Nama Lengkap</label><input class="input" id="ap-name" placeholder="cth. Budi Santoso" value="${escapeHtml(STATE.draft.name||'')}"></div>
+      <div class="grid-2">
+        <div class="field"><label>Email</label><input class="input" id="ap-email" type="email" placeholder="nama@email.com" value="${escapeHtml(STATE.draft.email||'')}"></div>
+        <div class="field"><label>No. WhatsApp</label><input class="input" id="ap-phone" placeholder="08xx-xxxx-xxxx" value="${escapeHtml(STATE.draft.phone||'')}"></div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="submitApply()">${icon('send',15)} Daftar & Mulai Asesmen</button>
+      <p class="small muted" style="margin-top:10px;text-align:center;">Anda akan diarahkan ke alur asesmen otomatis MAXY.</p>
+    </div>
+  </div>`;
+}
+function submitApply(){
+  const name=($('ap-name').value||'').trim(), email=($('ap-email').value||'').trim(), phone=($('ap-phone').value||'').trim();
+  if(!name||!email||!phone){ toast('Lengkapi semua data sebelum melanjutkan.', '', 'info'); return; }
+  const job = jobById(STATE.draft.jobId);
+  const c = blankCandidate(job.track, job);
+  Object.assign(c, {name, email, phone, appliedAt:new Date()});
+  CANDIDATES.push(c);
+  STATE.activeId = c.id;
+  STATE.draft = {};
+  sendNotification(c, 'Link Asesmen Anda — Lintas Maritim', 'Email berisi tautan asesmen unik telah dikirim otomatis setelah pendaftaran.');
+  nav('processing');
+  delayThen(1400, ()=>nav('stageA'));
+}
+function renderProcessing(){
+  return `<div style="max-width:480px;margin:70px auto;text-align:center;">
+    <div class="scanner" style="display:inline-flex;">${icon('anchor',16)}<span>MAXY sedang membuat profil kandidat<span class="dotflash"><span>.</span><span>.</span><span>.</span></span></span></div>
+    <p class="muted small" style="margin-top:18px;">Profil otomatis dibuat &middot; tautan asesmen unik dikirim via WhatsApp & Email</p>
+  </div>`;
+}
+
+/* ---------------- Tahap A — CV Screening ---------------- */
+function renderStageA(){
+  const c = activeCandidate(); if(!c) return emptyNoCandidate();
+  const step = STATE.draft.cvStep || 'upload';
+  let body;
+  if(step==='scanning'){
+    body = `<div class="scanner"><span class="spin"></span><span>AI membaca & mengekstrak data CV<span class="dotflash"><span>.</span><span>.</span><span>.</span></span></span></div>
+    <div class="card-flat" style="margin-top:18px;"><div class="small muted">${icon('upload',13)} ${escapeHtml(STATE.draft.cvFileName||'CV')}</div></div>`;
+  } else if(step==='review'){
+    body = `<p class="small muted" style="margin-bottom:16px;">AI telah mengekstrak data berikut dari CV. Anda dapat menyesuaikan jika diperlukan.</p>` + (c.track==='maritime' ? cvReviewMaritime(c) : cvReviewBackoffice(c));
+  } else {
+    body = `<div class="file-drop" onclick="$('cv-file-input').click()">${icon('upload',26)}<div style="font-weight:600;margin-top:10px;">Klik untuk unggah CV</div><div class="small muted" style="margin-top:4px;">PDF, DOC, atau DOCX &middot; maks 5MB</div></div>
+    <input type="file" id="cv-file-input" style="display:none" accept=".pdf,.doc,.docx" onchange="handleCvUpload(this)">
+    <div style="text-align:center;margin-top:14px;"><button class="btn btn-ghost btn-sm" onclick="handleCvUpload(null)">${icon('sparkle',13)} Gunakan contoh CV untuk demo</button></div>`;
+  }
+  return `<div style="max-width:680px;margin:0 auto;">
+    ${renderTicketHeader(c, 1)}
+    <div class="card">
+      <div class="flex-between"><div><div class="h3">${icon('file',16)} Tahap A — CV Screening & Job Matching</div><p class="small muted" style="margin-top:4px;">AI mengekstrak data & mencocokkan profil dengan posisi.</p></div>${stageTag('ai','AI')}</div>
+      <div class="divider"></div>${body}
+    </div>
+  </div>`;
+}
+function cvReviewMaritime(c){
+  const job=jobById(c.jobId), f=STATE.draft.cvFields, score=calcCvMatchMaritime(job,f);
+  return `<div class="eyebrow">${icon('award',12)} AI Ekstrak</div>
+  <div class="grid-2" style="margin-top:10px;">
+    <div class="field"><label>Jenis Kapal Terakhir</label><select class="select" onchange="updateCvField('vessel',this.value)">${VESSEL_TYPES.map(v=>`<option value="${escapeHtml(v)}" ${f.vessel===v?'selected':''}>${escapeHtml(v)}</option>`).join('')}</select></div>
+    <div class="field"><label>Pengalaman (tahun)</label><input class="input" type="number" min="0" value="${f.expYears}" onchange="updateCvField('expYears',Number(this.value))"></div>
+    <div class="field"><label>GT Tonnage Terakhir</label><input class="input" type="number" min="0" value="${f.gt}" onchange="updateCvField('gt',Number(this.value))"></div>
+    <div class="field"><label>Pengalaman OCIMF</label><div class="choice-group"><div class="choice ${f.ocimf?'selected':''}" onclick="updateCvField('ocimf',true)">Ya</div><div class="choice ${!f.ocimf?'selected':''}" onclick="updateCvField('ocimf',false)">Tidak</div></div></div>
+  </div>
+  <div class="field"><label>Sertifikasi yang Dimiliki</label><div class="choice-group">${MARITIME_CERTS.map(ct=>`<div class="choice ${(f.certs||[]).includes(ct)?'selected':''}" onclick="toggleCvCert('${ct.replace(/'/g,"\\'")}')">${escapeHtml(ct)}</div>`).join('')}</div></div>
+  <div class="card-flat" style="margin-top:18px;"><div class="flex-between"><div><div class="small" style="font-weight:700;">Match Score</div><div class="small muted">Requirement posisi ${escapeHtml(job.title)}</div></div><div class="gauge-num" style="color:${scoreColor(score)}">${score}</div></div></div>
+  <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="confirmCvScreening()">Konfirmasi & Lanjutkan ${icon('chev',14)}</button>`;
+}
+function cvReviewBackoffice(c){
+  const job=jobById(c.jobId), f=STATE.draft.cvFields, score=calcCvMatchBackoffice(job,f), eduOpts=['SMA/SMK','D3','S1','S2'];
+  return `<div class="eyebrow">${icon('award',12)} AI Ekstrak</div>
+  <div class="grid-2" style="margin-top:10px;">
+    <div class="field"><label>Pendidikan Terakhir</label><select class="select" onchange="updateCvField('edu',this.value)">${eduOpts.map(v=>`<option value="${v}" ${f.edu===v?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="field"><label>Usia</label><input class="input" type="number" min="17" value="${f.age}" onchange="updateCvField('age',Number(this.value))"></div>
+    <div class="field"><label>Pengalaman (tahun)</label><input class="input" type="number" min="0" value="${f.expYears}" onchange="updateCvField('expYears',Number(this.value))"></div>
+  </div>
+  <div class="field"><label>Tools / Skill yang Dikuasai</label><div class="choice-group">${BACKOFFICE_TOOLS.map(t=>`<div class="choice ${(f.tools||[]).includes(t)?'selected':''}" onclick="toggleCvTool('${t.replace(/'/g,"\\'")}')">${escapeHtml(t)}</div>`).join('')}</div></div>
+  <div class="card-flat" style="margin-top:18px;"><div class="flex-between"><div><div class="small" style="font-weight:700;">Match & Competency Score</div><div class="small muted">Edu, age, salary filter & competency matching</div></div><div class="gauge-num" style="color:${scoreColor(score)}">${score}</div></div></div>
+  <button class="btn btn-primary btn-block" style="margin-top:16px;" onclick="confirmCvScreening()">Konfirmasi & Lanjutkan ${icon('chev',14)}</button>`;
+}
+function handleCvUpload(inputEl){
+  const c = activeCandidate(); const job = jobById(c.jobId);
+  const file = inputEl && inputEl.files && inputEl.files[0];
+  STATE.draft.cvFileName = file ? file.name : ('CV_'+(c.name||'Kandidat').replace(/\s+/g,'_')+'.pdf');
+  STATE.draft.cvFields = c.track==='maritime'
+    ? { vessel:job.vesselHint, expYears:job.minExp, gt:job.gtMin||4000, ocimf:job.ocimf, certs:job.certsRequired.slice() }
+    : { edu:job.eduMin, age:Math.round((job.minAge+job.maxAge)/2), expYears:job.minExp, tools:job.toolsRequired.slice() };
+  STATE.draft.cvStep = 'scanning';
+  renderAll();
+  delayThen(1300, ()=>{ STATE.draft.cvStep='review'; renderAll(); });
+}
+function updateCvField(key,val){ STATE.draft.cvFields[key]=val; renderAll(); }
+function toggleCvCert(ct){ const arr=STATE.draft.cvFields.certs||(STATE.draft.cvFields.certs=[]); const i=arr.indexOf(ct); i>-1?arr.splice(i,1):arr.push(ct); renderAll(); }
+function toggleCvTool(t){ const arr=STATE.draft.cvFields.tools||(STATE.draft.cvFields.tools=[]); const i=arr.indexOf(t); i>-1?arr.splice(i,1):arr.push(t); renderAll(); }
+function confirmCvScreening(){
+  const c=activeCandidate(), job=jobById(c.jobId);
+  c.cv.fileName = STATE.draft.cvFileName; c.cv.fields = STATE.draft.cvFields;
+  c.cv.matchScore = c.track==='maritime' ? calcCvMatchMaritime(job,c.cv.fields) : calcCvMatchBackoffice(job,c.cv.fields);
+  toast('CV Summary & Match Score tersimpan.', 'success', 'check');
+  nav('stageB');
+}
+
+/* ---------------- Tahap B — Kualifikasi (maritime) / Bundle (backoffice) ---------------- */
+function renderStageB(){ const c=activeCandidate(); if(!c) return emptyNoCandidate(); return c.track==='maritime' ? renderStageBMaritime(c) : renderStageBBackoffice(c); }
+function renderStageBMaritime(c){
+  const a = STATE.draft.quizAnswers || (STATE.draft.quizAnswers={q1:null,q2:null,q3:'',q4:null});
+  return `<div style="max-width:680px;margin:0 auto;">
+    ${renderTicketHeader(c,2)}
+    <div class="card">
+      <div class="flex-between"><div><div class="h3">${icon('bars',16)} Tahap B — Kuis Kualifikasi Minimum</div><p class="small muted" style="margin-top:4px;">Verifikasi syarat mutlak (Pass/Fail) — otomatis via aturan sistem.</p></div>${stageTag('rule','Aturan')}</div>
+      <div class="divider"></div>
+      <div class="field"><label>${escapeHtml(MARITIME_QUIZ[0].text)}</label><div class="choice-group"><div class="choice ${a.q1==='Ya'?'selected':''}" onclick="setQuizAns('q1','Ya')">Ya</div><div class="choice ${a.q1==='Tidak'?'selected':''}" onclick="setQuizAns('q1','Tidak')">Tidak</div></div></div>
+      <div class="field"><label>${escapeHtml(MARITIME_QUIZ[1].text)}</label><div class="choice-group">${MARITIME_QUIZ[1].options.map(o=>`<div class="choice ${a.q2===o?'selected':''}" onclick="setQuizAns('q2','${o.replace(/'/g,"\\'")}')">${escapeHtml(o)}</div>`).join('')}</div></div>
+      <div class="field"><label>${escapeHtml(MARITIME_QUIZ[2].text)}</label><input class="input" type="number" min="0" placeholder="cth. 1200" value="${a.q3||''}" onchange="setQuizAns('q3',this.value)"></div>
+      <div class="field"><label>${escapeHtml(MARITIME_QUIZ[3].text)}</label><div class="choice-group"><div class="choice ${a.q4==='Ya'?'selected':''}" onclick="setQuizAns('q4','Ya')">Ya</div><div class="choice ${a.q4==='Tidak'?'selected':''}" onclick="setQuizAns('q4','Tidak')">Tidak</div></div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+        <button class="btn btn-primary btn-block" onclick="submitQuizMaritime()">Lanjutkan ${icon('chev',14)}</button>
+      </div>
+      <div style="margin-top:10px;text-align:center;">
+        <button class="btn btn-demo btn-sm" onclick="demoFillQuiz()">⚡ Isi Otomatis (Demo)</button>
+      </div>
+    </div>
+  </div>`;
+}
+function setQuizAns(k,v){ STATE.draft.quizAnswers[k]=v; renderAll(); }
+function demoFillQuiz(){
+  const c=activeCandidate(), job=jobById(c.jobId);
+  STATE.draft.quizAnswers = {q1:'Ya', q2:'Segera (≤1 minggu)', q3:String(Math.round((job.salaryMaxUsd||1200)*0.85)), q4:'Ya'};
+  submitQuizMaritime();
+}
+function submitQuizMaritime(){
+  const c=activeCandidate(), job=jobById(c.jobId), a=STATE.draft.quizAnswers;
+  if(a.q1==null||a.q2==null||!a.q3||a.q4==null){ toast('Lengkapi seluruh pertanyaan kuis.', '', 'info'); return; }
+  const ans = Object.assign({}, a, {_expYears:c.cv.fields.expYears});
+  const r = calcQualScoreMaritime(job, ans);
+  c.quiz.answers=ans; c.quiz.passFail=r.passFail; c.quiz.qualScore=r.score;
+  toast(r.passFail?'Syarat mutlak terpenuhi.':'Beberapa syarat belum terpenuhi — tetap dilanjutkan untuk direview HR.', r.passFail?'success':'info', 'check');
+  vqReset(); nav('stageC');
+}
+function renderStageBBackoffice(c){
+  const d = STATE.draft.bundle || (STATE.draft.bundle={story:'',tools:[],availabilityJoin:null,salaryExpIdr:null,disc:{},iq:{}});
+  return `<div style="max-width:680px;margin:0 auto;">
+    ${renderTicketHeader(c,2)}
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="flex-between"><div><div class="h3">${icon('file',16)} Form Tambahan</div><p class="small muted" style="margin-top:4px;">Cerita, keahlian, ketersediaan & ekspektasi gaji.</p></div>${stageTag('rule','Form')}</div>
+      <div class="divider"></div>
+
+      <div class="field">
+        <label>FORM 01 · Ceritakan pencapaian kerja yang paling Anda banggakan</label>
+        <textarea class="textarea" id="bd-story" oninput="STATE.draft.bundle.story=this.value"
+          placeholder="Tuliskan singkat di sini…">${escapeHtml(d.story||'')}</textarea>
+      </div>
+
+      <div class="field">
+        <label>FORM 02 · Tools / Skill yang Dikuasai</label>
+        <div class="choice-group">${BACKOFFICE_TOOLS.map(t=>`<div class="choice ${(d.tools||[]).includes(t)?'selected':''}" onclick="toggleBundleTool('${t.replace(/'/g,"\\'")}')">${escapeHtml(t)}</div>`).join('')}</div>
+      </div>
+
+      <div class="field">
+        <label>FORM 03 · Kapan Anda dapat bergabung jika diterima?</label>
+        <div class="choice-group" style="flex-direction:column;gap:8px;">
+          ${AVAILABILITY_OPTIONS.map(o=>`<div class="choice ${d.availabilityJoin===o?'selected':''}" onclick="STATE.draft.bundle.availabilityJoin='${o}';renderAll()">${escapeHtml(o)}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="field">
+        <label>FORM 04 · Ekspektasi Gaji (Rp / bulan)</label>
+        <div style="display:flex;align-items:center;border:1px solid var(--line);border-radius:var(--radius-s);overflow:hidden;background:var(--card);">
+          <span style="padding:0 12px;font-size:13px;color:var(--ink-soft);background:var(--line-soft);border-right:1px solid var(--line);line-height:44px;white-space:nowrap;">Rp</span>
+          <input class="input" type="number" min="0" step="100000" id="bd-salary"
+            style="border:none;border-radius:0;flex:1;" placeholder="mis. 6000000"
+            value="${d.salaryExpIdr||''}" oninput="STATE.draft.bundle.salaryExpIdr=Number(this.value)||null">
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="flex-between"><div><div class="h3">${icon('user',16)} Tes DISC</div><p class="small muted" style="margin-top:4px;">Penilaian kepribadian — pilih jawaban yang paling menggambarkan Anda.</p></div>${stageTag('ai','Psikometri')}</div>
+      <div class="divider"></div>
+      ${DISC_QUESTIONS.map((q,qi)=>`<div class="field" style="margin-top:12px;">
+        <label>${qi+1}. ${escapeHtml(q.text)}</label>
+        <div class="choice-group" style="flex-direction:column;gap:8px;">
+          ${q.options.map(o=>`<div class="choice ${d.disc[q.id]===o.k?'selected':''}" onclick="setBundleDisc('${q.id}','${o.k}')">${escapeHtml(o.t)}</div>`).join('')}
+        </div>
+      </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <div class="flex-between"><div><div class="h3">${icon('sparkle',16)} Tes Kognitif (IQ Singkat)</div><p class="small muted" style="margin-top:4px;">Tiga soal penalaran — pilih satu jawaban terbaik.</p></div>${stageTag('ai','Kognitif')}</div>
+      <div class="divider"></div>
+      ${IQ_QUESTIONS.map((q,qi)=>`<div class="field" style="margin-top:12px;">
+        <label>${qi+1}. ${escapeHtml(q.text)}</label>
+        <div class="choice-group">
+          ${q.options.map(o=>`<div class="choice ${d.iq[q.id]===o?'selected':''}" onclick="setBundleIq('${q.id}','${o.replace(/'/g,"\\'")}')">${escapeHtml(o)}</div>`).join('')}
+        </div>
+      </div>`).join('')}
+      <div style="margin-top:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" style="flex:1;" onclick="submitBundleBackoffice()">Simpan & Lanjutkan ${icon('chev',14)}</button>
+        <button class="btn btn-demo" onclick="demoFillBundle()" title="Isi semua kolom otomatis untuk demo">⚡ Isi Otomatis (Demo)</button>
+      </div>
+    </div>
+  </div>`;
+}
+function toggleBundleTool(t){ const arr=STATE.draft.bundle.tools||(STATE.draft.bundle.tools=[]); const i=arr.indexOf(t); i>-1?arr.splice(i,1):arr.push(t); renderAll(); }
+function setBundleDisc(qid,k){ STATE.draft.bundle.disc[qid]=k; renderAll(); }
+function setBundleIq(qid,v){ STATE.draft.bundle.iq[qid]=v; renderAll(); }
+function demoFillBundle(){
+  const c=activeCandidate(), job=jobById(c.jobId);
+  const d = STATE.draft.bundle = STATE.draft.bundle || {};
+  d.story='Demo: mengelola proses end-to-end dengan hasil terukur dan tepat waktu.';
+  d.tools=(job.toolsRequired||[]).concat(['Excel / Spreadsheet']).filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
+  d.availabilityJoin='Segera (≤1 minggu)';
+  d.salaryExpIdr=Math.round((job.salaryMaxIdr||6000000)*0.85);
+  d.disc={d1:'I',d2:'I',d3:'I',d4:'S'};
+  d.iq={iq1:'32',iq2:'Pilot',iq3:'Jangkar'};
+  submitBundleBackoffice();
+}
+function submitBundleBackoffice(){
+  const c=activeCandidate(), job=jobById(c.jobId), d=STATE.draft.bundle;
+  if($('bd-story')) d.story=$('bd-story').value;
+  if($('bd-salary')) d.salaryExpIdr=Number($('bd-salary').value)||null;
+  if(!d.availabilityJoin){ toast('Pilih ketersediaan bergabung (Form 03).','','info'); return; }
+  if(!d.salaryExpIdr){ toast('Isi ekspektasi gaji (Form 04).','','info'); return; }
+  if(Object.keys(d.disc).length<DISC_QUESTIONS.length||Object.keys(d.iq).length<IQ_QUESTIONS.length){ toast('Lengkapi seluruh pertanyaan DISC & IQ.','','info'); return; }
+  c.bundle.story=(d.story||'').trim(); c.bundle.tools=d.tools||[];
+  c.bundle.availabilityJoin=d.availabilityJoin; c.bundle.salaryExpIdr=d.salaryExpIdr;
+  c.bundle.disc.answers=d.disc; Object.assign(c.bundle.disc,calcDisc(d.disc));
+  c.bundle.iq.answers=d.iq; Object.assign(c.bundle.iq,calcIq(d.iq));
+  c.bundle.formScore=calcFormScore(c.bundle,job);
+  toast('Form, DISC & IQ tersimpan.','success','check');
+  vqReset(); nav('stageC');
+}
+
+/* ---------------- Tahap C — Video Interview (GDrive) ---------------- */
+const CANNED_VIDEO = {
+  maritime:[
+    [{transcript:'(Simulasi) Kandidat menjelaskan penanganan kebocoran kecil di ruang mesin — ikuti SOP darurat & koordinasi dengan Mualim Jaga.', summary:'Penyampaian tenang & terstruktur, menekankan keselamatan & prosedur.'},
+     {transcript:'(Simulasi) Kandidat menceritakan pengalaman memimpin pemadaman kebakaran kecil di galley bersama tim darurat.', summary:'Kepemimpinan baik di bawah tekanan, komunikasi jelas.'}],
+    [{transcript:'(Simulasi) Kandidat menjelaskan cara berkomunikasi lintas budaya dengan kru campuran menggunakan istilah maritim standar & briefing dua bahasa.', summary:'Komunikasi jelas, kosakata teknis cukup kaya.'},
+     {transcript:'(Simulasi) Kandidat menjelaskan pendekatan mentoring kru junior dari berbagai negara melalui pendampingan harian.', summary:'Sabar, kolaboratif, dan komunikatif lintas budaya.'}],
+  ],
+  backoffice:[
+    [{transcript:'(Simulasi) Menjelaskan proses audit internal yang dipercepat lewat penyusunan checklist & rekap data baru.', summary:'Terstruktur & berorientasi proses.'},
+     {transcript:'(Simulasi) Menjelaskan cara menyelesaikan keluhan kandidat lewat komunikasi proaktif & solusi alternatif.', summary:'Empatik & solutif.'}],
+    [{transcript:'(Simulasi) Menjelaskan penggunaan matriks prioritas untuk mengatur banyak tenggat waktu sekaligus.', summary:'Pendekatan sistematis, percaya diri sedang.'},
+     {transcript:'(Simulasi) Menjelaskan cara menjadwalkan ulang banyak agenda lewat kalender bersama tim.', summary:'Terorganisir & komunikatif.'}],
+  ],
+};
+function pickCannedAnswer(track,qi){ const pool=CANNED_VIDEO[track][qi]||CANNED_VIDEO[track][0]; return pool[Math.floor(Math.random()*pool.length)]; }
+function vqReset(){ STATE.vq = { index:0, gdUrl:'', answers:[] }; }
+
+function renderStageC(){
+  const c=activeCandidate(); if(!c) return emptyNoCandidate();
+  const qs=VIDEO_QUESTIONS[c.track]; const i=STATE.vq.index;
+  if(i>=qs.length) return renderProcessing();
+  const answered = STATE.vq.answers;
+  return `<div style="max-width:680px;margin:0 auto;">
+    ${renderTicketHeader(c, 3)}
+    <div class="card">
+      <div class="flex-between" style="flex-wrap:wrap;gap:12px;">
+        <div>
+          <div class="h3">${icon('video',16)} Video Interview — Pertanyaan ${i+1} dari ${qs.length}</div>
+          <p class="small muted" style="margin-top:4px;">Rekam video jawaban Anda, unggah ke Google Drive, lalu kirim link-nya di sini.</p>
+        </div>
+        ${stageTag('ai','AI')}
+      </div>
+      <div class="divider"></div>
+
+      <div class="card-flat" style="margin-bottom:18px;">
+        <div class="small muted" style="font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:10.5px;margin-bottom:8px;">Pertanyaan ${i+1}</div>
+        <div style="font-size:16px;line-height:1.55;font-weight:600;">${escapeHtml(qs[i])}</div>
+      </div>
+
+      <div class="field">
+        <label>Link Google Drive video jawaban Anda</label>
+        <input class="input" id="vq-gdurl" type="url" placeholder="https://drive.google.com/file/d/…"
+          value="${escapeHtml(STATE.vq.gdUrl||'')}"
+          oninput="STATE.vq.gdUrl=this.value">
+        <div class="hint" style="font-size:11.5px;color:var(--ink-faint);margin-top:5px;">Pastikan sharing diatur ke "Anyone with the link can view" sebelum mengirim.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" style="flex:1;" onclick="vqSubmitGdrive()">
+          ${icon('send',15)} Kirim Link Video
+        </button>
+        <button class="btn btn-ghost" onclick="vqSimulate()" title="Tidak punya video? Gunakan simulasi untuk demo">
+          ${icon('sparkle',14)} Simulasikan
+        </button>
+      </div>
+
+      ${answered.length>0?`<div class="divider"></div>
+        <div class="small muted" style="margin-bottom:8px;">${icon('check',13)} ${answered.length} pertanyaan sudah dijawab:</div>
+        ${answered.map((a,ai)=>`<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-top:1px solid var(--line-soft);">
+          <div class="ckbox checked">${icon('check',12)}</div>
+          <div class="small" style="flex:1;">${escapeHtml(a.question.substring(0,60))}…</div>
+          <span class="tag tag-auto" style="font-size:9px;">${a.videoUrl?icon('folder',9)+' GDrive':icon('sparkle',9)+' Sim'}</span>
+        </div>`).join('')}` :''}
+
+      <div style="margin-top:16px;text-align:center;border-top:1px dashed var(--line-soft);padding-top:12px;">
+        <button class="btn btn-demo btn-sm" onclick="vqSimulateAll()">⚡ Simulasikan Semua Pertanyaan (Demo)</button>
+      </div>
+    </div>
+  </div>`;
+}
+function vqSubmitGdrive(){
+  const url=(STATE.vq.gdUrl||'').trim();
+  if(!url.includes('drive.google') && !url.includes('docs.google')){
+    toast('Masukkan link Google Drive yang valid.','','info'); return;
+  }
+  vqRecordAnswer('gdrive', 0, url);
+}
+function vqSimulate(){ vqRecordAnswer('sim', 35+Math.floor(Math.random()*20), null); }
+function vqSimulateAll(){
+  const c=activeCandidate(); if(!c) return;
+  const qs=VIDEO_QUESTIONS[c.track];
+  while(STATE.vq.index<qs.length){
+    const gen=pickCannedAnswer(c.track, STATE.vq.index);
+    STATE.vq.answers.push({question:qs[STATE.vq.index], mode:'sim', durationSec:40, transcript:gen.transcript, summary:gen.summary, videoUrl:null});
+    STATE.vq.index++;
+  }
+  vqFinish();
+}
+function vqRecordAnswer(mode, duration, gdUrl){
+  const c=activeCandidate(), qs=VIDEO_QUESTIONS[c.track], i=STATE.vq.index, gen=pickCannedAnswer(c.track,i);
+  STATE.vq.answers.push({question:qs[i], mode, durationSec:duration, transcript:gen.transcript, summary:gen.summary, videoUrl:gdUrl||null});
+  STATE.vq.index++; STATE.vq.gdUrl='';
+  STATE.vq.index>=qs.length ? vqFinish() : renderAll();
+}
+function vqFinish(){
+  const c=activeCandidate();
+  const avgDur = STATE.vq.answers.reduce((s,a)=>s+a.durationSec,0)/STATE.vq.answers.length;
+  const score = Math.round(clamp(72+Math.min(18,avgDur/4)+Math.floor(Math.random()*9),60,96));
+  c.video.answers=STATE.vq.answers; c.video.aiScore=score;
+  toast('Analisis AI video interview selesai.', 'success', 'sparkle');
+  if(c.track==='maritime'){ nav('stageD'); } else { finishSelfServe(c); nav('complete'); }
+}
+function finishSelfServe(c){ c.selfServeDone=true; recompute(c); sendNotification(c,'Asesmen Anda Telah Lengkap','Konfirmasi seluruh tahapan asesmen mandiri telah selesai diterima sistem.'); }
+
+/* ---------------- Tahap D — Verifikasi Sertifikat (maritime) ---------------- */
+function renderStageD(){
+  const c=activeCandidate(); if(!c) return emptyNoCandidate();
+  const step = STATE.draft.certStep || 'idle'; let body;
+  if(step==='running'){
+    const tick = STATE.draft.certTick||1;
+    body = `<div class="checklist-row"><div class="ckbox checked">${icon('check',13)}</div><span>Navigasi ke pelaut.dephub.go.id</span></div>
+    <div class="checklist-row"><div class="ckbox ${tick>=2?'checked':''}">${tick>=2?icon('check',13):''}</div><span>CAPTCHA AI Vision diselesaikan otomatis</span></div>
+    <div class="checklist-row"><div class="ckbox ${tick>=3?'checked':''}">${tick>=3?icon('check',13):''}</div><span>Ekstraksi hasil status sertifikat</span></div>
+    <div class="scanner" style="margin-top:16px;"><span class="spin"></span><span>RPA Vision sedang memverifikasi<span class="dotflash"><span>.</span><span>.</span><span>.</span></span></span></div>`;
+  } else if(step==='done'){
+    const map = { valid:{label:'SERTIFIKAT VALID',cls:'',desc:'Nomor registrasi pelaut ditemukan & berstatus aktif.',ic:'shield'},
+                  expired:{label:'KADALUARSA',cls:'fail',desc:'Sertifikat ditemukan namun masa berlaku telah berakhir.',ic:'x'},
+                  not_found:{label:'TIDAK DITEMUKAN',cls:'fail',desc:'Nomor registrasi tidak ditemukan pada database Kemenhub.',ic:'x'},
+                  error:{label:'ERROR JARINGAN',cls:'fail',desc:'Verifikasi gagal karena gangguan koneksi ke portal.',ic:'x'} };
+    const s = map[STATE.draft.certResult];
+    body = `<div style="text-align:center;padding:8px 0;">
+      <div class="stamp ${s.cls}">${icon(s.ic,16)} ${s.label}</div>
+      <p class="small muted" style="margin-top:14px;">${s.desc}</p>
+      <div class="card-flat" style="margin-top:16px;text-align:left;">
+        <div class="paper-row"><span class="k">No. Registrasi</span><span class="v mono">${escapeHtml(STATE.draft.certNumber)}</span></div>
+        <div class="paper-row" style="border-bottom:none;"><span class="k">Timestamp Verifikasi</span><span class="v">${fmtDateTime(new Date())}</span></div>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:18px;" onclick="confirmCertCheck()">Lanjutkan ${icon('chev',14)}</button>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="STATE.draft.certStep='idle';renderAll()">Coba skenario lain</button>
+    </div>`;
+  } else {
+    body = `<p class="small muted" style="margin-bottom:16px;">Sistem akan otomatis membuka portal Kemenhub & memverifikasi nomor registrasi pelaut kandidat.</p>
+    <button class="btn btn-primary btn-block" onclick="runCertCheck('valid')">${icon('search',15)} Jalankan Verifikasi Otomatis</button>
+    <div class="divider"></div>
+    <div class="small muted" style="margin-bottom:10px;">Simulasikan skenario lain untuk demo:</div>
+    <div class="choice-group"><div class="choice" onclick="runCertCheck('valid')">Valid</div><div class="choice" onclick="runCertCheck('expired')">Kadaluarsa</div><div class="choice" onclick="runCertCheck('not_found')">Tidak Ditemukan</div><div class="choice" onclick="runCertCheck('error')">Error Jaringan</div></div>`;
+  }
+  return `<div style="max-width:680px;margin:0 auto;">
+    ${renderTicketHeader(c,4)}
+    <div class="card">
+      <div class="flex-between"><div><div class="h3">${icon('shield',16)} Tahap D — Verifikasi Sertifikat Pelaut</div><p class="small muted" style="margin-top:4px;">Pengecekan otomatis ke Kemenhub (pelaut.dephub.go.id) via RPA Vision.</p></div>${stageTag('auto','Auto')}</div>
+      <div class="divider"></div>${body}
+    </div>
+  </div>`;
+}
+function runCertCheck(scenario){
+  STATE.draft.certStep='running'; STATE.draft.certTick=1; STATE.draft.certResult=scenario;
+  STATE.draft.certNumber='PLT-'+Math.floor(1000+Math.random()*8999)+'-'+Math.floor(1000+Math.random()*8999);
+  renderAll();
+  delayThen(550, ()=>{ STATE.draft.certTick=2; renderAll(); });
+  delayThen(1100, ()=>{ STATE.draft.certTick=3; renderAll(); });
+  delayThen(1700, ()=>{ STATE.draft.certStep='done'; renderAll(); });
+}
+function confirmCertCheck(){
+  const c=activeCandidate();
+  const validUntil = STATE.draft.certResult==='valid' ? daysAgo(-400) : (STATE.draft.certResult==='expired' ? daysAgo(20) : null);
+  c.cert = { status:STATE.draft.certResult, number: STATE.draft.certResult==='not_found'?null:STATE.draft.certNumber, validUntil };
+  finishSelfServe(c);
+  nav('complete');
+}
+
+/* ---------------- Complete / Status / Inbox ---------------- */
+function renderComplete(){
+  const c=activeCandidate(); if(!c) return emptyNoCandidate();
+  const sub=subscoresFor(c), weights=c.track==='maritime'?MARITIME_WEIGHTS:BACKOFFICE_WEIGHTS, msg=statusMessage(c), pipeline=buildPipeline(c);
+  return `<div style="max-width:720px;margin:0 auto;">
+    <div class="ticket">
+      <div class="ticket-main">
+        <div class="ticket-route"><span class="city">${escapeHtml((c.name||'KANDIDAT').toUpperCase())}</span><span class="arrow"></span><span class="city">${escapeHtml(c.jobTitle.toUpperCase())}</span></div>
+        ${renderPipeline(pipeline)}
+      </div>
+      <div class="ticket-perf"></div>
+      <div class="ticket-stub"><div class="ticket-label">SKOR KOMPOSIT</div><div class="big">${c.composite}</div><div class="ticket-label" style="font-size:9px;">${escapeHtml(c.jobId.toUpperCase())}</div></div>
+    </div>
+    <div class="card" style="border-left:4px solid ${toneColor(msg.tone)};background:${toneBg(msg.tone)};">
+      <div style="font-weight:700;font-size:15px;color:${toneColor(msg.tone)};">${escapeHtml(msg.title)}</div>
+      <p class="small" style="margin-top:6px;line-height:1.6;color:var(--ink);">${escapeHtml(msg.body)}</p>
+      ${c.hr.final==='hired' ? (c.contractGenerated ? `<button class="btn btn-primary btn-sm" style="margin-top:14px;" onclick="openContractView('${c.id}')">${icon('printer',14)} Lihat Dokumen Kontrak</button>` : `<p class="small" style="margin-top:10px;color:var(--ink-soft);">${icon('clock',12)} Kontrak kerja (PKWT) sedang disiapkan tim HR.</p>`) : ''}
+    </div>
+    <div class="card">
+      <div class="h3">${icon('bars',15)} Rincian Skor Komposit</div>
+      <p class="small muted" style="margin-top:4px;">Bobot: ${weightCaption(weights)}</p>
+      <div style="margin-top:16px;">${renderScoreBars(weights,sub)}</div>
+    </div>
+    <div class="card">
+      <div class="flex-between"><div class="h3">${icon('mail',15)} Riwayat Notifikasi</div><span class="small muted">${c.emailLog.length} pesan</span></div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px;">${c.emailLog.slice().reverse().slice(0,3).map(emailMini).join('')}</div>
+      ${c.emailLog.length>3 ? `<button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="nav('inbox')">Lihat semua notifikasi</button>` : ''}
+    </div>
+    <div style="text-align:center;margin-top:8px;"><button class="btn btn-ghost btn-sm" onclick="nav('landing')">${iconBack(13)} Kembali ke Beranda</button></div>
+  </div>`;
+}
+function emailMini(e){
+  return `<div class="envelope"><div class="envelope-head"><div class="r"><span class="k">Dari</span><span>MAXY &middot; Lintas Maritim</span></div><div class="r"><span class="k">Subjek</span><span style="font-weight:600;">${escapeHtml(e.subject)}</span></div></div>
+  <div class="envelope-body" style="font-size:12.5px;padding:12px 16px;white-space:pre-wrap;line-height:1.65;">${escapeHtml(e.body)}<div class="small muted" style="margin-top:8px;white-space:normal;">${fmtDateTime(e.sentAt)} &middot; ${escapeHtml(e.channel||'Email & WhatsApp')}</div></div></div>`;
+}
+function renderInbox(){
+  const c=activeCandidate(); if(!c) return emptyNoCandidate();
+  return `<div style="max-width:600px;margin:0 auto;">
+    <button class="btn btn-ghost btn-sm" onclick="nav('complete')">${iconBack(14)} Kembali ke Status</button>
+    <div class="eyebrow" style="margin-top:18px;">${icon('mail',12)} Kotak Masuk</div>
+    <h1 class="h1" style="margin-top:8px;font-size:24px;">Riwayat Notifikasi Anda</h1>
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px;">${c.emailLog.slice().reverse().map(emailMini).join('') || `<div class="empty">${icon('mail',30)}<div class="small" style="margin-top:8px;">Belum ada notifikasi.</div></div>`}</div>
+  </div>`;
+}
+
+</script>
+
+<script>
+/* ============================================================
+   PART 5 — HR CONSOLE: Board, Detail, Actions, Contract
+   ============================================================ */
+
+/* ---- HR Board ---- */
+function renderHrBoard(){
+  const COLS = {
+    screening:{ label:'Asesmen Berlangsung', color:'var(--hr-text-soft)' },
+    review:   { label:'Review HR',           color:'var(--amber-dark)'   },
+    interview:{ label:'Interview',            color:'var(--teal-dark)'    },
+    decision: { label:'Keputusan Final',      color:'var(--green-dark)'   }
+  };
+
+  const filtered = CANDIDATES.filter(c => {
+    const matchTrack  = STATE.hrFilter==='all' || c.track===STATE.hrFilter;
+    const q           = (STATE.hrSearch||'').toLowerCase();
+    const matchSearch = !q || c.name.toLowerCase().includes(q) || c.jobTitle.toLowerCase().includes(q);
+    return matchTrack && matchSearch;
+  });
+
+  const grouped = { screening:[], review:[], interview:[], decision:[] };
+  filtered.forEach(c => grouped[hrColumn(c)].push(c));
+
+  const total    = CANDIDATES.length;
+  const hired    = CANDIDATES.filter(c=>c.hr.final==='hired').length;
+  const needRev  = CANDIDATES.filter(c=>hrColumn(c)==='review').length;
+  const avgScore = total ? Math.round(CANDIDATES.reduce((s,c)=>s+c.composite,0)/total) : 0;
+
+  return `<div>
+    <div class="flex-between" style="margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="eyebrow">${icon('grid',12)} Bridge Console · Manajemen Kandidat</div>
+        <div class="h2" style="margin-top:6px;">Rekrutmen Dashboard</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-demo btn-sm" onclick="hrCreateDemoCandidate()" title="Buat kandidat demo baru dan jalankan seluruh alur HR">${icon('sparkle',13)} Demo Full-Flow</button>
+        <input class="input" style="width:190px;padding:8px 12px;font-size:13px;" placeholder="Cari nama / posisi…"
+          value="${escapeHtml(STATE.hrSearch||'')}" oninput="STATE.hrSearch=this.value;renderAll()">
+        ${['all','maritime','backoffice'].map(f=>`
+          <button class="btn btn-sm ${STATE.hrFilter===f?'btn-primary':'btn-ghost'}"
+            onclick="STATE.hrFilter='${f}';renderAll()">
+            ${f==='all'?'Semua':(f==='maritime'?icon('anchor',12)+' Maritime':icon('building',12)+' Back Office')}
+          </button>`).join('')}
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div class="card-flat" style="text-align:center;">
+        <div class="mono" style="font-size:26px;font-weight:700;">${total}</div>
+        <div class="small muted">Total Kandidat</div>
+      </div>
+      <div class="card-flat" style="text-align:center;">
+        <div class="mono" style="font-size:26px;font-weight:700;color:var(--amber-dark);">${needRev}</div>
+        <div class="small muted">Perlu Review HR</div>
+      </div>
+      <div class="card-flat" style="text-align:center;">
+        <div class="mono" style="font-size:26px;font-weight:700;color:var(--green-dark);">${hired}</div>
+        <div class="small muted">Diterima (Hired)</div>
+      </div>
+      <div class="card-flat" style="text-align:center;">
+        <div class="mono" style="font-size:26px;font-weight:700;">${avgScore}</div>
+        <div class="small muted">Rata-rata Skor</div>
+      </div>
+    </div>
+
+    <div class="kanban">
+      ${Object.entries(COLS).map(([key,col])=>`
+        <div class="kcol">
+          <div class="kcol-head">
+            <span class="t" style="color:${col.color}">${col.label}</span>
+            <span class="n">${grouped[key].length}</span>
+          </div>
+          ${grouped[key].length===0
+            ? `<div class="empty" style="padding:28px 10px;font-size:12px;">${icon('info',20)}<div style="margin-top:8px;">Kosong</div></div>`
+            : grouped[key].map(renderKcard).join('')}
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderKcard(c){
+  const rec = aiRecommendation(c.composite);
+  let statusBadge;
+  if(c.hr.final==='hired')    statusBadge = `<span class="tag tag-rule" style="font-size:9px;">${icon('check',9)} Hired</span>`;
+  else if(c.hr.final==='pool') statusBadge = `<span class="tag tag-ai"  style="font-size:9px;">${icon('folder',9)} Pool</span>`;
+  else if(c.hr.final)          statusBadge = `<span class="tag tag-red"  style="font-size:9px;">${icon('x',9)} Rejected</span>`;
+  else                         statusBadge = `<span class="tag ${rec.cls}" style="font-size:9px;">${rec.label}</span>`;
+
+  return `<div class="kcard" onclick="nav('hr-detail',{hrOpenId:'${c.id}',hrDetailTab:'profil'})">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div class="avatar" style="width:34px;height:34px;font-size:12px;background:var(--bridge-2);">${initials(c.name)}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="name" style="font-size:13px;">${escapeHtml(c.name)}</div>
+        <div class="pos">${escapeHtml(c.jobTitle)}</div>
+      </div>
+    </div>
+    <div class="meta">
+      ${statusBadge}
+      <span class="score" style="color:${scoreColor(c.composite)}">${c.composite}</span>
+    </div>
+    <div style="margin-top:8px;font-size:10.5px;color:var(--hr-text-soft);">
+      ${fmtDate(c.appliedAt)} &middot; ${c.track==='maritime'?icon('anchor',10)+' Mar':icon('building',10)+' BO'}
+    </div>
+  </div>`;
+}
+
+/* ---- HR Detail — Shell ---- */
+function renderHrDetail(){
+  const c = CANDIDATES.find(c=>c.id===STATE.hrOpenId);
+  if(!c) return `<div class="empty">${icon('info',30)}
+    <div class="h3" style="margin-top:12px;">Kandidat tidak ditemukan</div>
+    <button class="btn btn-ghost" style="margin-top:16px;" onclick="nav('hr-board')">Kembali</button></div>`;
+
+  const t   = STATE.hrDetailTab || 'profil';
+  const isMar = c.track==='maritime';
+  const tabs = [
+    { id:'profil',     label:icon('user',14)+' Profil'       },
+    { id:'screening',  label:icon('bars',14)+' Scoring'      },
+    { id:'sertifikat', label:icon('shield',14)+' Sertifikat', hide:!isMar },
+    { id:'video',      label:icon('video',14)+' Video',  hide:!c.video.answers.length },
+    { id:'interview',  label:icon('calendar',14)+' Interview' },
+    { id:'bgcheck',    label:icon('search',14)+' Background' },
+    { id:'mcu',        label:icon('shield',14)+' MCU',   hide:!isMar },
+    { id:'keputusan',  label:icon('award',14)+' Keputusan' },
+    { id:'komunikasi', label:icon('mail',14)+' Komunikasi'   },
+  ];
+
+  let body = '';
+  if(t==='profil')         body = hrTabProfil(c);
+  else if(t==='screening') body = hrTabScreening(c);
+  else if(t==='sertifikat')body = hrTabCert(c);
+  else if(t==='video')     body = hrTabVideo(c);
+  else if(t==='interview') body = hrTabInterview(c);
+  else if(t==='bgcheck')   body = hrTabBgCheck(c);
+  else if(t==='mcu')       body = hrTabMcu(c);
+  else if(t==='keputusan') body = hrTabKeputusan(c);
+  else if(t==='komunikasi')body = hrTabKomunikasi(c);
+  else body = hrTabProfil(c);
+
+  return `<div>
+    <div class="flex-between" style="margin-bottom:18px;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn btn-ghost btn-sm" onclick="nav('hr-board')">${iconBack(14)} Board</button>
+        <div class="avatar lg">${initials(c.name)}</div>
+        <div>
+          <div class="h2">${escapeHtml(c.name)}</div>
+          <div class="small muted" style="margin-top:2px;">
+            ${escapeHtml(c.jobTitle)} &middot;
+            ${c.track==='maritime'?icon('anchor',11)+' Maritime':icon('building',11)+' Back Office'} &middot;
+            Daftar ${fmtDate(c.appliedAt)}
+          </div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div class="mono" style="font-size:32px;font-weight:700;color:${scoreColor(c.composite)}">${c.composite}</div>
+        <div class="small muted">Composite Score</div>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-bottom:20px;">
+      ${tabs.filter(tb=>!tb.hide).map(tb=>`
+        <div class="tab${t===tb.id?' active':''}" onclick="STATE.hrDetailTab='${tb.id}';renderAll()">
+          ${tb.label}
+        </div>`).join('')}
+    </div>
+
+    ${body}
+  </div>`;
+}
+
+/* ---- Helpers untuk Profil tab ---- */
+function candidateAsmProgress(c){
+  const steps = [];
+  steps.push({label:'CV Screening', done:!!c.cv.fileName, score:c.cv.fileName?c.cv.matchScore:null, extra:c.cv.fileName?('Match: '+c.cv.matchScore+'/100'):''});
+  if(c.track==='maritime'){
+    const qDone = c.quiz.passFail!==null;
+    steps.push({label:'Kuis Kualifikasi', done:qDone, score:qDone?c.quiz.qualScore:null, extra:qDone?(c.quiz.passFail?'Pass — syarat mutlak terpenuhi':'Fail — ada syarat yang tidak terpenuhi'):''});
+    steps.push({label:'Video Interview', done:c.video.aiScore>0, score:c.video.aiScore>0?c.video.aiScore:null, extra:c.video.aiScore>0?(c.video.answers.length+' jawaban terekam'):''});
+    steps.push({label:'Verifikasi Sertifikat', done:!!c.cert.status, score:null, extra:c.cert.status?({valid:'Valid ✓',expired:'Kadaluarsa',not_found:'Tidak Ditemukan',error:'Error Jaringan'}[c.cert.status]||c.cert.status):''});
+  } else {
+    const formDone = !!(c.bundle.disc&&c.bundle.disc.type);
+    steps.push({label:'Form + DISC + IQ', done:formDone, score:formDone?c.bundle.formScore:null,
+      extra:formDone?('DISC: '+(c.bundle.disc.type||'?')+' · IQ: '+(c.bundle.iq&&c.bundle.iq.score!=null?c.bundle.iq.score:'?')):''});
+    steps.push({label:'Video Interview', done:c.video.aiScore>0, score:c.video.aiScore>0?c.video.aiScore:null, extra:c.video.aiScore>0?(c.video.answers.length+' jawaban terekam'):''});
+  }
+  return steps;
+}
+
+function hrNextAction(c){
+  if(!c.selfServeDone) return {title:'Menunggu Kandidat', desc:'Kandidat belum menyelesaikan seluruh tahapan asesmen mandiri.'};
+  if(!c.hr.stage1) return {title:'Review Profil & Ambil Keputusan', desc:'Kandidat selesai asesmen. Tinjau scoring, video, dan insight AI lalu putuskan: Lanjut Interview / Talent Pool / Tolak.', tab:'profil', tabLabel:'Profil'};
+  if(c.hr.stage1!=='advance') return null;
+  if(!c.hr.interview.scheduledAt) return {title:'Jadwalkan Interview', desc:'Kandidat lolos review awal. Jadwalkan sesi interview HR & User sekarang.', tab:'interview', tabLabel:'Interview'};
+  if(!c.hr.interview.done) return {title:'Isi Evaluasi Interview', desc:'Interview sudah dijadwalkan. Setelah sesi selesai, isi formulir evaluasi komunikasi, teknis, dan sikap.', tab:'interview', tabLabel:'Interview'};
+  if(!c.hr.bgCheck.done) return {title:'Lakukan Background Check', desc:'Hubungi referensi kandidat dan isi hasil pengecekan latar belakang.', tab:'bgcheck', tabLabel:'Background'};
+  if(c.track==='maritime' && !c.hr.mcu.done) return {title:'Konfirmasi MCU', desc:'Background check selesai. Minta kandidat upload hasil Medical Check-Up (MCU) terbaru.', tab:'mcu', tabLabel:'MCU'};
+  if(!c.hr.final) return {title:'Ambil Keputusan Final', desc:'Semua tahap selesai. Putuskan: Terima (Hired), Talent Pool, atau Tolak — lalu generate kontrak jika diterima.', tab:'keputusan', tabLabel:'Keputusan'};
+  if(c.hr.final==='hired' && !c.contractGenerated) return {title:'Generate Kontrak PKWT', desc:'Kandidat diterima. Buat dan kirim dokumen kontrak (PKWT).', tab:'keputusan', tabLabel:'Keputusan'};
+  return null;
+}
+
+/* ---- Tab: Profil ---- */
+function hrTabProfil(c){
+  const rec = aiRecommendation(c.composite);
+  const ins = aiInsight(c);
+  const asmSteps = candidateAsmProgress(c);
+  const nextAction = hrNextAction(c);
+  const isMar = c.track === 'maritime';
+
+  // --- Blok Aksi HR (full-width, paling atas) ---
+  let aksiBlock = '';
+  if(!c.selfServeDone){
+    aksiBlock = `<div class="card" style="margin-bottom:16px;border-left:4px solid var(--amber-dark);background:var(--amber-light);">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div>${icon('clock',20)}</div>
+        <div>
+          <div style="font-weight:700;font-size:14px;">Menunggu Kandidat Selesai Asesmen</div>
+          <div class="small muted" style="margin-top:3px;">Kandidat belum menyelesaikan seluruh tahapan asesmen mandiri. Tidak ada aksi HR yang diperlukan saat ini.</div>
+        </div>
+      </div>
+    </div>`;
+  } else if(!c.hr.stage1){
+    aksiBlock = `<div class="card" style="margin-bottom:16px;border:2px solid var(--teal-dark);">
+      <div class="eyebrow" style="margin-bottom:14px;color:var(--teal-dark);">${icon('user',13)} Keputusan HR — Tahap 1 (Wajib Diisi)</div>
+      <p class="small" style="margin-bottom:14px;line-height:1.65;color:var(--ink-soft);">
+        Kandidat telah menyelesaikan asesmen mandiri. Tinjau profil di bawah, lalu ambil keputusan:
+      </p>
+      <div class="field" style="margin-bottom:12px;"><label>Catatan Recruiter (opsional)</label>
+        <textarea class="textarea" id="hr-s1-notes" style="min-height:56px;" placeholder="Tulis catatan internal untuk rekam jejak keputusan…">${escapeHtml(c.hr.stage1Notes||'')}</textarea>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-success btn-sm" onclick="hrSetStage1('${c.id}','advance')">${icon('check',13)} Lanjut ke Interview</button>
+        <button class="btn btn-sm" style="background:rgba(43,179,160,.18);color:var(--teal-dark);border:1px solid rgba(43,179,160,.3);" onclick="hrSetStage1('${c.id}','pool')">${icon('folder',13)} Simpan ke Talent Pool</button>
+        <button class="btn btn-danger btn-sm" onclick="hrSetStage1('${c.id}','reject')">${icon('x',13)} Tidak Lanjut</button>
+        <button class="btn btn-demo btn-sm" style="margin-left:auto;" onclick="hrDemoSkip('${c.id}','stage1')" title="Demo: otomatis lanjut interview">⚡ Demo</button>
+      </div>
+    </div>`;
+  } else if(nextAction){
+    aksiBlock = `<div class="card" style="margin-bottom:16px;border-left:3px solid var(--amber-dark);">
+      <div class="eyebrow" style="margin-bottom:6px;color:var(--amber-dark);">${icon('clock',12)} Aksi Selanjutnya</div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px;">${escapeHtml(nextAction.title)}</div>
+      <div class="small muted" style="line-height:1.6;">${escapeHtml(nextAction.desc)}</div>
+      ${nextAction.tab?`<button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="STATE.hrDetailTab='${nextAction.tab}';renderAll();">${icon('chev',13)} Buka Tab ${escapeHtml(nextAction.tabLabel||nextAction.tab)}</button>`:''}
+    </div>`;
+  } else {
+    // keputusan sudah final
+    const fc = c.hr.stage1==='advance'?'var(--teal)':c.hr.stage1==='pool'?'var(--amber)':'var(--red)';
+    aksiBlock = `<div class="card" style="margin-bottom:16px;border-left:3px solid ${fc};">
+      <div class="small muted">Keputusan Tahap 1 · ${fmtDate(c.hr.stage1At)}</div>
+      <div style="font-weight:700;margin-top:3px;">${c.hr.stage1==='advance'?'✓ Lanjut Interview':c.hr.stage1==='pool'?'⊙ Talent Pool':'✕ Tidak Dilanjutkan'}</div>
+      ${c.hr.stage1Notes?`<div class="small muted" style="margin-top:5px;">${escapeHtml(c.hr.stage1Notes)}</div>`:''}
+    </div>`;
+  }
+
+  // --- Skor & progress (full-width) ---
+  const scoreBlock = `<div class="card" style="margin-bottom:16px;">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div style="text-align:center;flex:none;">
+        <div class="gauge-num" style="color:${scoreColor(c.composite)};font-size:44px;">${c.composite}</div>
+        <div class="small muted">Composite Score</div>
+        <div style="margin-top:6px;"><span class="tag ${rec.cls}">${icon('sparkle',10)} ${rec.label}</span></div>
+      </div>
+      <div style="flex:1;min-width:180px;">${renderScoreBars(isMar?MARITIME_WEIGHTS:BACKOFFICE_WEIGHTS, subscoresFor(c))}</div>
+    </div>
+  </div>`;
+
+  // --- Progress Asesmen ---
+  const asmBlock = `<div class="card" style="margin-bottom:16px;">
+    <div class="eyebrow" style="margin-bottom:12px;">${icon('bars',12)} Progres Asesmen Mandiri</div>
+    ${asmSteps.map(s=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--bridge-line);">
+        <div style="width:22px;height:22px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;${s.done?'background:var(--teal-dark);color:#fff;':'background:var(--bridge-2);color:var(--hr-text-soft);'}">
+          ${s.done?icon('check',12):'<span style="font-size:10px;">–</span>'}
+        </div>
+        <div style="flex:1;">
+          <div class="small" style="font-weight:600;${s.done?'':'color:var(--hr-text-soft);'}">${escapeHtml(s.label)}</div>
+          ${s.extra?`<div style="font-size:11px;color:var(--hr-text-soft);margin-top:1px;">${escapeHtml(s.extra)}</div>`:''}
+        </div>
+        ${s.score!=null?`<div class="mono" style="font-size:14px;font-weight:700;color:${scoreColor(s.score)}">${s.score}</div>`:''}
+      </div>`).join('')}
+  </div>`;
+
+  // --- 2-kolom: Data kandidat + AI Insight ---
+  const leftCol = `<div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="eyebrow" style="margin-bottom:12px;">${icon('user',12)} Data Kandidat</div>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;line-height:1.7;">
+        <span style="color:var(--hr-text-soft);white-space:nowrap;">Nama</span><span style="font-weight:600;">${escapeHtml(c.name)}</span>
+        <span style="color:var(--hr-text-soft);white-space:nowrap;">Posisi</span><span>${escapeHtml(c.jobTitle)}</span>
+        <span style="color:var(--hr-text-soft);white-space:nowrap;">Track</span><span>${isMar?icon('anchor',11)+' Maritime Crew':icon('building',11)+' Back Office'}</span>
+        <span style="color:var(--hr-text-soft);white-space:nowrap;">Email</span><span>${escapeHtml(c.email)}</span>
+        <span style="color:var(--hr-text-soft);white-space:nowrap;">WhatsApp</span><span>${escapeHtml(c.phone)}</span>
+        <span style="color:var(--hr-text-soft);white-space:nowrap;">Mendaftar</span><span>${fmtDateTime(c.appliedAt)}</span>
+      </div>
+      ${c.cv.fileName?`<div class="card-flat" style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;">${icon('file',14)}<span>${escapeHtml(c.cv.fileName)}</span></div>`:''}
+    </div>
+    ${c.cv.summary?`<div class="card">
+      <div class="eyebrow" style="margin-bottom:8px;">${icon('sparkle',12)} Ringkasan CV oleh AI</div>
+      <p class="small" style="line-height:1.75;color:var(--ink);">${escapeHtml(c.cv.summary)}</p>
+    </div>`:''}
+  </div>`;
+
+  const rightCol = `<div class="card">
+    <div class="eyebrow" style="margin-bottom:12px;">${icon('sparkle',12)} Kelebihan &amp; Kekurangan (AI)</div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:11px;font-weight:700;color:var(--green-dark);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">${icon('check',11)} Kelebihan</div>
+      ${ins.pros.map(p=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--bridge-line);font-size:13px;line-height:1.5;">
+        <span style="color:var(--green-dark);font-weight:700;flex:none;">+</span><span>${escapeHtml(p)}</span>
+      </div>`).join('')}
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--red-dark);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">${icon('x',11)} Perlu Dicermati</div>
+      ${ins.cons.map(p=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--bridge-line);font-size:13px;line-height:1.5;">
+        <span style="color:var(--red-dark);font-weight:700;flex:none;">−</span><span>${escapeHtml(p)}</span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+
+  return `<div>
+    ${aksiBlock}
+    ${scoreBlock}
+    ${asmBlock}
+    <div class="grid-2">${leftCol}${rightCol}</div>
+  </div>`;
+}
+
+/* ---- Tab: Screening ---- */
+function hrTabScreening(c){
+  let html = '';
+
+  if(c.track==='maritime'){
+    html += `<div class="card" style="margin-bottom:14px;">
+      <div class="eyebrow" style="margin-bottom:12px;">${icon('file',12)} CV Matching — Maritime</div>
+      <div class="small" style="line-height:2.2;">
+        <b>Jenis Kapal:</b> ${escapeHtml(c.cv.fields.vessel||'-')} &nbsp;&middot;&nbsp;
+        <b>Pengalaman:</b> ${c.cv.fields.expYears||0} tahun &nbsp;&middot;&nbsp;
+        <b>GT:</b> ${(c.cv.fields.gt||0).toLocaleString('id-ID')} &nbsp;&middot;&nbsp;
+        <b>OCIMF:</b> ${c.cv.fields.ocimf?'Ya':'Tidak'}
+      </div>
+      <div style="margin-top:10px;">${(c.cv.fields.certs||[]).map(ct=>`<span class="pill" style="margin:2px;">${escapeHtml(ct)}</span>`).join('')}</div>
+      <hr class="divider">
+      <div class="flex-between">
+        <span class="small muted">CV Match Score</span>
+        <span class="mono" style="font-weight:700;font-size:20px;color:${scoreColor(c.cv.matchScore)}">${c.cv.matchScore}</span>
+      </div>
+    </div>`;
+
+    html += `<div class="card" style="margin-bottom:14px;">
+      <div class="eyebrow" style="margin-bottom:12px;">${icon('bars',12)} Kuis Kualifikasi Minimum</div>
+      <div class="small" style="line-height:2.2;">
+        <b>CoC/CoP Aktif:</b> ${escapeHtml(c.quiz.answers.q1||'-')}<br>
+        <b>Ketersediaan Join:</b> ${escapeHtml(c.quiz.answers.q2||'-')}<br>
+        <b>Ekspektasi Gaji:</b> USD ${escapeHtml(String(c.quiz.answers.q3||'-'))}<br>
+        <b>Bersedia Penempatan:</b> ${escapeHtml(c.quiz.answers.q4||'-')}
+      </div>
+      <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+        <span class="tag ${c.quiz.passFail?'tag-rule':'tag-red'}">${c.quiz.passFail?icon('check',11)+' Pass':icon('x',11)+' Fail'}</span>
+        <span class="small muted">Qual Score: <b style="color:${scoreColor(c.quiz.qualScore)}">${c.quiz.qualScore}</b></span>
+      </div>
+    </div>`;
+
+  } else {
+    html += `<div class="card" style="margin-bottom:14px;">
+      <div class="eyebrow" style="margin-bottom:12px;">${icon('file',12)} CV Matching — Back Office</div>
+      <div class="small" style="line-height:2.2;">
+        <b>Pendidikan:</b> ${escapeHtml(c.cv.fields.edu||'-')} &nbsp;&middot;&nbsp;
+        <b>Usia:</b> ${c.cv.fields.age||'-'} tahun &nbsp;&middot;&nbsp;
+        <b>Pengalaman:</b> ${c.cv.fields.expYears||0} tahun
+      </div>
+      <div style="margin-top:10px;">${(c.cv.fields.tools||[]).map(t=>`<span class="pill" style="margin:2px;">${escapeHtml(t)}</span>`).join('')}</div>
+      <hr class="divider">
+      <div class="flex-between">
+        <span class="small muted">CV &amp; Competency Score</span>
+        <span class="mono" style="font-weight:700;font-size:20px;color:${scoreColor(c.cv.matchScore)}">${c.cv.matchScore}</span>
+      </div>
+    </div>`;
+
+    const src = c.bundle.testSource;
+    const srcBadge = src ? `<span class="tag ${src==='api'?'tag-auto':'tag-hr'}" style="margin-left:8px;">${src==='api'?'Sinkron API':'Upload kandidat'}</span>` : '';
+    const discFile = (c.bundle.disc && c.bundle.disc.resultUrl) ? c.bundle.disc.resultUrl : null;
+    const iqFile   = (c.bundle.iq && c.bundle.iq.resultUrl) ? c.bundle.iq.resultUrl : null;
+    if(c.bundle.disc.type || src || discFile || iqFile){
+      html += `<div class="grid-2" style="margin-bottom:14px;">
+        <div class="card">
+          <div class="eyebrow" style="margin-bottom:10px;">${icon('user',12)} DISC / MBTI ${srcBadge}</div>
+          <div class="mono" style="font-size:28px;font-weight:700;">${c.bundle.disc.type||'—'}</div>
+          <div class="small muted" style="margin-top:4px;">${escapeHtml(c.bundle.disc.label||'Tipe belum dilaporkan')}</div>
+          <hr class="divider">
+          <div class="flex-between">
+            <span class="small muted">Fit Score</span>
+            <span class="mono" style="font-weight:700;color:${scoreColor(c.bundle.disc.fitScore)}">${c.bundle.disc.fitScore}</span>
+          </div>
+          ${discFile?`<a class="btn btn-ghost btn-sm" style="margin-top:12px;" href="${discFile}" target="_blank">${icon('file',13)} Lihat Berkas Hasil DISC</a>`:''}
+        </div>
+        <div class="card">
+          <div class="eyebrow" style="margin-bottom:10px;">${icon('sparkle',12)} IQ Test</div>
+          <div class="mono" style="font-size:28px;font-weight:700;">${(c.bundle.iq.score!=null?c.bundle.iq.score:'—')}</div>
+          <div class="small muted" style="margin-top:4px;">${(c.bundle.iq.correct!=null&&c.bundle.iq.total!=null)?(c.bundle.iq.correct+' benar dari '+c.bundle.iq.total+' soal'):'Skor dari platform tes eksternal'}</div>
+          <hr class="divider">
+          <div class="flex-between">
+            <span class="small muted">IQ Score</span>
+            <span class="mono" style="font-weight:700;color:${scoreColor(c.bundle.iq.score)}">${c.bundle.iq.score}</span>
+          </div>
+          ${iqFile?`<a class="btn btn-ghost btn-sm" style="margin-top:12px;" href="${iqFile}" target="_blank">${icon('file',13)} Lihat Berkas Hasil IQ</a>`:''}
+        </div>
+      </div>`;
+    }
+
+    if(c.bundle.story || c.bundle.availabilityJoin || c.bundle.salaryExpIdr){
+      const job = jobById(c.jobId);
+      const salaryOk = job && c.bundle.salaryExpIdr && c.bundle.salaryExpIdr <= (job.salaryMaxIdr||Infinity);
+      html += `<div class="card">
+        <div class="eyebrow" style="margin-bottom:10px;">${icon('file',12)} Custom Form — Tambahan Kandidat</div>
+        ${c.bundle.story?`<p class="small" style="line-height:1.7;margin-bottom:10px;">${escapeHtml(c.bundle.story)}</p>`:''}
+        <div>${(c.bundle.tools||[]).map(t=>`<span class="pill" style="margin:2px;">${escapeHtml(t)}</span>`).join('')}</div>
+        <hr class="divider">
+        <div class="grid-2" style="gap:10px;">
+          ${c.bundle.availabilityJoin?`<div><div class="small muted" style="margin-bottom:3px;">Ketersediaan Bergabung</div><div style="font-weight:700;font-size:13px;">${escapeHtml(c.bundle.availabilityJoin)}</div></div>`:''}
+          ${c.bundle.salaryExpIdr?`<div>
+            <div class="small muted" style="margin-bottom:3px;">Ekspektasi Gaji</div>
+            <div style="font-weight:700;font-size:13px;color:${salaryOk?'var(--green-dark)':'var(--red-dark)'};">${fmtIDR(c.bundle.salaryExpIdr)}/bln</div>
+            ${job&&job.salaryMaxIdr?`<div style="font-size:11px;color:var(--hr-text-soft);">Budget: hingga ${fmtIDR(job.salaryMaxIdr)} ${salaryOk?'✓ Sesuai':'⚠ Melebihi budget'}</div>`:''}
+          </div>`:''}
+        </div>
+      </div>`;
+    }
+  }
+
+  return html;
+}
+
+/* ---- Tab: Video ---- */
+function hrTabVideo(c){
+  if(!c.video.answers.length)
+    return `<div class="empty">${icon('video',30)}<div class="small" style="margin-top:8px;">Belum ada video interview.</div></div>`;
+
+  return `<div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="flex-between">
+        <div>
+          <div class="eyebrow">${icon('video',12)} AI Video Score</div>
+          <p class="small muted" style="margin-top:4px;">Dinilai berdasarkan komunikasi, relevansi jawaban &amp; kepercayaan diri.</p>
+        </div>
+        <div class="gauge-num" style="color:${scoreColor(c.video.aiScore)}">${c.video.aiScore}</div>
+      </div>
+    </div>
+    ${c.video.answers.map((a,i)=>{
+      const isGdrive = a.videoUrl && (a.videoUrl.startsWith('https://drive.google') || a.videoUrl.startsWith('https://docs.google'));
+      const isLocal  = a.videoUrl && !isGdrive;
+      const isDemo   = a.mode==='demo' || a.transcript==='[Demo] Jawaban video dilewati.';
+      return `
+    <div class="card" style="margin-bottom:14px;">
+      <div class="eyebrow" style="margin-bottom:10px;">${icon('video',12)} Pertanyaan ${i+1}</div>
+      <div class="card-flat" style="margin-bottom:12px;font-size:14px;font-weight:600;">${escapeHtml(a.question)}</div>
+      ${isLocal?`<video controls preload="metadata" style="width:100%;border-radius:10px;background:#000;margin-bottom:12px;max-height:340px;" src="${escapeHtml(a.videoUrl)}"></video>`:''}
+      ${isGdrive?`<div class="card-flat" style="margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+        ${icon('video',20)}<div><div class="small" style="font-weight:600;">Video tersimpan di Google Drive kandidat</div><div class="small muted">Klik untuk menonton langsung dari Drive</div></div>
+        <a href="${escapeHtml(a.videoUrl)}" target="_blank" class="btn btn-teal btn-sm" style="margin-left:auto;">${icon('eye',13)} Tonton ${icon('chev',13)}</a>
+      </div>`:''}
+      <div style="margin-bottom:10px;">
+        <span class="tag tag-auto">${isGdrive?(icon('folder',11)+' Google Drive'):isLocal?(icon('camera',11)+' Upload Server'):isDemo?(icon('sparkle',11)+' Demo Skip'):(a.mode==='real'?icon('camera',11)+' Rekaman Nyata':icon('sparkle',11)+' Simulasi')}</span>
+        <span class="small muted" style="margin-left:8px;">${fmtSeconds(a.durationSec)}</span>
+      </div>
+      ${a.transcript?`
+      <div class="card-flat" style="margin-bottom:10px;">
+        <div class="small muted" style="margin-bottom:5px;font-weight:600;">Transkrip</div>
+        <div class="small" style="line-height:1.65;">${escapeHtml(a.transcript)}</div>
+      </div>`:''}
+      ${a.summary?`
+      <div style="font-size:12px;color:var(--teal-dark);font-weight:600;display:flex;gap:6px;align-items:flex-start;">
+        ${icon('sparkle',12)} <span>AI Summary: ${escapeHtml(a.summary)}</span>
+      </div>`:''}
+    </div>`;}).join('')}
+  </div>`;
+}
+
+/* ---- Tab: Pipeline ---- */
+/* ---- shared: progress strip + gate ---- */
+function hrPipelineStrip(c){
+  return `<div class="card" style="margin-bottom:14px;">
+    <div class="eyebrow" style="margin-bottom:14px;">${icon('clock',12)} Progress Pipeline</div>
+    ${renderPipeline(buildPipeline(c))}
+  </div>`;
+}
+function hrGateNote(){
+  return `<div class=”card” style=”text-align:center;padding:28px 20px;”>
+    <div style=”width:44px;height:44px;border-radius:99px;background:var(--amber-light);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;”>${icon('clock',20)}</div>
+    <div style=”font-weight:700;font-size:15px;margin-bottom:6px;”>Tahap Ini Belum Terbuka</div>
+    <p class=”small muted” style=”max-width:320px;margin:0 auto 18px;line-height:1.65;”>
+      Tab Interview, Background Check, dan Keputusan hanya bisa diakses setelah HR menyatakan kandidat <b>”Lanjut Interview”</b> di tab Profil.
+    </p>
+    <button class=”btn btn-primary btn-sm” onclick=”STATE.hrDetailTab='profil';renderAll();”>
+      ${icon('user',13)} Buka Tab Profil &amp; Beri Keputusan
+    </button>
+  </div>`;
+}
+
+/* ---- Tab: Verifikasi Sertifikat (HR-side RPA, maritime) ---- */
+function hrTabCert(c){
+  const kode = (c.cv.fields && c.cv.fields.kodePelaut) || c.cert.number || '';
+  const verifying = STATE.certVerifying && STATE.certVerifying[c.id];
+  const certMap   = {valid:'tag-rule',expired:'tag-red',not_found:'tag-red',error:'tag-hr'};
+  const certLabel = {valid:'Valid ✓',expired:'Kadaluarsa',not_found:'Tidak Ditemukan',error:'Error Jaringan'};
+
+  // AGEN BERGERAK SENDIRI: begitu kandidat menyelesaikan asesmen, sistem otomatis
+  // menjalankan verifikasi. HR tidak memicunya — HR hanya meninjau (ACC) hasilnya.
+  const queued = !c.cert.status && !verifying && kode && (c.selfServeDone || c.cert.auto);
+  if(queued && !(STATE.certAuto && STATE.certAuto[c.id])){
+    STATE.certAuto = STATE.certAuto || {};
+    STATE.certAuto[c.id] = true;
+    setTimeout(()=>hrVerifyCert(c.id), 500);   // dijalankan sistem, bukan klik HR
+  }
+
+  let panel;
+  if(verifying || (queued)){
+    panel = `<div class="card-flat" style="display:flex;gap:14px;align-items:center;">
+      <span class="spin" style="width:22px;height:22px;color:var(--teal-dark);"></span>
+      <div>
+        <div style="font-weight:600;">Sistem menjalankan verifikasi otomatis…</div>
+        <div class="small muted" style="margin-top:3px;">Membuka portal Kemenhub (RPA) · AI Vision membaca &amp; mengisi CAPTCHA · submit kode pelaut.</div>
+      </div>
+    </div>`;
+  } else if(c.cert.status){
+    panel = `<div class="card-flat">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+        <span class="tag ${certMap[c.cert.status]||'tag-auto'}">${certLabel[c.cert.status]||c.cert.status}</span>
+        ${c.cert.number?`<span class="mono small">${escapeHtml(c.cert.number)}</span>`:''}
+        ${c.cert.validUntil?`<span class="small muted">berlaku s/d ${fmtDate(c.cert.validUntil)}</span>`:''}
+      </div>
+      <div class="small muted" style="margin-bottom:10px;">${icon('sparkle',11)} Diverifikasi otomatis oleh sistem${c.cert.verifiedAt?' · '+fmtDateTime(c.cert.verifiedAt):''} · ${icon('eye',11)} screenshot bukti tersimpan</div>
+      <button class="btn btn-ghost btn-sm" onclick="hrVerifyCert('${c.id}')">${icon('search',13)} Jalankan Ulang</button>
+    </div>`;
+  } else {
+    panel = `<div class="card-flat">
+      <div class="small muted" style="line-height:1.7;">
+        Verifikasi berjalan otomatis setelah kandidat menyelesaikan asesmen mandiri.
+        ${kode?'':'<br><b>Kode pelaut tidak tersedia</b> pada data pendaftaran kandidat.'}
+      </div>
+    </div>`;
+  }
+
+  return `${hrPipelineStrip(c)}
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:12px;">${icon('shield',12)} Verifikasi Sertifikat Pelaut — Kemenhub <span class="tag tag-auto" style="margin-left:8px;">${icon('sparkle',10)} Otomatis (Sistem)</span></div>
+      <div class="grid-2" style="margin-bottom:14px;">
+        <div class="small"><div class="muted">Kode Pelaut</div><div class="mono" style="font-weight:600;">${escapeHtml(kode||'—')}</div></div>
+        <div class="small"><div class="muted">Sumber</div><div style="font-weight:600;">Data pendaftaran (crewing.lintasmaritim.com)</div></div>
+      </div>
+      ${panel}
+      <div class="small muted" style="margin-top:12px;line-height:1.6;">
+        ${icon('info',11)} Dijalankan sistem (agen) — bukan tugas HR. Kandidat tidak melihat alurnya; di portal kandidat hanya tampil “Tahap Analisa HR”. HR cukup melakukan <b>ACC</b> pada keputusan.
+      </div>
+    </div>`;
+}
+
+/* ---- Tab: Interview ---- */
+function hrTabInterview(c){
+  const isMaritime = c.track==='maritime';
+  const iv = c.hr.interview;
+  let html = hrPipelineStrip(c);
+
+  html += '<div class="card">';
+  html += '<div class="eyebrow" style="margin-bottom:14px;">'+icon('calendar',12)+' Interview '+(isMaritime?'HR &amp; User':'User / Manager')+'</div>';
+
+  if(!iv.done){
+    // Status banner
+    if(iv.scheduledAt){
+      html += '<div class="card-flat" style="margin-bottom:16px;background:rgba(43,179,160,.07);border-color:rgba(43,179,160,.25);">'
+        +'<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'
+        +'<div style="flex:1;"><div style="font-weight:700;font-size:14px;margin-bottom:3px;">'+icon('calendar',13)+' Dijadwalkan: '+fmtDateTime(iv.scheduledAt)+'</div>'
+        +'<div class="small muted">Mode: '+escapeHtml(iv.mode)+(iv.location?' &nbsp;·&nbsp; '+escapeHtml(iv.location):'')+'</div></div>'
+        +'<button class="btn btn-teal btn-sm" onclick="hrSendInterviewInvite(\''+c.id+'\')">'+icon('send',13)+' Kirim Ulang Undangan</button>'
+        +'</div></div>';
+    } else {
+      html += '<div class="card-flat" style="margin-bottom:16px;background:rgba(200,130,31,.07);border-color:rgba(200,130,31,.2);">'
+        +'<div class="small" style="line-height:1.65;">'+icon('info',12)+' Interview belum dijadwalkan. '
+        +'Isi form di bawah, simpan jadwal, lalu kirim undangan resmi ke kandidat.</div></div>';
+    }
+
+    // Schedule form
+    html += '<div class="grid-2" style="margin-bottom:14px;">'
+      +'<div class="field"><label>Tanggal &amp; Waktu Interview</label>'
+      +'<input class="input" type="datetime-local" id="hr-int-date" value="'+(iv.scheduledAt?new Date(iv.scheduledAt).toISOString().slice(0,16):'')+'">'
+      +'</div>'
+      +'<div class="field"><label>Mode Pelaksanaan</label>'
+      +'<select class="select" id="hr-int-mode">'
+      +'<option value="Online"'+(iv.mode==='Online'?' selected':'')+'>Online (Video Call)</option>'
+      +'<option value="Offline"'+(iv.mode==='Offline'?' selected':'')+'>Offline (Tatap Muka)</option>'
+      +'</select></div>'
+      +'<div class="field" style="grid-column:span 2"><label>Lokasi / Link Meeting</label>'
+      +'<input class="input" id="hr-int-loc" placeholder="misal: Google Meet, Zoom, atau Alamat Kantor" value="'+escapeHtml(iv.location||'')+'">'
+      +'</div></div>';
+
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:'+(iv.scheduledAt?'20':'0')+'px;">'
+      +'<button class="btn btn-primary btn-sm" onclick="hrScheduleInterview(\''+c.id+'\')">'+icon('calendar',13)+' '+(iv.scheduledAt?'Perbarui Jadwal':'Simpan &amp; Jadwalkan')+'</button>'
+      +'<button class="btn btn-demo btn-sm" onclick="hrDemoSkip(\''+c.id+'\',\'interview\')" title="Demo: isi jadwal + evaluasi otomatis">⚡ Demo Selesaikan Interview</button>'
+      +'</div>';
+
+    // Evaluation form (only shown once scheduled)
+    if(iv.scheduledAt){
+      html += '<div class="divider" style="margin:16px 0;"></div>'
+        +'<div class="eyebrow" style="margin-bottom:10px;">'+icon('bars',12)+' Formulir Evaluasi Interview</div>'
+        +'<div class="card-flat" style="margin-bottom:14px;background:rgba(200,130,31,.05);border-color:rgba(200,130,31,.15);">'
+        +'<div class="small muted">Isi setelah sesi interview selesai. Evaluasi ini bersifat internal — tidak terlihat oleh kandidat.</div></div>';
+
+      const evalDesc = {komunikasi:'kemampuan menyampaikan & mendengarkan', teknis:'pemahaman & pengetahuan teknis', sikap:'profesionalisme & kesesuaian budaya'};
+      ['komunikasi','teknis','sikap'].forEach(k=>{
+        html += '<div class="field" style="margin-bottom:14px;">'
+          +'<label>'+k.charAt(0).toUpperCase()+k.slice(1)+' (1 – 5) '
+          +'<span class="small muted" style="font-weight:400;font-size:11px;">— '+evalDesc[k]+'</span></label>'
+          +'<div class="choice-group">'
+          +[1,2,3,4,5].map(v=>'<div class="choice'+(iv.eval[k]===v?' selected':'')+'" onclick="hrSetEval(\''+c.id+'\',\''+k+'\','+v+')">'+v+'</div>').join('')
+          +'</div></div>';
+      });
+
+      html += '<div class="field" style="margin-bottom:14px;"><label>Catatan Interview</label>'
+        +'<textarea class="textarea" id="hr-int-notes" style="min-height:80px;" placeholder="Ringkasan observasi: kelebihan, catatan, hal yang perlu dipertimbangkan...">'+escapeHtml(iv.eval.notes||'')+'</textarea></div>'
+        +'<button class="btn btn-success btn-sm" onclick="hrFinishInterview(\''+c.id+'\')">'+icon('check',13)+' Tandai Interview Selesai &amp; Simpan Evaluasi</button>';
+    }
+  } else {
+    // Interview done — visual results
+    html += '<div class="card-flat" style="display:flex;align-items:center;gap:10px;margin-bottom:16px;background:var(--green-light);border-color:rgba(60,140,74,.2);">'
+      +'<span class="tag tag-rule">'+icon('check',11)+' Interview Selesai</span>'
+      +'<span class="small muted">'+fmtDateTime(iv.scheduledAt)+' &nbsp;·&nbsp; '+escapeHtml(iv.mode)+(iv.location?' &nbsp;·&nbsp; '+escapeHtml(iv.location):'')+'</span>'
+      +'</div>';
+
+    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">';
+    const scoreLabels = {komunikasi:'Komunikasi', teknis:'Teknis', sikap:'Sikap'};
+    ['komunikasi','teknis','sikap'].forEach(k=>{
+      const score = iv.eval[k]||0;
+      html += '<div style="text-align:center;padding:16px 10px;background:var(--hull-2);border-radius:10px;border:1px solid var(--bridge-line);">'
+        +'<div class="mono" style="font-size:32px;font-weight:700;color:'+scoreColor(score*20)+'">'+score+'</div>'
+        +'<div style="font-size:11px;color:var(--hr-text-soft);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:5px;">'+scoreLabels[k]+'</div>'
+        +'<div class="small muted">dari 5</div>'
+        +'</div>';
+    });
+    html += '</div>';
+
+    if(iv.eval.notes){
+      html += '<div class="card-flat"><div class="eyebrow" style="margin-bottom:6px;font-size:11px;">Catatan Interview</div>'
+        +'<div class="small" style="line-height:1.75;white-space:pre-wrap;color:var(--ink);">'+escapeHtml(iv.eval.notes)+'</div></div>';
+    }
+  }
+
+  html += '</div>';
+  return html;
+}
+
+/* ---- Tab: Background Check ---- */
+function hrTabBgCheck(c){
+  const bg = c.hr.bgCheck;
+  let html = hrPipelineStrip(c);
+
+  html += '<div class="card">'
+    +'<div class="eyebrow" style="margin-bottom:12px;">'+icon('search',12)+' Background Check &amp; Referensi'
+    +'<span class="tag tag-hr" style="margin-left:10px;font-size:10px;">'+icon('eye',10)+' HR Only</span></div>';
+
+  if(!bg.done){
+    html += '<div class="card-flat" style="margin-bottom:16px;background:rgba(200,130,31,.07);border-color:rgba(200,130,31,.2);">'
+      +'<div class="small" style="line-height:1.65;">'+icon('info',12)+' <b>Bagian ini eksklusif HR.</b> '
+      +'Hubungi referensi kandidat dan isi hasil pengecekan di bawah. '
+      +'Data ini tidak ditampilkan ke kandidat.</div></div>';
+
+    html += '<div class="eyebrow" style="margin-bottom:8px;font-size:11px;">'+icon('user',11)+' Referensi 1</div>'
+      +'<div class="grid-2" style="margin-bottom:16px;">'
+      +'<div class="field"><label>Nama &amp; Jabatan</label><input class="input" id="hr-bg-r1n" placeholder="Nama lengkap + jabatan / relasi" value="'+escapeHtml(bg.ref1Name||'')+'"></div>'
+      +'<div class="field"><label>Hasil Pengecekan</label><input class="input" id="hr-bg-r1r" placeholder="Positif / negatif / catatan singkat" value="'+escapeHtml(bg.ref1Result||'')+'"></div>'
+      +'</div>';
+
+    html += '<div class="eyebrow" style="margin-bottom:8px;font-size:11px;">'+icon('user',11)+' Referensi 2 (opsional)</div>'
+      +'<div class="grid-2" style="margin-bottom:16px;">'
+      +'<div class="field"><label>Nama &amp; Jabatan</label><input class="input" id="hr-bg-r2n" placeholder="Nama lengkap + jabatan / relasi" value="'+escapeHtml(bg.ref2Name||'')+'"></div>'
+      +'<div class="field"><label>Hasil Pengecekan</label><input class="input" id="hr-bg-r2r" placeholder="Positif / negatif / catatan singkat" value="'+escapeHtml(bg.ref2Result||'')+'"></div>'
+      +'</div>';
+
+    html += '<div class="eyebrow" style="margin-bottom:8px;font-size:11px;">'+icon('file',11)+' Riwayat Kerja Terakhir</div>'
+      +'<div class="grid-2" style="margin-bottom:16px;">'
+      +'<div class="field"><label>Durasi Masa Kerja</label><input class="input" id="hr-bg-ten" placeholder="misal: 2 tahun 4 bulan" value="'+escapeHtml(bg.lastTenure||'')+'"></div>'
+      +'<div class="field"><label>Alasan Resign / Keluar</label><input class="input" id="hr-bg-res" placeholder="misal: kontrak selesai, relokasi..." value="'+escapeHtml(bg.resignReason||'')+'"></div>'
+      +'<div class="field" style="grid-column:span 2"><label>Eligible Rehire?</label>'
+      +'<select class="select" id="hr-bg-reh">'
+      +'<option value="">Pilih...</option>'
+      +'<option value="Ya"'+(bg.rehire==='Ya'?' selected':'')+'>Ya — direkomendasikan kembali</option>'
+      +'<option value="Tidak"'+(bg.rehire==='Tidak'?' selected':'')+'>Tidak — tidak disarankan</option>'
+      +'<option value="Pertimbangan"'+(bg.rehire==='Pertimbangan'?' selected':'')+'>Dengan Pertimbangan</option>'
+      +'</select></div></div>';
+
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+      +'<button class="btn btn-primary btn-sm" onclick="hrSaveBgCheck(\''+c.id+'\')">'+icon('check',13)+' Simpan &amp; Tandai Selesai</button>'
+      +'<button class="btn btn-demo btn-sm" onclick="hrDemoSkip(\''+c.id+'\',\'bgcheck\')" title="Demo: isi hasil background check otomatis">⚡ Demo Auto-fill</button>'
+      +'</div>';
+  } else {
+    const rehireCol = bg.rehire==='Ya'?'var(--green-dark)':bg.rehire==='Tidak'?'var(--red)':'var(--amber)';
+    const rehireIcon = bg.rehire==='Ya'?icon('check',11):bg.rehire==='Tidak'?icon('x',11):icon('clock',11);
+
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">'
+      +'<span class="tag tag-rule">'+icon('check',11)+' Selesai</span>'
+      +'</div>';
+
+    html += '<div style="display:grid;gap:10px;">';
+
+    // Reference 1
+    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:14px;">'
+      +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);margin-bottom:8px;">Referensi 1</div>'
+      +'<div style="font-weight:600;font-size:13px;margin-bottom:3px;">'+escapeHtml(bg.ref1Name||'—')+'</div>'
+      +'<div class="small muted">'+escapeHtml(bg.ref1Result||'—')+'</div></div>';
+
+    // Reference 2 (if present)
+    if(bg.ref2Name){
+      html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:14px;">'
+        +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);margin-bottom:8px;">Referensi 2</div>'
+        +'<div style="font-weight:600;font-size:13px;margin-bottom:3px;">'+escapeHtml(bg.ref2Name)+'</div>'
+        +'<div class="small muted">'+escapeHtml(bg.ref2Result||'—')+'</div></div>';
+    }
+
+    // Summary row
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;">'
+      +'<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+      +'<div class="small muted" style="margin-bottom:3px;">Masa Kerja</div>'
+      +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.lastTenure||'—')+'</div></div>'
+      +'<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+      +'<div class="small muted" style="margin-bottom:3px;">Alasan Resign</div>'
+      +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.resignReason||'—')+'</div></div>'
+      +'<div style="background:var(--hull-2);border:2px solid '+rehireCol+';border-radius:10px;padding:12px;text-align:center;min-width:100px;">'
+      +'<div class="small muted" style="margin-bottom:3px;">Rehire</div>'
+      +'<div style="font-weight:700;font-size:13px;color:'+rehireCol+';">'+rehireIcon+' '+escapeHtml(bg.rehire||'—')+'</div></div>'
+      +'</div>';
+
+    html += '</div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+/* ---- Tab: MCU (maritime) ---- */
+function hrTabMcu(c){
+  let html = hrPipelineStrip(c);
+  // MCU hanya muncul setelah interview selesai (sesuai alur canvas)
+  if(!c.hr.interview.done){
+    return html + `<div class="card"><div class="small muted" style="line-height:1.7;">${icon('info',12)}
+      MCU hanya dapat diproses setelah sesi <b>Interview</b> selesai dan dievaluasi.
+      Buka tab <b>Interview</b> untuk menandai interview selesai terlebih dahulu.</div></div>`;
+  }
+  html += `<div class="card">
+    <div class="eyebrow" style="margin-bottom:12px;">${icon('shield',12)} Medical Check-Up (MCU)
+      <span class="tag tag-hr" style="margin-left:10px;font-size:10px;">${icon('eye',10)} HR Only — Tersembunyi dari Kandidat</span>
+    </div>`;
+  if(!c.hr.mcu.done){
+    html += `<div class="grid-2">
+      <div class="field"><label>Tanggal Kadaluarsa MCU</label>
+        <input class="input" type="date" id="hr-mcu-exp"
+          value="${c.hr.mcu.validUntil?new Date(c.hr.mcu.validUntil).toISOString().slice(0,10):''}">
+      </div>
+      <div class="field"><label>Status Fit for Duty</label>
+        <select class="select" id="hr-mcu-fit">
+          <option value="">Pilih...</option>
+          <option value="Fit for Duty">Fit for Duty</option>
+          <option value="Unfit">Unfit</option>
+          <option value="Conditional Fit">Conditional Fit</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <button class="btn btn-primary btn-sm" onclick="hrSaveMcu('${c.id}')">${icon('check',13)} Konfirmasi MCU</button>
+      <button class="btn btn-demo btn-sm" onclick="hrDemoSkip('${c.id}','mcu')" title="Demo: isi MCU otomatis — Fit for Duty">⚡ Demo Fit for Duty</button>
+    </div>`;
+  } else {
+    html += `<div class="card-flat" style="display:flex;gap:12px;align-items:center;">
+      <span class="tag tag-rule">${icon('shield',11)} MCU Valid</span>
+      <span class="small muted">Berlaku s/d ${fmtDate(c.hr.mcu.validUntil)} &nbsp;·&nbsp; ${escapeHtml(c.hr.mcu.fitForDuty||'-')}</span>
+    </div>`;
+  }
+  return html + `</div>`;
+}
+
+/* ---- Tab: Keputusan Final & Kontrak ---- */
+function hrTabKeputusan(c){
+  const isMaritime = c.track==='maritime';
+  let html = hrPipelineStrip(c);
+
+  if(!c.hr.final){
+    const ready = !!(c.hr.bgCheck.done && (!isMaritime || c.hr.mcu.done));
+    const border = ready ? 'var(--green)' : 'var(--line)';
+    let notice = '';
+    if(!ready){
+      const missing = 'Background Check' + (isMaritime ? ' &amp; MCU' : '');
+      notice = '<div class="card-flat" style="margin-bottom:14px;background:rgba(200,130,31,.07);border-color:rgba(200,130,31,.2);">'
+        +'<div class="small" style="line-height:1.65;">'+icon('info',12)+' Idealnya selesaikan tahap <b>'+missing+'</b> sebelum keputusan final. '
+        +'Untuk demo, Anda tetap dapat mengambil keputusan sekarang.</div></div>';
+    }
+    html += '<div class="card" style="border-left:3px solid '+border+'">'
+      +'<div class="eyebrow" style="margin-bottom:12px;">'+icon('award',12)+' Keputusan Final</div>'
+      +notice
+      +'<div class="field"><label>Catatan untuk Kandidat</label>'
+      +'<textarea class="textarea" id="hr-final-notes" style="min-height:66px;" placeholder="Tuliskan catatan keputusan akhir…"></textarea></div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+      +'<button class="btn btn-success btn-sm" onclick="hrSetFinal(\''+c.id+'\',\'hired\')">'+icon('check',13)+' Terima (Hired)</button>'
+      +'<button class="btn btn-sm" style="background:rgba(43,179,160,.18);color:var(--teal-dark);" onclick="hrSetFinal(\''+c.id+'\',\'pool\')">'+icon('folder',13)+' Talent Pool</button>'
+      +'<button class="btn btn-danger btn-sm" onclick="hrSetFinal(\''+c.id+'\',\'rejected\')">'+icon('x',13)+' Tolak</button>'
+      +'<button class="btn btn-demo btn-sm" onclick="hrDemoSkip(\''+c.id+'\',\'final_hire\')" title="Demo: terima kandidat otomatis">⚡ Demo Hired</button>'
+      +'</div></div>';
+
+  } else if(c.hr.final==='hired'){
+    const contractBtn = c.contractGenerated
+      ? '<button class="btn btn-ghost btn-sm" onclick="openContractView(\''+c.id+'\')">'+icon('printer',13)+' Lihat &amp; Cetak Kontrak</button>'
+      : '<button class="btn btn-primary btn-sm" onclick="generateContract(\''+c.id+'\')">'+icon('file',13)+' Generate Kontrak PKWT</button>';
+    const notesHtml = c.hr.finalNotes
+      ? '<div class="card-flat" style="margin-bottom:14px;"><div class="small muted" style="line-height:1.65;">'+escapeHtml(c.hr.finalNotes)+'</div></div>'
+      : '';
+    html += '<div class="card" style="border-left:4px solid var(--green)">'
+      +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
+      +'<div style="width:44px;height:44px;border-radius:50%;background:var(--green-light);border:2px solid var(--green-dark);display:flex;align-items:center;justify-content:center;flex:none;">'+icon('check',20)+'</div>'
+      +'<div><div style="font-weight:700;font-size:18px;color:var(--green-dark);">Diterima (Hired)</div>'
+      +'<div class="small muted">Keputusan ditetapkan '+fmtDate(c.hr.finalAt)+'</div></div></div>'
+      +notesHtml
+      +'<div class="eyebrow" style="margin-bottom:10px;">'+icon('chev',12)+' Langkah Selanjutnya</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+      +contractBtn
+      +'<button class="btn btn-teal btn-sm" onclick="prefillNotif(2,\''+c.id+'\');STATE.hrDetailTab=\'komunikasi\';renderAll();">'+icon('send',13)+' Kirim Notifikasi Penerimaan</button>'
+      +'</div></div>';
+
+  } else if(c.hr.final==='pool'){
+    const notesHtml = c.hr.finalNotes
+      ? '<br><br><span class="muted">Catatan: '+escapeHtml(c.hr.finalNotes)+'</span>'
+      : '';
+    html += '<div class="card" style="border-left:4px solid var(--teal)">'
+      +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
+      +'<div style="width:44px;height:44px;border-radius:50%;background:var(--teal-light);border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;flex:none;">'+icon('folder',20)+'</div>'
+      +'<div><div style="font-weight:700;font-size:18px;color:var(--teal-dark);">Masuk Talent Pool</div>'
+      +'<div class="small muted">Keputusan ditetapkan '+fmtDate(c.hr.finalAt)+'</div></div></div>'
+      +'<div class="card-flat" style="margin-bottom:14px;">'
+      +'<div class="small" style="line-height:1.75;">Profil <b>'+escapeHtml(c.name)+'</b> disimpan dalam talent pool dan akan '
+      +'dipertimbangkan untuk kebutuhan rekrutmen berikutnya yang sesuai.'+notesHtml+'</div></div>'
+      +'<button class="btn btn-teal btn-sm" onclick="prefillNotif(3,\''+c.id+'\');STATE.hrDetailTab=\'komunikasi\';renderAll();">'+icon('send',13)+' Kirim Notifikasi ke Kandidat</button>'
+      +'</div>';
+
+  } else {
+    // rejected
+    const notesHtml = c.hr.finalNotes
+      ? '<br><span style="color:var(--hr-text-soft);">Catatan internal: '+escapeHtml(c.hr.finalNotes)+'</span>'
+      : '';
+    html += '<div class="card" style="border-left:4px solid var(--red)">'
+      +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
+      +'<div style="width:44px;height:44px;border-radius:50%;background:var(--red-light);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;flex:none;">'+icon('x',20)+'</div>'
+      +'<div><div style="font-weight:700;font-size:18px;color:var(--red);">Tidak Diterima</div>'
+      +'<div class="small muted">Keputusan ditetapkan '+fmtDate(c.hr.finalAt)+'</div></div></div>'
+      +'<div class="card-flat" style="margin-bottom:16px;background:rgba(220,53,69,.05);border-color:rgba(220,53,69,.15);">'
+      +'<div class="small" style="line-height:1.75;">'
+      +'Proses seleksi untuk <b>'+escapeHtml(c.name)+'</b> pada posisi <b>'+escapeHtml(c.jobTitle)+'</b> '
+      +'telah selesai. Kandidat dinyatakan <b>tidak lolos</b> tahap ini.'+notesHtml+'</div></div>'
+      +'<div class="eyebrow" style="margin-bottom:10px;">'+icon('send',12)+' Langkah Selanjutnya</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">'
+      +'<button class="btn btn-primary btn-sm" onclick="prefillNotif(4,\''+c.id+'\');STATE.hrDetailTab=\'komunikasi\';renderAll();">'+icon('send',13)+' Kirim Notifikasi Penolakan ke Kandidat</button>'
+      +'<button class="btn btn-sm" style="background:rgba(43,179,160,.18);color:var(--teal-dark);" onclick="hrOverrideFinal(\''+c.id+'\',\'pool\')">'+icon('folder',13)+' Pindahkan ke Talent Pool</button>'
+      +'</div>'
+      +'<div class="small muted" style="line-height:1.65;">'
+      +icon('info',11)+' Notifikasi penolakan yang dikirim bersifat profesional dan tidak menyertakan alasan internal. '
+      +'Kandidat dapat melamar kembali di masa mendatang.</div>'
+      +'</div>';
+  }
+
+  return html;
+}
+
+/* ---- HR-side certificate verification (RPA trigger; simulated in demo) ---- */
+function hrVerifyCert(id){
+  const c = CANDIDATES.find(x=>x.id===id); if(!c) return;
+  const kode = (c.cv.fields && c.cv.fields.kodePelaut) || c.cert.number || '';
+  if(!kode) return;
+  STATE.certVerifying = STATE.certVerifying || {};
+  STATE.certVerifying[id] = true; renderAll();
+  // Panggil endpoint RPA (di produksi menjalankan cert_verifier.py → pelaut.dephub.go.id).
+  try{ fetch(`/api/candidates/${id}/verify-cert`, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'}).catch(()=>{}); }catch(e){}
+  setTimeout(()=>{
+    if(STATE.certVerifying) delete STATE.certVerifying[id];
+    const now = new Date().toISOString();
+    const vu = new Date(); vu.setFullYear(vu.getFullYear()+2);
+    c.cert = {status:'valid', number:kode, validUntil:vu.toISOString(), verifiedAt:now};
+    if(typeof persistCandidate==='function') persistCandidate(id);
+    else if(typeof saveCandidateById==='function') saveCandidateById(id);
+    renderAll();
+  }, 1900);
+}
+
+/* ---- Tab: Komunikasi ---- */
+function hrTabKomunikasi(c){
+  return `<div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="eyebrow" style="margin-bottom:12px;">${icon('send',12)} Kirim Notifikasi Manual</div>
+      <div class="field"><label>Template Cepat</label>
+        <select class="select" id="notif-tpl" onchange="prefillNotif(this.value,'${c.id}')">
+          <option value="">— Pilih template —</option>
+          <option value="0">Link Asesmen</option>
+          <option value="1">Undangan Interview</option>
+          <option value="2">Diterima (Hired)</option>
+          <option value="3">Talent Pool</option>
+          <option value="4">Tidak Lanjut</option>
+        </select>
+      </div>
+      <div class="field"><label>Subjek</label><input class="input" id="notif-subj" value="" placeholder="Subjek notifikasi…"></div>
+      <div class="field"><label>Pesan</label><textarea class="textarea" id="notif-body" style="min-height:180px;font-size:13px;line-height:1.6;" placeholder="Isi pesan…"></textarea></div>
+      <button class="btn btn-primary btn-sm" onclick="hrSendNotif('${c.id}')">${icon('send',13)} Kirim via Email &amp; WhatsApp</button>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow" style="margin-bottom:12px;">${icon('mail',12)} Riwayat Notifikasi (${c.emailLog.length})</div>
+      ${c.emailLog.length===0
+        ?`<div class="small muted">Belum ada notifikasi dikirim.</div>`
+        :c.emailLog.slice().reverse().map(e=>`
+          <div class="envelope" style="margin-bottom:10px;">
+            <div class="envelope-head">
+              <div class="r"><span class="k">Subjek</span><span style="font-weight:600;">${escapeHtml(e.subject)}</span></div>
+            </div>
+            <div class="envelope-body" style="font-size:12.5px;padding:12px 16px;white-space:pre-wrap;line-height:1.65;">
+${escapeHtml(e.body)}
+              <div class="small muted" style="margin-top:10px;white-space:normal;">${fmtDateTime(e.sentAt)} &middot; ${escapeHtml(e.channel||'Email & WhatsApp')}</div>
+            </div>
+          </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   HR ACTION FUNCTIONS
+   ============================================================ */
+
+function hrSetStage1(id, action){
+  const c = CANDIDATES.find(c=>c.id===id); if(!c) return;
+  const notes = (document.getElementById('hr-s1-notes')?.value||'').trim();
+  c.hr.stage1   = action==='reject'?'reject':(action==='pool'?'pool':'advance');
+  c.hr.stage1At = new Date();
+  c.hr.stage1Notes = notes;
+  const S = {
+    advance:{ subject:'Selamat! Anda Lolos ke Tahap Interview', body:'Profil Anda lolos review awal HR. Tim kami akan segera menghubungi untuk menjadwalkan interview.' },
+    pool:   { subject:'Update Status Lamaran — Talent Pool', body:'Profil Anda potensial namun belum ada posisi yang cocok saat ini. Kami akan menghubungi Anda.' },
+    reject: { subject:'Update Status Lamaran Anda', body:'Terima kasih atas minat Anda bergabung. Kami belum dapat melanjutkan lamaran Anda kali ini.' },
+  };
+  logEmail(c, S[action].subject, S[action].body);
+  if(action!=='advance'){ c.hr.final=action==='pool'?'pool':'rejected'; c.hr.finalAt=new Date(); c.hr.finalNotes=notes; }
+  toast(action==='advance'?'Kandidat dilanjutkan ke Interview.':action==='pool'?'Kandidat masuk Talent Pool.':'Kandidat ditolak.', 'success', 'check');
+  renderAll();
+}
+
+function hrScheduleInterview(id){
+  const c  = CANDIDATES.find(c=>c.id===id);
+  const dt = document.getElementById('hr-int-date')?.value;
+  if(!dt){ toast('Pilih tanggal &amp; waktu interview.', '', 'info'); return; }
+  c.hr.interview.scheduledAt = new Date(dt);
+  c.hr.interview.mode        = document.getElementById('hr-int-mode')?.value || 'Online';
+  c.hr.interview.location    = document.getElementById('hr-int-loc')?.value || '';
+  toast('Jadwal interview tersimpan. Klik "Kirim Undangan" untuk notifikasi ke kandidat.', 'success', 'calendar');
+  renderAll();
+}
+
+function hrSendInterviewInvite(id){
+  const c = CANDIDATES.find(c=>c.id===id); if(!c) return;
+  if(!c.hr.interview.scheduledAt){ toast('Jadwal belum diset.', '', 'info'); return; }
+  const tgl  = fmtDateTime(c.hr.interview.scheduledAt);
+  const mode = c.hr.interview.mode || 'Online';
+  const loc  = c.hr.interview.location || '';
+  const locLine = loc ? `\n📍 Lokasi/Link  : ${loc}` : '';
+  const subj = `Undangan Wawancara — ${c.jobTitle} · PT Lintas Maritim Indonesia`;
+  const body =
+`Yth. ${c.name},
+
+Selamat! Anda telah lolos tahap asesmen mandiri untuk posisi ${c.jobTitle} di PT Lintas Maritim Indonesia.
+
+Kami dengan senang hati mengundang Anda untuk mengikuti sesi Wawancara bersama tim HR & User:
+
+📅 Waktu      : ${tgl}
+📞 Mode       : ${mode}${locLine}
+
+Mohon konfirmasi kehadiran Anda dengan membalas pesan ini paling lambat 1×24 jam sebelum jadwal.${mode==='Online'?'\n\nPastikan koneksi internet Anda stabil dan kamera/mikrofon berfungsi sebelum sesi dimulai.':''}
+
+Kami menantikan pertemuan dengan Anda.
+
+Salam,
+Tim HR PT Lintas Maritim Indonesia`;
+  logEmail(c, subj, body);
+  toast(`Undangan interview terkirim ke ${c.name} via Email & WhatsApp.`, 'success', 'send');
+}
+
+function hrSetEval(id, key, val){
+  const c = CANDIDATES.find(c=>c.id===id);
+  c.hr.interview.eval[key] = val;
+  renderAll();
+}
+
+function hrFinishInterview(id){
+  const c = CANDIDATES.find(c=>c.id===id);
+  c.hr.interview.done = true;
+  c.hr.interview.eval.notes = document.getElementById('hr-int-notes')?.value || '';
+  toast('Evaluasi interview tersimpan.', 'success', 'check');
+  renderAll();
+}
+
+function hrSaveBgCheck(id){
+  const c = CANDIDATES.find(c=>c.id===id);
+  c.hr.bgCheck = {
+    ref1Name:     document.getElementById('hr-bg-r1n')?.value||'',
+    ref1Result:   document.getElementById('hr-bg-r1r')?.value||'',
+    ref2Name:     document.getElementById('hr-bg-r2n')?.value||'',
+    ref2Result:   document.getElementById('hr-bg-r2r')?.value||'',
+    lastTenure:   document.getElementById('hr-bg-ten')?.value||'',
+    resignReason: document.getElementById('hr-bg-res')?.value||'',
+    rehire:       document.getElementById('hr-bg-reh')?.value||'',
+    done: true,
+  };
+  toast('Background check tersimpan.', 'success', 'check');
+  renderAll();
+}
+
+function hrSaveMcu(id){
+  const c   = CANDIDATES.find(c=>c.id===id);
+  const exp = document.getElementById('hr-mcu-exp')?.value;
+  const fit = document.getElementById('hr-mcu-fit')?.value;
+  if(!exp||!fit){ toast('Lengkapi data MCU (tanggal &amp; status).', '', 'info'); return; }
+  c.hr.mcu = { uploaded:true, validUntil:new Date(exp), fitForDuty:fit, done:true };
+  toast('Data MCU tersimpan.', 'success', 'check');
+  renderAll();
+}
+
+function hrOverrideFinal(id, action){
+  const c = CANDIDATES.find(c=>c.id===id); if(!c) return;
+  c.hr.final   = action;
+  c.hr.finalAt = new Date();
+  const msgs = {pool:'Kandidat dipindahkan ke Talent Pool.', hired:'Kandidat diterima! 🎉'};
+  toast(msgs[action]||'Status diperbarui.', 'success', 'check');
+  renderAll();
+}
+
+function hrSetFinal(id, action){
+  const c = CANDIDATES.find(c=>c.id===id); if(!c) return;
+  const notes = (document.getElementById('hr-final-notes')?.value||'').trim();
+  c.hr.final     = action;
+  c.hr.finalAt   = new Date();
+  c.hr.finalNotes= notes;
+  const S = {
+    hired:    { subject:'Selamat! Anda Diterima — Lintas Maritim', body:'Kami dengan senang hati menyampaikan bahwa Anda diterima. Kontrak kerja (PKWT) akan segera dikirimkan.' },
+    pool:     { subject:'Update Status Lamaran — Talent Pool', body:'Profil Anda kami simpan dan akan dihubungi saat ada posisi yang sesuai.' },
+    rejected: { subject:'Update Status Lamaran Anda', body:'Setelah melalui seluruh tahapan, kami belum dapat melanjutkan lamaran Anda saat ini. Terima kasih.' },
+  };
+  logEmail(c, S[action].subject, S[action].body);
+  const msgs = {hired:'Kandidat diterima! 🎉', pool:'Kandidat masuk Talent Pool.', rejected:'Kandidat ditolak.'};
+  toast(msgs[action], 'success', action==='hired'?'award':'check');
+  renderAll();
+}
+
+function prefillNotif(idxStr, cid){
+  const c = CANDIDATES.find(x=>x.id===cid);
+  if(!c) return;
+  const nama    = c.name || 'Bapak/Ibu';
+  const posisi  = c.jobTitle || 'posisi yang Anda lamar';
+  const iv      = c.hr.interview;
+  const tglIv   = iv && iv.scheduledAt ? fmtDateTime(iv.scheduledAt) : '[tanggal akan dikonfirmasi]';
+  const modeIv  = iv && iv.mode ? iv.mode : 'Online';
+  const locIv   = iv && iv.location ? iv.location : '';
+  const locLine = locIv ? `\n📍 Lokasi/Link  : ${locIv}` : '';
+
+  const templates = [
+    {
+      subject: `Link Asesmen Mandiri — ${posisi} · PT Lintas Maritim Indonesia`,
+      body:
+`Yth. ${nama},
+
+Terima kasih atas minat Anda bergabung bersama PT Lintas Maritim Indonesia untuk posisi ${posisi}.
+
+Kami mengundang Anda untuk menyelesaikan tahapan Asesmen Mandiri MAXY yang mencakup:
+• Kuis kualifikasi awal
+• Pengisian form profil & dokumen pendukung
+• Video interview singkat (3 pertanyaan)
+
+Silakan buka tautan asesmen yang telah kami kirimkan dan selesaikan seluruh tahapan dalam 3×24 jam ke depan.
+
+Jika ada pertanyaan, balas pesan ini atau hubungi tim HR kami.
+
+Salam hangat,
+Tim HR PT Lintas Maritim Indonesia`
+    },
+    {
+      subject: `Undangan Wawancara — ${posisi} · PT Lintas Maritim Indonesia`,
+      body:
+`Yth. ${nama},
+
+Selamat! Anda telah lolos tahap asesmen mandiri untuk posisi ${posisi} di PT Lintas Maritim Indonesia.
+
+Kami dengan senang hati mengundang Anda untuk mengikuti sesi Wawancara bersama tim HR & User:
+
+📅 Waktu      : ${tglIv}
+📞 Mode       : ${modeIv}${locLine}
+
+Mohon konfirmasi kehadiran Anda dengan membalas pesan ini paling lambat 1×24 jam sebelum jadwal.${modeIv==='Online'?'\n\nPastikan koneksi internet Anda stabil dan kamera/mikrofon berfungsi sebelum sesi dimulai.':''}
+
+Kami menantikan pertemuan dengan Anda.
+
+Salam,
+Tim HR PT Lintas Maritim Indonesia`
+    },
+    {
+      subject: `Selamat! Anda Diterima sebagai ${posisi} — PT Lintas Maritim Indonesia`,
+      body:
+`Yth. ${nama},
+
+Dengan bangga kami sampaikan bahwa Anda DITERIMA untuk posisi ${posisi} di PT Lintas Maritim Indonesia.
+
+Langkah selanjutnya:
+1. Kontrak Kerja (PKWT) akan segera dikirimkan ke email Anda untuk ditandatangani.
+2. Harap siapkan dokumen asli (KTP, ijazah, sertifikat kompetensi) untuk proses onboarding.
+3. Tim HR akan menghubungi Anda untuk konfirmasi tanggal mulai bergabung.
+
+Selamat bergabung bersama keluarga besar Lintas Maritim! Kami sangat menantikan kontribusi Anda.
+
+Salam hangat,
+Tim HR PT Lintas Maritim Indonesia`
+    },
+    {
+      subject: `Update Status Lamaran — Talent Pool · PT Lintas Maritim Indonesia`,
+      body:
+`Yth. ${nama},
+
+Terima kasih atas waktu dan upaya Anda dalam mengikuti proses seleksi posisi ${posisi} di PT Lintas Maritim Indonesia.
+
+Setelah melalui evaluasi menyeluruh, kami menilai profil Anda sangat potensial. Meskipun saat ini belum ada posisi yang sesuai, data Anda akan kami simpan dalam Talent Pool prioritas kami.
+
+Kami akan menghubungi Anda kembali apabila ada peluang yang cocok di masa mendatang.
+
+Terima kasih atas kepercayaan Anda kepada kami.
+
+Salam,
+Tim HR PT Lintas Maritim Indonesia`
+    },
+    {
+      subject: `Update Status Lamaran Anda — PT Lintas Maritim Indonesia`,
+      body:
+`Yth. ${nama},
+
+Terima kasih atas minat dan upaya Anda dalam mengikuti proses seleksi posisi ${posisi} di PT Lintas Maritim Indonesia.
+
+Setelah melalui proses evaluasi yang komprehensif, dengan berat hati kami sampaikan bahwa pada tahap ini kami belum dapat melanjutkan proses lamaran Anda.
+
+Keputusan ini tidak mengurangi penilaian kami terhadap kompetensi Anda. Kami mendorong Anda untuk terus mengembangkan diri dan tidak menutup kemungkinan untuk melamar kembali di masa mendatang.
+
+Terima kasih atas kepercayaan Anda kepada PT Lintas Maritim Indonesia.
+
+Salam hormat,
+Tim HR PT Lintas Maritim Indonesia`
+    },
+  ];
+  const idx = parseInt(idxStr);
+  if(isNaN(idx)) return;
+  const t = templates[idx];
+  const s = document.getElementById('notif-subj');
+  const b = document.getElementById('notif-body');
+  if(s) s.value = t.subject;
+  if(b) b.value = t.body;
+}
+
+function hrSendNotif(id){
+  const c    = CANDIDATES.find(c=>c.id===id);
+  const subj = (document.getElementById('notif-subj')?.value||'').trim();
+  const body = (document.getElementById('notif-body')?.value||'').trim();
+  if(!subj||!body){ toast('Lengkapi subjek dan pesan notifikasi.', '', 'info'); return; }
+  logEmail(c, subj, body);
+  toast('Notifikasi terkirim via Email &amp; WhatsApp.', 'success', 'send');
+  const s = document.getElementById('notif-subj');
+  const b = document.getElementById('notif-body');
+  const tpl = document.getElementById('notif-tpl');
+  if(s) s.value=''; if(b) b.value=''; if(tpl) tpl.value='';
+  renderAll();
+}
+
+/* ============================================================
+   CONTRACT GENERATOR & VIEWER
+   ============================================================ */
+
+function generateContract(id){
+  const c = CANDIDATES.find(c=>c.id===id); if(!c) return;
+  c.contractGenerated = true;
+  toast('Kontrak PKWT berhasil di-generate!', 'success', 'file');
+  renderAll();
+}
+
+function openContractView(id){
+  const c   = CANDIDATES.find(c=>c.id===id); if(!c) return;
+  const job = jobById(c.jobId);
+  const today   = new Date();
+  const endDate = new Date(today); endDate.setMonth(endDate.getMonth()+6);
+  const isMaritime = c.track==='maritime';
+  const salary  = isMaritime?('USD '+(job.salaryMaxUsd||0).toLocaleString('en-US')):fmtIDR(job.salaryMaxIdr||0);
+  const noKontrak = 'LMI/PKWT/'+today.getFullYear()+'/'+String(Math.floor(Math.random()*9000+1000)).padStart(4,'0');
+
+  openModal(`
+  <div class="modal-head">
+    <div class="h3">${icon('file',16)} Dokumen Kontrak — PKWT</div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="paper">
+      <div class="paper-head">
+        <div>
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:.01em;">LINTAS MARITIM INDONESIA</div>
+          <div class="small" style="color:var(--ink-soft);margin-top:2px;">Perjanjian Kerja Waktu Tertentu (PKWT)</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="mono small" style="font-weight:600;">No: ${noKontrak}</div>
+          <div class="small" style="color:var(--ink-soft);">${fmtDate(today)}</div>
+        </div>
+      </div>
+
+      <p class="small" style="line-height:1.75;margin-bottom:18px;color:var(--ink-soft);">
+        Perjanjian Kerja Waktu Tertentu ini dibuat antara <b style="color:var(--ink);">PT Lintas Maritim Indonesia</b>
+        (selanjutnya disebut "Perusahaan") dan pihak pekerja di bawah ini, dengan kesepakatan sebagai berikut:
+      </p>
+
+      <div class="paper-row"><span class="k">Nama Lengkap</span><span class="v">${escapeHtml(c.name)}</span></div>
+      <div class="paper-row"><span class="k">Jabatan / Posisi</span><span class="v">${escapeHtml(c.jobTitle)}</span></div>
+      <div class="paper-row"><span class="k">Departemen</span><span class="v">${isMaritime?escapeHtml(job.vesselHint||'Maritime Operations'):escapeHtml(job.dept||'Back Office')}</span></div>
+      <div class="paper-row"><span class="k">Jalur Rekrutmen</span><span class="v">${isMaritime?'Maritime Crew':'Back Office Administration'}</span></div>
+      <div class="paper-row"><span class="k">Jenis Kontrak</span><span class="v">PKWT — Waktu Tertentu (6 Bulan)</span></div>
+      <div class="paper-row"><span class="k">Tanggal Mulai</span><span class="v">${fmtDate(today)}</span></div>
+      <div class="paper-row"><span class="k">Tanggal Berakhir</span><span class="v">${fmtDate(endDate)}</span></div>
+      <div class="paper-row"><span class="k">Gaji Pokok</span><span class="v">${salary} / Bulan</span></div>
+      ${isMaritime&&c.cert.number?`<div class="paper-row"><span class="k">No. Sertifikat</span><span class="v">${escapeHtml(c.cert.number)}</span></div>`:''}
+
+      <p class="small" style="line-height:1.75;margin-top:18px;color:var(--ink-soft);border-top:1px dashed var(--line-soft);padding-top:14px;">
+        Pekerja bersedia mematuhi seluruh peraturan perusahaan, menjaga kerahasiaan informasi, dan melaksanakan tugas sesuai standar kompetensi yang dipersyaratkan.
+        Kontrak dapat diperpanjang berdasarkan evaluasi kinerja dan kebutuhan perusahaan.
+      </p>
+
+      <div class="sigline">
+        <div class="box"><div class="ln">Pekerja<br><b>${escapeHtml(c.name)}</b></div></div>
+        <div class="box"><div class="ln">HR Manager<br><b>PT Lintas Maritim Indonesia</b></div></div>
+        <div class="box"><div class="ln">Direktur Utama<br><b>PT Lintas Maritim Indonesia</b></div></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:16px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;" class="no-print">
+      <button class="btn btn-primary btn-sm" onclick="downloadContract('${id}','pdf')">${icon('file',13)} Unduh PDF</button>
+      <button class="btn btn-sm" style="background:rgba(43,179,160,.18);color:var(--teal-dark);" onclick="downloadContract('${id}','docx')">${icon('file',13)} Unduh DOCX</button>
+      <button class="btn btn-ghost btn-sm" onclick="window.print()">${icon('printer',13)} Cetak</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Tutup</button>
+    </div>
+  </div>`);
+}
+
+/* ============================================================
+   HR DEMO SKIP
+   ============================================================ */
+
+function hrDemoSkip(id, step){
+  const c = CANDIDATES.find(x=>x.id===id); if(!c) return;
+  if(step==='stage1'){
+    c.hr.stage1='advance'; c.hr.stage1At=new Date();
+    c.hr.stage1Notes='[Demo] Profil sesuai kebutuhan posisi — dilanjutkan ke interview.';
+    logEmail(c,'Selamat! Anda Lolos ke Tahap Interview','Profil Anda lolos review awal HR. Tim kami akan segera menghubungi untuk menjadwalkan interview.');
+  } else if(step==='interview'){
+    const d=new Date(); d.setDate(d.getDate()+2);
+    c.hr.interview={scheduledAt:d, mode:'Online', location:'Google Meet', done:true,
+      eval:{komunikasi:4, teknis:4, sikap:5, notes:'[Demo] Komunikasi jelas, teknis solid, sikap profesional dan kooperatif.'}};
+    logEmail(c,'Jadwal Interview Dikonfirmasi','Interview '+fmtDateTime(d)+' via Online (Google Meet).');
+  } else if(step==='bgcheck'){
+    c.hr.bgCheck={
+      ref1Name:'Atasan Langsung (Demo)', ref1Result:'Positif — performa dan integritas baik',
+      ref2Name:'HRD Perusahaan Sebelumnya (Demo)', ref2Result:'Positif — eligible rehire',
+      lastTenure:'2 tahun 3 bulan', resignReason:'Mencari tantangan dan jenjang karier lebih baik', rehire:'Ya', done:true
+    };
+  } else if(step==='mcu'){
+    const exp=new Date(); exp.setFullYear(exp.getFullYear()+1);
+    c.hr.mcu={uploaded:true, validUntil:exp, fitForDuty:'Fit for Duty', done:true};
+  } else if(step==='final_hire'){
+    c.hr.final='hired'; c.hr.finalAt=new Date();
+    c.hr.finalNotes='[Demo] Semua tahap penilaian terpenuhi — kandidat diterima.';
+    logEmail(c,'Selamat! Anda Diterima — Lintas Maritim','Kami dengan senang hati menyampaikan bahwa Anda diterima. Kontrak kerja (PKWT) akan segera dikirimkan.');
+  } else { toast('Step tidak dikenal: '+step,'','info'); return; }
+  saveCandidateById(id);
+  toast('Demo: langkah "'+step+'" diisi otomatis ✓', 'success', 'sparkle');
+  renderAll();
+}
+
+function hrCreateDemoCandidate(){
+  const track = Math.random()>0.5 ? 'maritime' : 'backoffice';
+  const job = track==='maritime' ? jobById('mar-2nd-eng') : jobById('bo-hr');
+  const c = blankCandidate(track, job);
+  const names = ['Demo Kandidat','Ahmad Demo','Sari Demo','Rizky Demo'];
+  c.name = names[Math.floor(Math.random()*names.length)];
+  c.email = 'demo_'+Date.now()+'@example.com'; c.phone='0811-DEMO-0000';
+  if(track==='maritime'){
+    c.cv.fields={vessel:'Bulk Carrier', expYears:4, gt:9000, ocimf:false, certs:['STCW Basic Safety Training','CoC Class II']};
+    c.cv.fileName='CV_Demo.pdf'; c.cv.matchScore=calcCvMatchMaritime(job,c.cv.fields);
+    c.cv.summary='Kandidat demo — 4 tahun pengalaman Bulk Carrier GT 9.000 dengan sertifikasi lengkap. Dibuat otomatis untuk keperluan demonstrasi alur HR.';
+    c.quiz.answers={q1:'Ya',q2:'Segera (≤1 minggu)',q3:'3200',q4:'Ya',_expYears:4};
+    const qr=calcQualScoreMaritime(job,c.quiz.answers); c.quiz.passFail=qr.passFail; c.quiz.qualScore=qr.score;
+    c.cert={status:'valid',number:'PLT-DEMO-0000',validUntil:daysAgo(-400)};
+  } else {
+    c.cv.fields={edu:'S1',age:28,expYears:3,tools:['Excel / Spreadsheet']};
+    c.cv.fileName='CV_Demo.pdf'; c.cv.matchScore=calcCvMatchBackoffice(job,c.cv.fields);
+    c.cv.summary='Kandidat demo — S1 usia 28 tahun, 3 tahun pengalaman HR Recruitment. Dibuat otomatis untuk keperluan demonstrasi alur HR.';
+    c.bundle.story='Demo: mengelola rekrutmen end-to-end 30+ posisi dalam setahun.';
+    c.bundle.tools=['Excel / Spreadsheet']; c.bundle.availabilityJoin='Segera (≤1 minggu)'; c.bundle.salaryExpIdr=8000000;
+    c.bundle.formScore=calcFormScore(c.bundle, job);
+    c.bundle.disc.answers={d1:'I',d2:'I',d3:'I',d4:'S'}; Object.assign(c.bundle.disc, calcDisc(c.bundle.disc.answers));
+    c.bundle.iq.answers={iq1:'32',iq2:'Pilot',iq3:'Jangkar'}; Object.assign(c.bundle.iq, calcIq(c.bundle.iq.answers));
+  }
+  c.video.answers=[{question:(VIDEO_QUESTIONS[track]||[])[0]||'Demo',mode:'sim',durationSec:45,transcript:'(Demo) Jawaban video diisi otomatis untuk keperluan demonstrasi.',summary:'Kandidat menjelaskan pengalaman dengan jelas dan terstruktur.',aiScore:82}];
+  c.video.aiScore=82; c.selfServeDone=true; recompute(c);
+  logEmail(c,'Link Asesmen (Demo)','Kandidat demo dibuat otomatis oleh sistem MAXY.');
+  CANDIDATES.unshift(c);
+  STATE.hrOpenId=c.id; STATE.hrDetailTab='profil';
+  nav('hr-detail');
+  toast('Kandidat demo "'+c.name+'" dibuat — gunakan tombol ⚡ Demo di setiap tab untuk menelusuri alur HR.', 'success', 'sparkle');
+}
+
+/* ============================================================
+   LIVE MODE — wiring konsol HR ke backend MAXY
+   File ini berfungsi ganda:
+     • Sebagai konsol HR LIVE saat di-serve oleh server (membaca/menyimpan via API)
+     • Sebagai demo offline mandiri (fallback ke data seed) bila API tak tersedia
+   ============================================================ */
+const LIVE = false;                // true = HR live (simpan ke server); false = demo mandiri (reset tiap refresh)
+const API_BASE = '';               // origin yang sama dengan server
+
+function reviveDoc(c){
+  // Pastikan struktur minimum ada agar fungsi render demo tidak error
+  c.cv      = c.cv      || {fields:{}, fileName:null};
+  c.quiz    = c.quiz    || {answers:{}, passFail:null, qualScore:0};
+  c.bundle  = c.bundle  || {};
+  c.bundle.story            = c.bundle.story            || '';
+  c.bundle.tools            = c.bundle.tools            || [];
+  c.bundle.availabilityJoin = c.bundle.availabilityJoin ?? null;
+  c.bundle.salaryExpIdr     = c.bundle.salaryExpIdr     ?? null;
+  c.bundle.disc             = c.bundle.disc             || {};
+  c.bundle.iq               = c.bundle.iq               || {};
+  c.bundle.formScore        = c.bundle.formScore        ?? 0;
+  c.video   = c.video   || {answers:[], aiScore:0};
+  c.video.answers = c.video.answers || [];
+  c.cert    = c.cert    || {status:null, number:null, validUntil:null};
+  c.hr      = c.hr      || {};
+  const h = c.hr;
+  h.stage1 = h.stage1 ?? null; h.stage1At = h.stage1At ?? null; h.stage1Notes = h.stage1Notes || '';
+  h.interview = h.interview || {scheduledAt:null, mode:'Online', location:'', done:false, eval:{komunikasi:0,teknis:0,sikap:0,notes:''}};
+  h.interview.eval = h.interview.eval || {komunikasi:0,teknis:0,sikap:0,notes:''};
+  h.bgCheck = h.bgCheck || {done:false};
+  h.mcu = h.mcu || {uploaded:false, validUntil:null, fitForDuty:'', done:false};
+  h.final = h.final ?? null; h.finalAt = h.finalAt ?? null; h.finalNotes = h.finalNotes || '';
+  c.emailLog = c.emailLog || [];
+  c.contractGenerated = !!c.contractGenerated;
+  return c;
+}
+
+async function apiLoadCandidates(){
+  const r = await fetch(API_BASE + '/api/candidates');
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const data = await r.json();
+  return (data.candidates || []).map(reviveDoc);
+}
+
+// Simpan dokumen kandidat ke server (debounce agar input beruntun tidak membanjiri).
+const _saveTimers = {};
+function saveCandidateById(id){
+  if(!LIVE) return;
+  clearTimeout(_saveTimers[id]);
+  _saveTimers[id] = setTimeout(async ()=>{
+    const c = CANDIDATES.find(x=>x.id===id);
+    if(!c) return;
+    try{
+      const r = await fetch(API_BASE + '/api/candidates/'+encodeURIComponent(id), {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(c)
+      });
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const out = await r.json();
+      if(out && out.candidate){
+        // sinkronkan skor hasil recompute server tanpa mengganggu referensi tampilan
+        const i = CANDIDATES.findIndex(x=>x.id===id);
+        if(i>=0){ CANDIDATES[i] = reviveDoc(out.candidate); if(STATE.activeId===id) renderAll(); }
+      }
+    }catch(e){ console.warn('Gagal menyimpan kandidat', id, e); toast('Gagal menyimpan ke server', '', 'info'); }
+  }, 450);
+}
+
+// Bungkus seluruh aksi HR agar otomatis tersimpan ke server setelah dijalankan.
+['hrSetStage1','hrScheduleInterview','hrSendInterviewInvite','hrSetEval','hrFinishInterview',
+ 'hrSaveBgCheck','hrSaveMcu','hrSetFinal','hrSendNotif'].forEach(name=>{
+  const orig = window[name];
+  if(typeof orig === 'function'){
+    window[name] = function(id){ const r = orig.apply(this, arguments); saveCandidateById(id); return r; };
+  }
+});
+
+// Generate kontrak: minta server membuat berkas PDF nyata, lalu tandai & simpan.
+const _origGenerateContract = window.generateContract;
+window.generateContract = function(id){
+  const c = CANDIDATES.find(x=>x.id===id); if(!c) return;
+  c.contractGenerated = true;
+  if(LIVE){
+    fetch(API_BASE + '/api/candidates/'+encodeURIComponent(id)+'/contract?fmt=pdf', {method:'POST'})
+      .then(r=>r.json()).then(out=>{
+        if(out && out.url){ c._contractUrl = out.url; toast('Kontrak PKWT berhasil dibuat!', 'success', 'file'); }
+      }).catch(()=>toast('Kontrak ditandai (server tak merespons)', '', 'info'));
+    saveCandidateById(id);
+  } else {
+    toast('Kontrak PKWT berhasil di-generate!', 'success', 'file');
+  }
+  renderAll();
+};
+
+// Unduh kontrak dalam format tertentu (PDF/DOCX) dari server.
+function downloadContract(id, fmt){
+  if(!LIVE){ toast('Mode demo: unduhan tersedia di server live.', '', 'info'); return; }
+  toast('Menyiapkan '+fmt.toUpperCase()+'…', '', 'file');
+  fetch(API_BASE + '/api/candidates/'+encodeURIComponent(id)+'/contract?fmt='+fmt, {method:'POST'})
+    .then(r=>r.json()).then(out=>{
+      if(out && out.url){ window.open(API_BASE + out.url, '_blank'); }
+      else toast('Gagal membuat kontrak', '', 'info');
+    }).catch(()=>toast('Gagal menghubungi server', '', 'info'));
+}
+
+// Tarik pendaftar terbaru dari crewing (tombol manual di header HR bila tersedia).
+function pollCrewingNow(){
+  toast('Menarik pendaftar baru…', '', 'bars');
+  fetch(API_BASE + '/api/poll-crewing', {method:'POST'})
+    .then(r=>r.json()).then(out=>{
+      toast((out.new||0)+' pendaftar baru ditarik', 'success', 'check');
+      bootLive();
+    }).catch(()=>toast('Polling gagal', '', 'info'));
+}
+
+async function bootLive(){
+  if(LIVE){
+    try{
+      const docs = await apiLoadCandidates();
+      CANDIDATES.length = 0;
+      docs.forEach(d=>CANDIDATES.push(d));
+      if(!CANDIDATES.length){ console.info('Belum ada kandidat di server.'); }
+    }catch(e){
+      console.warn('API tidak tersedia, memakai data demo:', e);
+      if(!CANDIDATES.length) seedCandidates();
+    }
+  } else {
+    seedCandidates();
+  }
+  // Konsol ini selalu membuka langsung ke papan HR.
+  STATE.role = 'hr';
+  STATE.view = (STATE.view==='hr-detail') ? 'hr-detail' : 'hr-board';
+  renderAll();
+}
+
+/* ---- Boot ---- */
+bootLive();
+// Segarkan daftar kandidat berkala agar pendaftar/asesmen baru muncul otomatis.
+if(LIVE){ setInterval(()=>{ if(STATE.role==='hr' && STATE.view==='hr-board'){ apiLoadCandidates().then(docs=>{ if(docs.length!==CANDIDATES.length){ CANDIDATES.length=0; docs.forEach(d=>CANDIDATES.push(d)); renderAll(); } }).catch(()=>{}); } }, 20000); }
+</script>
+</body>
+</html>

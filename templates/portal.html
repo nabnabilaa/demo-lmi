@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Asesmen Kandidat — MAXY · Lintas Maritim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root{
+  --page-bg:#EEF3F5; --ticket:#FBF6EA; --card:#FFFFFF;
+  --ink:#16222B; --ink-soft:#56666F; --ink-faint:#8B98A1;
+  --line:#DCE3E6; --line-soft:#E8EDEF;
+  --hull:#0C2233; --hull-2:#0A1C2B; --bridge:#14304A;
+  --teal:#168E7F; --teal-light:#E3F3F0; --teal-dark:#2BB3A0;
+  --amber:#C8821F; --amber-light:#FBF0DE; --amber-dark:#EAAE4F;
+  --red:#BF4A3D; --red-light:#FBEAE7; --red-dark:#E1685A;
+  --green:#3C8C4A; --green-light:#E7F4E9; --green-dark:#57B868;
+  --blue:#28496A; --blue-light:#E8EEF6;
+  --gold:#A87B2C; --gold-light:#F6EEDC;
+  --font-display:'Fraunces', serif; --font-head:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif; --font-mono:'IBM Plex Mono', monospace;
+  --radius-s:6px; --radius-m:10px; --radius-l:16px;
+  --shadow-s:0 1px 2px rgba(16,30,40,.06), 0 1px 1px rgba(16,30,40,.04);
+  --shadow-m:0 6px 20px rgba(16,30,40,.10), 0 2px 6px rgba(16,30,40,.06);
+  --shadow-l:0 16px 40px rgba(8,16,24,.18);
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+body{
+  font-family:var(--font-body); background:var(--page-bg); color:var(--ink);
+  -webkit-font-smoothing:antialiased; min-height:100vh;
+  background-image:radial-gradient(1200px 500px at 50% -200px, #fff 0%, var(--page-bg) 60%);
+}
+h1,h2,h3,h4{ font-family:var(--font-head); margin:0; letter-spacing:-0.01em; }
+button{ font-family:var(--font-body); cursor:pointer; }
+input,select,textarea{ font-family:var(--font-body); }
+::selection{ background:var(--teal); color:#fff; }
+a{ color:var(--teal); }
+
+.topbar{ background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:30; }
+.topbar-in{ max-width:880px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; gap:12px; }
+.brand-mark{ width:38px; height:38px; border-radius:10px; flex:none;
+  background:linear-gradient(155deg, var(--teal), #0e5f54);
+  display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:var(--shadow-s); }
+.brand-mark svg{ width:21px; height:21px; }
+.brand-word{ font-family:var(--font-display); font-weight:600; font-size:21px; letter-spacing:.01em; line-height:1; }
+.brand-sub{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); letter-spacing:.02em; margin-top:3px; }
+.topbar-tag{ margin-left:auto; font-size:11.5px; font-family:var(--font-mono); color:var(--ink-soft);
+  background:var(--page-bg); border:1px solid var(--line); padding:5px 11px; border-radius:99px; }
+
+.wrap{ max-width:760px; margin:0 auto; padding:26px 22px 110px; }
+
+.stepper{ display:flex; align-items:center; gap:0; margin:6px 0 26px; flex-wrap:wrap; row-gap:10px; }
+.step{ display:flex; align-items:center; gap:9px; }
+.step-dot{ width:26px; height:26px; border-radius:99px; flex:none; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; font-family:var(--font-mono);
+  background:var(--card); border:1.5px solid var(--line); color:var(--ink-faint); transition:.25s; }
+.step.done .step-dot{ background:var(--teal); border-color:var(--teal); color:#fff; }
+.step.active .step-dot{ background:#fff; border-color:var(--teal); color:var(--teal); box-shadow:0 0 0 4px var(--teal-light); }
+.step.waiting .step-dot{ background:#fff; border-color:var(--amber); color:var(--amber); box-shadow:0 0 0 4px var(--amber-light); animation:pulse 1.6s infinite; }
+@keyframes pulse{ 50%{ box-shadow:0 0 0 7px rgba(234,174,79,.12); } }
+.step-label{ font-size:12.5px; color:var(--ink-faint); font-weight:500; white-space:nowrap; }
+.step.done .step-label, .step.active .step-label, .step.waiting .step-label{ color:var(--ink); }
+.step-bar{ width:26px; height:1.5px; background:var(--line); margin:0 7px; }
+.step.done + .step .step-bar, .step.done .step-bar{ background:var(--teal); }
+
+.card{ background:var(--card); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-m); overflow:hidden; }
+.card-head{ padding:22px 26px 18px; border-bottom:1px solid var(--line-soft); position:relative; }
+.card-head.tealtop{ border-top:3px solid var(--teal); }
+.eyebrow{ font-size:11px; font-family:var(--font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--teal); font-weight:600; }
+.card-title{ font-size:23px; margin-top:7px; line-height:1.18; }
+.card-desc{ color:var(--ink-soft); font-size:14px; margin-top:8px; line-height:1.55; }
+.card-body{ padding:24px 26px 26px; }
+
+.hero-job{ display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--ticket);
+  border:1px solid #ECE2C9; border-radius:var(--radius-m); margin:4px 0 18px; }
+.hero-job .pin{ width:42px; height:42px; border-radius:10px; background:#fff; border:1px solid #EADFC4;
+  display:flex; align-items:center; justify-content:center; flex:none; }
+.hero-job .pin svg{ width:22px; height:22px; color:var(--gold); }
+.hero-job h3{ font-size:17px; }
+.hero-job .meta{ font-size:12.5px; color:var(--ink-soft); font-family:var(--font-mono); margin-top:3px; }
+.track-chip{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; font-family:var(--font-mono);
+  padding:3px 9px; border-radius:99px; letter-spacing:.03em; }
+.track-chip.maritime{ background:var(--teal-light); color:#0e5f54; }
+.track-chip.backoffice{ background:var(--blue-light); color:var(--blue); }
+
+.pulled-note{ display:flex; gap:11px; align-items:flex-start; background:var(--teal-light); border:1px solid #C8E6DF;
+  border-radius:var(--radius-m); padding:13px 15px; margin:0 0 16px; }
+.pulled-note svg{ width:18px; height:18px; color:#0e5f54; flex:none; margin-top:1px; }
+.pulled-note p{ margin:0; font-size:12.8px; color:#2A5F57; line-height:1.5; }
+
+.expect{ display:grid; gap:11px; margin:18px 0 6px; }
+.expect-row{ display:flex; gap:13px; align-items:flex-start; }
+.expect-row .ic{ width:30px; height:30px; border-radius:8px; flex:none; background:var(--teal-light); color:#0e5f54;
+  display:flex; align-items:center; justify-content:center; }
+.expect-row .ic svg{ width:16px; height:16px; }
+.expect-row b{ font-size:14px; font-weight:600; display:block; }
+.expect-row span{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
+
+.q{ padding:18px 0; border-bottom:1px solid var(--line-soft); }
+.q:last-child{ border-bottom:none; }
+.q-num{ font-family:var(--font-mono); font-size:11px; color:var(--teal); font-weight:600; letter-spacing:.08em; }
+.q-text{ font-size:15px; font-weight:600; margin:6px 0 14px; line-height:1.45; }
+.opts{ display:grid; gap:9px; }
+.opt{ display:flex; align-items:center; gap:12px; padding:13px 15px; border:1.5px solid var(--line);
+  border-radius:var(--radius-m); cursor:pointer; transition:.16s; background:#fff; font-size:14px; }
+.opt:hover{ border-color:var(--teal-dark); background:#fbfdfc; }
+.opt.sel{ border-color:var(--teal); background:var(--teal-light); box-shadow:inset 0 0 0 1px var(--teal); }
+.opt .radio{ width:18px; height:18px; border-radius:99px; border:2px solid var(--line); flex:none; position:relative; transition:.16s; }
+.opt.sel .radio{ border-color:var(--teal); }
+.opt.sel .radio::after{ content:''; position:absolute; inset:3px; border-radius:99px; background:var(--teal); }
+.opt .check{ width:18px; height:18px; border-radius:5px; border:2px solid var(--line); flex:none; position:relative; transition:.16s; }
+.opt.sel .check{ border-color:var(--teal); background:var(--teal); }
+.opt.sel .check::after{ content:''; position:absolute; left:5px; top:1.5px; width:5px; height:9px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg); }
+
+.field-num{ display:flex; align-items:center; gap:10px; }
+input[type=number], input[type=text], select, textarea{
+  width:100%; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;
+  font-size:14px; color:var(--ink); background:#fff; transition:.16s; }
+input:focus, textarea:focus, select:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-light); }
+.unit{ font-family:var(--font-mono); font-size:13px; color:var(--ink-soft); font-weight:600; }
+textarea{ resize:vertical; min-height:104px; line-height:1.55; }
+.hint{ font-size:12px; color:var(--ink-faint); margin-top:7px; line-height:1.45; }
+.tools-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:9px; }
+@media(max-width:540px){ .tools-grid{ grid-template-columns:1fr; } }
+.opts-col{ display:flex; flex-direction:column; gap:9px; }
+.inp-row{ display:flex; align-items:center; gap:0; border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; background:#fff; }
+.inp-prefix{ padding:0 12px; font-size:13px; color:var(--ink-soft); background:var(--line-soft); border-right:1.5px solid var(--line); white-space:nowrap; line-height:44px; }
+.inp-row input{ border:none; outline:none; padding:0 12px; font-size:14px; flex:1; height:44px; background:transparent; }
+
+.test-card{ border:1px solid var(--line); border-radius:var(--radius-l); padding:18px 18px 20px; margin-bottom:16px; background:#fff; }
+.test-card .tc-head{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+.test-card .tc-ic{ width:36px; height:36px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center; }
+.test-card.disc .tc-ic{ background:var(--blue-light); color:var(--blue); }
+.test-card.iq .tc-ic{ background:var(--amber-light); color:var(--amber); }
+.test-card .tc-ic svg{ width:19px; height:19px; }
+.test-card h3{ font-size:16px; }
+.test-card .tc-sub{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; margin:2px 0 14px; }
+.ext-btn{ display:inline-flex; align-items:center; gap:8px; border:1.5px solid var(--teal); color:var(--teal);
+  background:var(--teal-light); border-radius:var(--radius-m); padding:11px 16px; font-size:13.5px; font-weight:600; text-decoration:none; }
+.ext-btn:hover{ background:#d4ece6; }
+.ext-btn svg{ width:15px; height:15px; }
+.dropzone{ margin-top:14px; border:1.6px dashed var(--line); border-radius:var(--radius-m); padding:16px; text-align:center;
+  background:#FAFCFC; transition:.16s; cursor:pointer; }
+.dropzone:hover{ border-color:var(--teal-dark); background:#f4faf8; }
+.dropzone.filled{ border-style:solid; border-color:var(--green); background:var(--green-light); }
+.dropzone svg{ width:22px; height:22px; color:var(--ink-faint); }
+.dropzone.filled svg{ color:var(--green); }
+.dropzone .dz-main{ font-size:13px; font-weight:600; margin-top:6px; color:var(--ink); }
+.dropzone .dz-sub{ font-size:11.5px; color:var(--ink-faint); margin-top:3px; }
+.dz-row{ display:grid; grid-template-columns:1fr 1fr; gap:13px; margin-top:13px; align-items:end; }
+@media(max-width:540px){ .dz-row{ grid-template-columns:1fr; } }
+.dz-field label{ font-size:12px; color:var(--ink-soft); font-weight:600; display:block; margin-bottom:6px; }
+.api-panel{ background:var(--blue-light); border:1px solid #CBD9EA; border-radius:var(--radius-m); padding:15px 17px; margin-top:4px; }
+.api-panel p{ margin:0 0 12px; font-size:13px; color:#2A4360; line-height:1.55; }
+.ext-links{ display:flex; gap:10px; flex-wrap:wrap; }
+
+.vid-q{ background:var(--ticket); border:1px solid #ECE2C9; border-radius:var(--radius-m); padding:15px 17px; margin-bottom:16px; }
+.vid-q .lab{ font-size:11px; font-family:var(--font-mono); color:var(--gold); letter-spacing:.08em; font-weight:600; text-transform:uppercase; }
+.vid-q p{ margin:7px 0 0; font-size:15px; font-weight:600; line-height:1.45; }
+.vid-answers{ margin-top:18px; display:grid; gap:9px; }
+.va-item{ display:flex; align-items:center; gap:11px; padding:11px 14px; background:var(--green-light); border:1px solid #CDE7D2; border-radius:var(--radius-m); font-size:13px; }
+.va-item .vi-ic{ width:24px;height:24px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;flex:none;}
+.va-item .vi-ic svg{ width:13px;height:13px; }
+
+.rec-block{ border:1.5px solid var(--line); border-radius:var(--radius-l); overflow:hidden; margin-bottom:18px; }
+.rec-block.done{ border-color:#CDE7D2; }
+.rec-qhead{ background:var(--ticket); border-bottom:1px solid #ECE2C9; padding:14px 18px; }
+.rec-qhead .lab{ font-size:11px; font-family:var(--font-mono); color:var(--gold); letter-spacing:.08em; font-weight:600; text-transform:uppercase; }
+.rec-qhead p{ margin:6px 0 0; font-size:15px; font-weight:600; line-height:1.45; }
+.rec-body{ padding:18px; }
+.rec-video-wrap{ position:relative; width:100%; aspect-ratio:16/9; background:#0a1520; border-radius:var(--radius-m); overflow:hidden; margin-bottom:14px; display:none; }
+.rec-video-wrap.show{ display:block; }
+.rec-video-wrap video{ width:100%; height:100%; object-fit:cover; display:block; }
+.rec-timer{ position:absolute; top:10px; right:12px; font-family:var(--font-mono); font-size:13px; font-weight:700; color:#fff; background:rgba(191,74,61,.85); border-radius:99px; padding:3px 10px; display:flex; align-items:center; gap:6px; }
+.rec-timer .dot{ width:7px; height:7px; border-radius:99px; background:#fff; animation:blink-rec .9s infinite; }
+@keyframes blink-rec{ 0%,100%{opacity:1} 50%{opacity:.2} }
+.rec-countdown{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:72px; font-weight:600; color:#fff; text-shadow:0 2px 20px rgba(0,0,0,.5); }
+.rec-controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.rec-done-row{ display:flex; align-items:center; gap:11px; padding:11px 14px; background:var(--green-light); border:1px solid #CDE7D2; border-radius:var(--radius-m); font-size:13px; font-weight:600; }
+.rec-done-row .vi-ic{ width:24px;height:24px;border-radius:99px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;flex:none; }
+.rec-done-row .vi-ic svg{ width:13px;height:13px; }
+.warn-keep{ display:flex; gap:10px; align-items:flex-start; background:var(--amber-light); border:1px solid #EFD9AE; border-radius:var(--radius-m); padding:12px 14px; }
+.warn-keep svg{ width:17px;height:17px;color:var(--amber);flex:none;margin-top:1px; }
+.warn-keep p{ margin:0;font-size:12.5px;color:#7A4E10;line-height:1.5; }
+.howto{ background:var(--page-bg); border:1px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin-bottom:20px; }
+.howto h4{ font-size:13px; font-weight:700; margin:0 0 9px; display:flex; align-items:center; gap:8px; }
+.howto h4 svg{ width:16px;height:16px;color:var(--teal); }
+.howto ol{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:5px; }
+.howto ol li{ font-size:13px; color:var(--ink-soft); line-height:1.5; }
+
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; border:none; border-radius:var(--radius-m);
+  padding:13px 22px; font-size:14.5px; font-weight:600; transition:.16s; }
+.btn svg{ width:17px; height:17px; }
+.btn-primary{ background:var(--teal); color:#fff; box-shadow:var(--shadow-s); }
+.btn-primary:hover{ background:#127667; }
+.btn-primary:disabled{ background:#A9C9C3; cursor:not-allowed; box-shadow:none; }
+.btn-ghost{ background:#fff; color:var(--ink); border:1.5px solid var(--line); }
+.btn-ghost:hover{ border-color:var(--ink-faint); }
+.btn-danger{ background:var(--red); color:#fff; }
+.btn-demo{ background:transparent; color:var(--ink-faint); border:1.5px dashed var(--line); font-size:12.5px; padding:10px 14px; }
+.btn-demo:hover{ border-color:var(--amber); color:var(--amber); }
+.btn-danger:hover{ background:#a53e32; }
+.btn-block{ width:100%; }
+.actions{ display:flex; gap:11px; margin-top:24px; align-items:center; }
+.actions .spacer{ flex:1; }
+
+.done-wrap{ text-align:center; padding:14px 10px 6px; }
+.done-seal{ width:78px; height:78px; border-radius:99px; margin:0 auto 20px; background:var(--green-light);
+  border:2px solid #CDE7D2; display:flex; align-items:center; justify-content:center; }
+.done-seal svg{ width:38px; height:38px; color:var(--green); }
+.done-wrap h2{ font-size:25px; }
+.done-wrap p{ color:var(--ink-soft); font-size:14.5px; line-height:1.6; max-width:460px; margin:12px auto 0; }
+.hr-stage{ display:flex; gap:12px; align-items:center; max-width:430px; margin:22px auto 0; padding:15px 17px;
+  background:var(--amber-light); border:1px solid #EFD9AE; border-radius:var(--radius-m); text-align:left; }
+.hr-stage .hs-ic{ width:36px; height:36px; border-radius:99px; flex:none; background:#fff; border:1px solid #EBD49E;
+  display:flex; align-items:center; justify-content:center; color:var(--amber); }
+.hr-stage .hs-ic svg{ width:18px; height:18px; }
+.hr-stage b{ font-size:13.5px; display:block; }
+.hr-stage span{ font-size:12.5px; color:var(--ink-soft); line-height:1.45; }
+
+.loading{ text-align:center; padding:80px 20px; color:var(--ink-soft); }
+.spin{ width:34px; height:34px; border:3px solid var(--line); border-top-color:var(--teal); border-radius:99px; animation:rot 1s linear infinite; margin:0 auto 16px; }
+@keyframes rot{ to{ transform:rotate(360deg); } }
+.errbox{ background:var(--red-light); border:1px solid #EFC9C3; color:#8E3429; padding:14px 16px; border-radius:var(--radius-m); font-size:13.5px; margin-top:14px; }
+.toast{ position:fixed; left:50%; bottom:74px; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff;
+  padding:13px 20px; border-radius:99px; font-size:13.5px; box-shadow:var(--shadow-l); opacity:0; transition:.3s; z-index:80; pointer-events:none; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.note{ font-size:12.5px; color:var(--ink-faint); margin-top:18px; text-align:center; line-height:1.5; }
+.hide{ display:none !important; }
+.sysflag{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-family:var(--font-mono); color:var(--ink-soft);
+  background:var(--page-bg); border:1px solid var(--line); border-radius:99px; padding:4px 10px; }
+.sysflag .d{ width:6px; height:6px; border-radius:99px; background:var(--amber); }
+
+.demobar{ position:fixed; left:0; right:0; bottom:0; z-index:60; background:rgba(12,34,51,.97);
+  border-top:1px solid rgba(255,255,255,.08); backdrop-filter:blur(6px); }
+.demobar-in{ max-width:880px; margin:0 auto; padding:9px 16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.demobar .dlabel{ font-size:10.5px; font-family:var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:#7FA8C2; display:flex; align-items:center; gap:7px; }
+.demobar .dlabel .d{ width:7px; height:7px; border-radius:99px; background:var(--amber-dark); }
+.demobar .dnav{ display:flex; gap:6px; flex-wrap:wrap; }
+.dchip{ font-size:11.5px; font-family:var(--font-mono); color:#CBDDEA; background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10); border-radius:99px; padding:5px 11px; cursor:pointer; transition:.15s; white-space:nowrap; }
+.dchip:hover{ background:rgba(255,255,255,.14); color:#fff; }
+.dchip.cur{ background:var(--teal); border-color:var(--teal); color:#fff; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <a href="/" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink-soft);font-size:12px;font-family:var(--font-mono);border:1px solid var(--line);border-radius:99px;padding:5px 12px;background:var(--page-bg);flex-shrink:0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+      Demo Home
+    </a>
+    <div class="brand-mark" style="margin-left:8px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8m0 0 8 4-8 4-8-4 8-4Z"/><path d="M4 14v4l8 4 8-4v-4"/></svg>
+    </div>
+    <div>
+      <div class="brand-word">MAXY</div>
+      <div class="brand-sub">PT LINTAS MARITIM · PORTAL KANDIDAT</div>
+    </div>
+    <div class="topbar-tag">Asesmen Mandiri</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div id="stepper" class="stepper hide"></div>
+
+  <div id="screen-loading" class="loading">
+    <div class="spin"></div>
+    Memuat sesi asesmen Anda…
+  </div>
+
+  <div id="screen-error" class="card hide" style="border-color:#EFC9C3;">
+    <div class="card-body">
+      <h2 style="color:#8E3429;font-size:20px;">Tautan tidak dapat dibuka</h2>
+      <p id="error-msg" style="color:var(--ink-soft);margin-top:10px;font-size:14px;"></p>
+    </div>
+  </div>
+
+  <!-- WELCOME -->
+  <div id="screen-welcome" class="card hide">
+    <div class="card-head tealtop">
+      <div class="eyebrow">Selamat Datang</div>
+      <h1 class="card-title">Halo, <span id="w-name">Kandidat</span> 👋</h1>
+      <p class="card-desc">Terima kasih telah mendaftar di PT Lintas Maritim Indonesia. Berikut tahapan asesmen mandiri yang perlu Anda selesaikan. Estimasi sekitar 15–20 menit. Untuk sesi video, siapkan kamera dan koneksi internet untuk merekam dan mengunggah ke Google Drive.</p>
+    </div>
+    <div class="card-body">
+      <div class="hero-job">
+        <div class="pin">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div style="flex:1">
+          <h3 id="w-job">—</h3>
+          <div class="meta" id="w-jobmeta">—</div>
+        </div>
+        <span id="w-track" class="track-chip maritime">MARITIME</span>
+      </div>
+
+      <div class="pulled-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <p><b>Data &amp; CV Anda sudah kami terima</b> dari formulir pendaftaran. Anda tidak perlu mengisi ulang biodata atau mengunggah CV di sini — cukup lanjutkan tahapan asesmen di bawah.</p>
+      </div>
+
+      <div class="expect" id="w-expect"></div>
+
+      <div class="actions">
+        <div class="spacer"></div>
+        <button class="btn btn-primary" onclick="App.startFlow()">
+          Mulai Asesmen
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ (maritime) -->
+  <div id="screen-quiz" class="card hide">
+    <div class="card-head tealtop">
+      <div class="eyebrow">Tahap A — Kuis Kualifikasi Minimum</div>
+      <h1 class="card-title">Verifikasi Syarat Mutlak</h1>
+      <p class="card-desc">Beberapa pertanyaan singkat untuk memastikan kesesuaian dasar Anda dengan posisi ini. Jawab dengan jujur.</p>
+    </div>
+    <div class="card-body">
+      <div id="quiz-questions"></div>
+      <div class="errbox hide" id="quiz-err"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="App.prev()">Kembali</button>
+        <div class="spacer"></div>
+        <button class="btn btn-demo" onclick="App.demoSkip('quiz')" title="Isi otomatis dengan data demo">⚡ Lewati (Demo)</button>
+        <button class="btn btn-primary" id="quiz-submit" onclick="App.submitQuiz()">Simpan &amp; Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM (backoffice custom form) -->
+  <div id="screen-form" class="card hide">
+    <div class="card-head tealtop">
+      <div class="eyebrow">Tahap A — Form Tambahan</div>
+      <h1 class="card-title">Kuesioner Singkat Posisi</h1>
+      <p class="card-desc">Lengkapi pertanyaan singkat khusus posisi ini. Bagian ini melengkapi data pendaftaran Anda (bukan pengisian ulang).</p>
+    </div>
+    <div class="card-body">
+      <div class="q">
+        <div class="q-num">FORM · 01</div>
+        <div class="q-text">Ceritakan singkat pengalaman atau pencapaian Anda yang paling relevan dengan posisi ini.</div>
+        <textarea id="b-story" placeholder="Tulis 2–4 kalimat…"></textarea>
+        <div class="hint">Minimal beberapa kalimat agar penilaian lebih akurat.</div>
+      </div>
+      <div class="q">
+        <div class="q-num">FORM · 02</div>
+        <div class="q-text">Tools / keahlian yang Anda kuasai (pilih semua yang sesuai):</div>
+        <div class="tools-grid" id="b-tools"></div>
+      </div>
+      <div class="q">
+        <div class="q-num">FORM · 03</div>
+        <div class="q-text">Kapan Anda dapat bergabung jika diterima?</div>
+        <div class="opts-col" id="b-avail"></div>
+      </div>
+      <div class="q">
+        <div class="q-num">FORM · 04</div>
+        <div class="q-text">Berapa ekspektasi gaji Anda? (Rp / bulan)</div>
+        <div class="inp-row">
+          <span class="inp-prefix">Rp</span>
+          <input type="number" id="b-salary" min="0" step="100000" placeholder="mis. 6000000" style="flex:1">
+        </div>
+        <div class="hint">Isi sesuai harapan gaji bersih per bulan.</div>
+      </div>
+      <div class="errbox hide" id="form-err"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="App.prev()">Kembali</button>
+        <div class="spacer"></div>
+        <button class="btn btn-demo" onclick="App.demoSkip('bundle')" title="Isi otomatis dengan data demo">⚡ Lewati (Demo)</button>
+        <button class="btn btn-primary" id="form-submit" onclick="App.submitForm()">Simpan &amp; Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTS (backoffice DISC + IQ, external) -->
+  <div id="screen-tests" class="card hide">
+    <div class="card-head tealtop">
+      <div class="eyebrow">Tahap B — Tes DISC/MBTI &amp; IQ</div>
+      <h1 class="card-title">Tes Kepribadian &amp; Logika</h1>
+      <p class="card-desc">Tes ini dikerjakan di <b>platform tes eksternal</b>. Kerjakan melalui tautan yang tersedia, lalu lanjutkan sesuai petunjuk di bawah.</p>
+    </div>
+    <div class="card-body">
+      <div id="tests-upload">
+        <div class="test-card disc">
+          <div class="tc-head">
+            <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/></svg></div>
+            <div><h3>Tes DISC / MBTI</h3></div>
+          </div>
+          <div class="tc-sub">Asesmen gaya kerja &amp; kepribadian. Kerjakan di platform eksternal, lalu unggah berkas hasilnya (PDF/gambar).</div>
+          <a class="ext-btn" id="disc-link" target="_blank" rel="noopener">
+            Buka Tes DISC
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
+          <div class="dropzone" id="disc-dz" onclick="document.getElementById('disc-file').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            <div class="dz-main" id="disc-dz-main">Unggah berkas hasil DISC</div>
+            <div class="dz-sub">PDF / JPG / PNG · klik untuk memilih</div>
+          </div>
+          <input type="file" id="disc-file" accept=".pdf,.png,.jpg,.jpeg,.webp" class="hide">
+          <div class="dz-row">
+            <div class="dz-field">
+              <label>Tipe dominan hasil tes (opsional)</label>
+              <select id="disc-type">
+                <option value="">— pilih bila tahu —</option>
+                <option value="D">D — Dominance</option>
+                <option value="I">I — Influence</option>
+                <option value="S">S — Steadiness</option>
+                <option value="C">C — Conscientiousness</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="test-card iq">
+          <div class="tc-head">
+            <div class="tc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.3A7 7 0 0 0 12 2Z"/><path d="M9 22h6"/></svg></div>
+            <div><h3>Tes IQ / Kognitif</h3></div>
+          </div>
+          <div class="tc-sub">Tes kemampuan kognitif. Kerjakan di platform eksternal, lalu unggah berkas hasilnya.</div>
+          <a class="ext-btn" id="iq-link" target="_blank" rel="noopener">
+            Buka Tes IQ
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
+          <div class="dropzone" id="iq-dz" onclick="document.getElementById('iq-file').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+            <div class="dz-main" id="iq-dz-main">Unggah berkas hasil IQ</div>
+            <div class="dz-sub">PDF / JPG / PNG · klik untuk memilih</div>
+          </div>
+          <input type="file" id="iq-file" accept=".pdf,.png,.jpg,.jpeg,.webp" class="hide">
+          <div class="dz-row">
+            <div class="dz-field">
+              <label>Skor hasil tes 0–100 (opsional)</label>
+              <input type="number" id="iq-score" min="0" max="100" placeholder="mis. 88">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tests-api" class="hide">
+        <div class="api-panel">
+          <p>Hasil tes DISC &amp; IQ Anda akan <b>tersinkron otomatis</b> ke sistem setelah Anda menyelesaikannya di platform tes. Anda tidak perlu mengunggah berkas apa pun — cukup kerjakan kedua tes, lalu klik tombol di bawah.</p>
+          <div class="ext-links">
+            <a class="ext-btn" id="disc-link-api" target="_blank" rel="noopener">Buka Tes DISC <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+            <a class="ext-btn" id="iq-link-api" target="_blank" rel="noopener">Buka Tes IQ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px"><span class="sysflag"><span class="d"></span> Hasil tes ditinjau tim HR · skor tidak ditampilkan ke kandidat</span></div>
+      <div class="errbox hide" id="tests-err"></div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="App.prev()">Kembali</button>
+        <div class="spacer"></div>
+        <button class="btn btn-demo" onclick="App.demoSkip('tests')" title="Isi otomatis dengan data demo">⚡ Lewati (Demo)</button>
+        <button class="btn btn-primary" id="tests-submit" onclick="App.submitTests()">Kirim Hasil &amp; Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDEO (in-browser recorder) -->
+  <div id="screen-video" class="card hide">
+    <div class="card-head tealtop">
+      <div class="eyebrow" id="v-eyebrow">Video Interview</div>
+      <h1 class="card-title">Wawancara Video</h1>
+      <p class="card-desc">Jawab setiap pertanyaan — rekaman otomatis tersimpan aman ke Google Drive (Cloud). Pastikan kamera dan mikrofon aktif sebelum memulai.</p>
+    </div>
+    <div class="card-body">
+
+      <div id="v-questions"></div>
+
+      <div class="errbox hide" id="video-err"></div>
+
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="App.prev()" id="v-back">Kembali</button>
+        <div class="spacer"></div>
+        <button class="btn btn-demo" id="v-demo-skip" onclick="App.demoSkip('video')" title="Lewati semua video dengan data demo">⚡ Lewati (Demo)</button>
+        <button class="btn btn-primary hide" id="v-next" onclick="App.finish()">Selesaikan Asesmen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETE / HANDOFF -->
+  <div id="screen-complete" class="card hide">
+    <div class="card-body">
+      <div class="done-wrap">
+        <div class="done-seal" style="background:var(--amber-light);color:var(--amber-dark);border-color:#FDE68A;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h2>Menunggu Keputusan HR</h2>
+        <p>Terima kasih, <b id="c-name">Kandidat</b>. Seluruh tahapan asesmen mandiri telah selesai. Saat ini profil Anda sedang <b>dalam antrean peninjauan</b> oleh tim HR Lintas Maritim.</p>
+
+        <!-- JADWAL WAWANCARA — muncul hanya jika sudah dijadwalkan HR -->
+        <div id="schedule-card" style="display:none;margin:20px auto 0;max-width:430px;border-radius:12px;border:1.5px solid #CDE7D2;background:var(--green-light);padding:18px 20px;text-align:left;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:38px;height:38px;border-radius:99px;background:#fff;border:1px solid #CDE7D2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#3C8C4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#1b5e36;">Jadwal Wawancara Anda</div>
+              <div style="font-size:11.5px;color:#3C8C4A;font-family:var(--font-mono);margin-top:1px;">HR sudah menjadwalkan wawancara</div>
+            </div>
+          </div>
+          <div id="schedule-detail" style="font-size:13.5px;color:#16222B;line-height:1.7;"></div>
+        </div>
+
+        <div class="hr-stage" id="hr-stage-waiting">
+          <div class="hs-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <div>
+            <b>Tahap Analisa HR</b>
+            <span>Tim kami sedang meninjau berkas &amp; hasil asesmen Anda. Kami akan menghubungi Anda via email atau WhatsApp untuk tahap berikutnya.</span>
+          </div>
+        </div>
+        <div class="note">Anda dapat menutup halaman ini. Tautan ini tetap menyimpan progres jika perlu dibuka kembali.</div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- DEMO NAVIGATOR (hanya untuk demo — tidak ada di produksi) -->
+<div class="demobar" id="demobar">
+  <div class="demobar-in">
+    <div class="dlabel"><span class="d"></span> Mode Demo · lompat tahap</div>
+    <div class="dnav" id="demo-nav"></div>
+  </div>
+</div>
+
+<script>
+const TOKEN = (function(){
+  const p = location.pathname.split('/').filter(Boolean);
+  const i = p.indexOf('a');
+  if (i >= 0 && p[i+1]) return p[i+1];
+  return p[p.length-1] || '';
+})();
+
+const API = {
+  state:    ()   => fetch(`/api/assessment/${TOKEN}`).then(j),
+  schedule: ()   => fetch(`/api/assessment/${TOKEN}/schedule`).then(j),
+  quiz:     (b)  => post(`/api/assessment/${TOKEN}/quiz`, b),
+  form:     (b)  => post(`/api/assessment/${TOKEN}/bundle`, b),
+  tests:  (fd) => fetch(`/api/assessment/${TOKEN}/tests`, {method:'POST', body:fd}).then(j),
+  video:  (fd) => fetch(`/api/assessment/${TOKEN}/video`, {method:'POST', body:fd}).then(j),
+  complete:()  => post(`/api/assessment/${TOKEN}/complete`, {}),
+  skip:   (s)  => post(`/api/assessment/${TOKEN}/skip`, {step:s}),
+};
+function j(r){ if(!r.ok) return r.text().then(t=>{throw new Error(t||r.status)}); return r.json(); }
+function post(url, body){ return fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}).then(j); }
+
+function el(id){ return document.getElementById(id); }
+const SCREENS = ['loading','error','welcome','quiz','form','tests','video','complete'];
+function show(id){ SCREENS.forEach(s => el('screen-'+s).classList.toggle('hide', s!==id)); window.scrollTo({top:0, behavior:'smooth'}); }
+function toast(msg){ const t=el('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+const ICON = {
+  quiz:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>',
+  video:'<path d="m23 7-7 5 7 5V7Z"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
+  form:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+  test:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/>',
+  hr:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+};
+
+const App = {
+  data:null, track:null, flow:[], idx:0, cur:'welcome', testMode:'upload', completing:false,
+  quizAns:{}, toolsSel:new Set(), discFile:null, iqFile:null,
+  vIndex:0, vDone:{}, recState:{},
+  gClientId:'', gTokenClient:null, gToken:null, gTokenExp:0,
+
+  async init(){
+    try{
+      const d = await API.state();
+      this.data = d; this.track = d.catalog.track;
+      this.testMode = (d.catalog.testMode) || 'upload';
+      this.render();
+      this.buildDemoNav();
+      // Init Google Drive upload (non-blocking)
+      fetch('/api/pubconfig').then(r=>r.json()).then(cfg=>{
+        if(cfg.google_client_id) this._initDrive(cfg.google_client_id);
+      }).catch(()=>{});
+      // Jika asesmen sudah selesai, langsung tampilkan screen complete + cek jadwal
+      if(d.progress && d.progress.completed){
+        this.cur='complete';
+        show('complete');
+        el('stepper').classList.remove('hide');
+        this.syncStepper();
+        this.paintDemoNav();
+        this.checkSchedule();
+        return;
+      }
+      show('welcome'); this.cur='welcome';
+      el('stepper').classList.remove('hide');
+      this.syncStepper();
+      this.paintDemoNav();
+    }catch(e){
+      el('error-msg').textContent = (''+e.message).slice(0,300) || 'Tautan tidak valid atau telah kedaluwarsa.';
+      show('error');
+    }
+  },
+
+  async checkSchedule(){
+    try{
+      const s = await API.schedule();
+      const card = el('schedule-card');
+      const waiting = el('hr-stage-waiting');
+      if(s && s.scheduled){
+        let detail = '';
+        if(s.scheduledAt){
+          try{
+            const dt = new Date(s.scheduledAt);
+            const tgl = dt.toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+            const jam = dt.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+            detail += `<b>📅 Waktu:</b> ${tgl} pukul ${jam}<br>`;
+          }catch(_){ detail += `<b>📅 Waktu:</b> ${esc(s.scheduledAt)}<br>`; }
+        }
+        if(s.mode) detail += `<b>📍 Mode:</b> ${esc(s.mode)}<br>`;
+        if(s.location) detail += `<b>🏢 Lokasi/Link:</b> ${esc(s.location)}<br>`;
+        if(s.notes) detail += `<br><b>📝 Catatan HR:</b> ${esc(s.notes)}`;
+        el('schedule-detail').innerHTML = detail;
+        if(card) card.style.display = 'block';
+        if(waiting) waiting.style.display = 'none';
+      }
+    }catch(e){ /* tidak ada jadwal atau error — tampilkan default */ }
+  },
+
+  render(){
+    const c = this.data.candidate, job = this.data.catalog.job || {};
+    el('w-name').textContent = c.name || 'Kandidat';
+    el('c-name').textContent = c.name || 'Kandidat';
+    el('w-job').textContent = c.jobTitle || job.title || '—';
+    el('w-jobmeta').textContent = this.track==='maritime'
+        ? (job.vesselHint ? ('Jalur Maritime Crew · '+job.vesselHint) : 'Jalur Maritime Crew')
+        : (job.dept ? ('Jalur Back Office · '+job.dept) : 'Jalur Back Office');
+    const tEl = el('w-track');
+    tEl.textContent = this.track==='maritime' ? 'MARITIME CREW' : 'BACK OFFICE';
+    tEl.className = 'track-chip ' + this.track;
+
+    const steps = this.track==='maritime'
+      ? [['quiz','Kuis Kualifikasi','Verifikasi syarat mutlak posisi'],
+         ['video','Video Interview','Kirim link Google Drive per pertanyaan video'],
+         ['hr','Tahap Analisa HR','Tim HR meninjau berkas & hasil asesmen Anda']]
+      : [['form','Form Tambahan','Kuesioner singkat khusus posisi'],
+         ['test','Tes DISC & IQ','Dikerjakan di platform eksternal'],
+         ['video','Video Interview','Kirim link Google Drive per pertanyaan video'],
+         ['hr','Tahap Analisa HR','Tim HR meninjau berkas & hasil asesmen Anda']];
+    el('w-expect').innerHTML = steps.map(s=>`
+      <div class="expect-row">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[s[0]]}</svg></div>
+        <div><b>${esc(s[1])}</b><span>${esc(s[2])}</span></div>
+      </div>`).join('');
+
+    this.flow = this.track==='maritime' ? ['quiz','video','complete'] : ['form','tests','video','complete'];
+
+    this.buildStepper();
+    if(this.track==='maritime'){ this.renderQuiz(); }
+    else { this.renderForm(); this.renderTests(); }
+    this.renderVideoStatic();
+  },
+
+  buildStepper(){
+    const labels = this.data.catalog.steps;
+    el('stepper').innerHTML = labels.map((lab,i)=>`
+      <div class="step" data-i="${i}">
+        ${i>0?'<span class="step-bar"></span>':''}
+        <span class="step-dot">${i+1}</span>
+        <span class="step-label">${esc(lab)}</span>
+      </div>`).join('');
+  },
+
+  // map current screen → stepper index
+  stepIndexFor(scr){
+    if(this.track==='maritime') return {welcome:0, quiz:1, video:2, complete:3}[scr] ?? 1;
+    return {welcome:0, form:1, tests:2, video:3, complete:4}[scr] ?? 1;
+  },
+  syncStepper(){
+    const total = this.data.catalog.steps.length;
+    const scr = this.cur;
+    const active = this.stepIndexFor(scr);
+    const isComplete = (scr==='complete');
+    document.querySelectorAll('#stepper .step').forEach(s=>{
+      const i = +s.dataset.i;
+      s.classList.remove('done','active','waiting');
+      if(isComplete){
+        if(i < total-1) s.classList.add('done');
+        else s.classList.add('waiting');   // "Tahap Analisa HR" — menunggu HR
+      } else {
+        if(i < active) s.classList.add('done');
+        else if(i === active) s.classList.add('active');
+      }
+    });
+  },
+
+  /* ---------- demo navigator ---------- */
+  buildDemoNav(){
+    const labelMap = {welcome:'Welcome', quiz:'Kuis', form:'Form', tests:'Tes DISC/IQ', video:'Video', complete:'Selesai'};
+    const names = ['welcome', ...this.flow];
+    el('demo-nav').innerHTML = names.map(n=>`<span class="dchip" data-scr="${n}" onclick="App.gotoDemo('${n}')">${esc(labelMap[n]||n)}</span>`).join('');
+  },
+  paintDemoNav(){ document.querySelectorAll('#demo-nav .dchip').forEach(ch=>ch.classList.toggle('cur', ch.dataset.scr===this.cur)); },
+  gotoDemo(name){
+    if(name==='welcome'){ this.cur='welcome'; show('welcome'); }
+    else {
+      const k = this.flow.indexOf(name); if(k<0) return;
+      this.idx = k; this.cur = name; show(name);
+      if(name==='video') this.enterVideo();
+    }
+    this.syncStepper(); this.paintDemoNav();
+  },
+
+  /* ---------- flow control ---------- */
+  startFlow(){ this.idx = 0; this.goCurrent(); },
+  goCurrent(){ this.cur = this.flow[this.idx]; show(this.cur); this.syncStepper(); this.paintDemoNav(); if(this.cur==='video') this.enterVideo(); },
+  next(){
+    if(this.idx >= this.flow.length-1) return;
+    if(this.flow[this.idx+1]==='complete'){ this.finish(); return; }
+    this.idx++; this.goCurrent();
+  },
+  prev(){ if(this.idx>0){ this.idx--; this.goCurrent(); } else { this.gotoDemo('welcome'); } },
+
+  /* ---------- maritime quiz ---------- */
+  renderQuiz(){
+    const qs = this.data.catalog.quiz || [];
+    el('quiz-questions').innerHTML = qs.map((q,i)=>{
+      let body='';
+      if(q.type==='yesno'){
+        body = `<div class="opts" data-q="${q.id}">${['Ya','Tidak'].map(o=>`<div class="opt" data-v="${o}"><span class="radio"></span>${o}</div>`).join('')}</div>`;
+      } else if(q.type==='choice'){
+        body = `<div class="opts" data-q="${q.id}">${q.options.map(o=>`<div class="opt" data-v="${esc(o)}"><span class="radio"></span>${esc(o)}</div>`).join('')}</div>`;
+      } else if(q.type==='number'){
+        body = `<div class="field-num"><input type="number" min="0" data-q="${q.id}" placeholder="0"><span class="unit">${esc(q.unit||'')}</span></div>`;
+      }
+      return `<div class="q"><div class="q-num">SYARAT · 0${i+1}${q.gate?' · WAJIB':''}</div><div class="q-text">${esc(q.text)}</div>${body}</div>`;
+    }).join('');
+    el('quiz-questions').querySelectorAll('.opts').forEach(grp=>{
+      grp.querySelectorAll('.opt').forEach(opt=>{
+        opt.onclick = ()=>{ grp.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); opt.classList.add('sel'); this.quizAns[grp.dataset.q]=opt.dataset.v; };
+      });
+    });
+    el('quiz-questions').querySelectorAll('input[type=number]').forEach(inp=>{ inp.oninput = ()=>{ this.quizAns[inp.dataset.q]=inp.value; }; });
+  },
+  async submitQuiz(){
+    for(const q of (this.data.catalog.quiz||[])){
+      const v = this.quizAns[q.id];
+      if(v===undefined||v===null||v===''){ return this.err('quiz-err','Mohon lengkapi semua pertanyaan terlebih dahulu.'); }
+    }
+    this.hideErr('quiz-err');
+    const btn=el('quiz-submit'); btn.disabled=true; btn.textContent='Menyimpan…';
+    try{ await API.quiz({q1:this.quizAns.q1,q2:this.quizAns.q2,q3:this.quizAns.q3,q4:this.quizAns.q4}); toast('Jawaban tersimpan ✓'); this.next(); }
+    catch(e){ this.err('quiz-err','Gagal menyimpan: '+e.message); }
+    finally{ btn.disabled=false; btn.textContent='Simpan & Lanjut'; }
+  },
+
+  /* ---------- backoffice: custom form ---------- */
+  renderForm(){
+    const tools = this.data.catalog.tools || [];
+    const avOpts = this.data.availabilityOptions || [];
+    el('b-tools').innerHTML = tools.map(t=>`<div class="opt" data-t="${esc(t)}"><span class="check"></span>${esc(t)}</div>`).join('');
+    el('b-tools').querySelectorAll('.opt').forEach(opt=>{
+      opt.onclick = ()=>{ const t=opt.dataset.t; if(this.toolsSel.has(t)){this.toolsSel.delete(t);opt.classList.remove('sel');}else{this.toolsSel.add(t);opt.classList.add('sel');} };
+    });
+    el('b-avail').innerHTML = avOpts.map(o=>`<div class="opt" data-v="${esc(o)}"><span class="check"></span>${esc(o)}</div>`).join('');
+    el('b-avail').querySelectorAll('.opt').forEach(opt=>{
+      opt.onclick = ()=>{
+        el('b-avail').querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+        opt.classList.add('sel');
+      };
+    });
+    const sf = this.data.savedForm || {};
+    if(sf.story) el('b-story').value = sf.story;
+    if(sf.salaryExpIdr) el('b-salary').value = sf.salaryExpIdr;
+    (sf.tools||[]).forEach(t=>{ this.toolsSel.add(t); const o=[...el('b-tools').children].find(x=>x.dataset.t===t); if(o) o.classList.add('sel'); });
+    if(sf.availabilityJoin){
+      const sel=[...el('b-avail').children].find(x=>x.dataset.v===sf.availabilityJoin);
+      if(sel) sel.classList.add('sel');
+    }
+  },
+  async submitForm(){
+    const story=(el('b-story').value||'').trim();
+    const availSel = el('b-avail').querySelector('.opt.sel');
+    const avail = availSel ? availSel.dataset.v : null;
+    const salary = parseInt(el('b-salary').value||'0', 10) || null;
+    if(story.length<3 && this.toolsSel.size===0){ return this.err('form-err','Mohon isi pengalaman singkat atau pilih minimal satu keahlian.'); }
+    if(!avail){ return this.err('form-err','Mohon pilih ketersediaan bergabung (pertanyaan 03).'); }
+    if(!salary){ return this.err('form-err','Mohon isi ekspektasi gaji (pertanyaan 04).'); }
+    this.hideErr('form-err');
+    const btn=el('form-submit'); btn.disabled=true; btn.textContent='Menyimpan…';
+    try{
+      await API.form({story, tools:[...this.toolsSel], availabilityJoin:avail, salaryExpIdr:salary});
+      toast('Form tersimpan ✓'); this.next();
+    }
+    catch(e){ this.err('form-err','Gagal menyimpan: '+e.message); }
+    finally{ btn.disabled=false; btn.textContent='Simpan & Lanjut'; }
+  },
+
+  /* ---------- backoffice: external DISC/IQ tests ---------- */
+  renderTests(){
+    const cat = this.data.catalog;
+    ['disc-link','disc-link-api'].forEach(id=>{ const a=el(id); if(a) a.href=cat.discTestUrl||'#'; });
+    ['iq-link','iq-link-api'].forEach(id=>{ const a=el(id); if(a) a.href=cat.iqTestUrl||'#'; });
+    const upload = (this.testMode!=='api');
+    el('tests-upload').classList.toggle('hide', !upload);
+    el('tests-api').classList.toggle('hide', upload);
+    el('tests-submit').textContent = upload ? 'Kirim Hasil & Lanjut' : 'Saya Sudah Menyelesaikan Tes';
+    if(upload){
+      el('disc-file').onchange = ()=>this._pickFile('disc');
+      el('iq-file').onchange = ()=>this._pickFile('iq');
+    }
+    // restore saved state
+    const st=this.data.savedTests||{};
+    if(st.discType){ const sel=el('disc-type'); if(sel) sel.value=st.discType; }
+    if(st.iqScore!=null){ const inp=el('iq-score'); if(inp) inp.value=st.iqScore; }
+    if(st.discFile) this._markFilled('disc','Berkas DISC tersimpan');
+    if(st.iqFile) this._markFilled('iq','Berkas IQ tersimpan');
+  },
+  _pickFile(kind){
+    const inp=el(kind+'-file'); const f=inp.files[0]; if(!f) return;
+    if(kind==='disc') this.discFile=f; else this.iqFile=f;
+    this._markFilled(kind, f.name);
+  },
+  _markFilled(kind, label){
+    const dz=el(kind+'-dz'); dz.classList.add('filled');
+    el(kind+'-dz-main').textContent = label;
+  },
+  async submitTests(){
+    const btn=el('tests-submit'); const orig=btn.textContent;
+    this.hideErr('tests-err');
+    if(this.testMode==='api'){
+      btn.disabled=true; btn.textContent='Menyinkron hasil…';
+      try{ const fd=new FormData(); fd.append('mode','api'); await API.tests(fd); toast('Hasil tes tersinkron ✓'); this.next(); }
+      catch(e){ this.err('tests-err','Gagal menyinkron hasil: '+e.message); }
+      finally{ btn.disabled=false; btn.textContent=orig; }
+      return;
+    }
+    const discType=(el('disc-type').value||'').trim();
+    const iqScore=(el('iq-score').value||'').trim();
+    if(!(this.discFile||discType)){ return this.err('tests-err','Untuk DISC: unggah berkas hasil atau pilih tipe dominan.'); }
+    if(!(this.iqFile||iqScore)){ return this.err('tests-err','Untuk IQ: unggah berkas hasil atau isi skor 0–100.'); }
+    btn.disabled=true; btn.textContent='Mengirim…';
+    try{
+      const fd=new FormData(); fd.append('mode','upload');
+      if(this.discFile) fd.append('discFile', this.discFile, this.discFile.name);
+      if(this.iqFile) fd.append('iqFile', this.iqFile, this.iqFile.name);
+      if(discType) fd.append('discType', discType);
+      if(iqScore) fd.append('iqScore', iqScore);
+      await API.tests(fd); toast('Hasil tes terkirim ✓'); this.next();
+    }catch(e){ this.err('tests-err','Gagal mengirim hasil: '+e.message); }
+    finally{ btn.disabled=false; btn.textContent=orig; }
+  },
+
+  /* ---------- video (Google Drive mode) ---------- */
+  renderVideoStatic(){
+    el('v-eyebrow').textContent = this.track==='maritime' ? 'Tahap B — Video Interview Terstruktur' : 'Tahap C — Video Interview';
+    (this.data.videoAnswers||[]).forEach(a=>{ this.vDone[a.qIndex] = {qIndex:a.qIndex, done:true, url:a.url||''}; });
+  },
+  enterVideo(){
+    this.paintVideo();
+  },
+  paintVideo(){
+    const vq = this.data.catalog.videoQuestions || [];
+    // Stop any active recording streams before re-render
+    vq.forEach((_, i) => {
+      const s = this.recState[i];
+      if (!s) return;
+      if (s.timerId) clearInterval(s.timerId);
+      if (s.recorder && s.recorder.state !== 'inactive') { s.recorder.onstop = null; s.recorder.stop(); }
+      if (s.stream) s.stream.getTracks().forEach(t => t.stop());
+    });
+    this.recState = {};
+    this.hideErr('video-err');
+    el('v-questions').innerHTML = vq.map((q,i) => this._renderRecBlock(i, q)).join('');
+    const allDone = vq.length > 0 && vq.every((_,i) => !!this.vDone[i]);
+    el('v-next').classList.toggle('hide', !allDone);
+  },
+  _renderRecBlock(i, question){
+    const done = !!this.vDone[i];
+    if (done) return `
+    <div class="rec-block done" id="rec-block-${i}">
+      <div class="rec-qhead"><div class="lab">Pertanyaan ${i+1}</div><p>${esc(question)}</p></div>
+      <div class="rec-body">
+        <div class="rec-done-row">
+          <span class="vi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+          <span>Video diterima &amp; tersimpan</span>
+        </div>
+      </div>
+    </div>`;
+    return `
+    <div class="rec-block" id="rec-block-${i}">
+      <div class="rec-qhead"><div class="lab">Pertanyaan ${i+1}</div><p>${esc(question)}</p></div>
+      <div class="rec-body">
+        <div class="rec-video-wrap" id="rec-wrap-${i}">
+          <video id="rec-video-${i}" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+          <div class="rec-timer hide" id="rec-timer-${i}"><span class="dot"></span><span id="rec-time-${i}">0:00</span></div>
+          <div class="rec-countdown hide" id="rec-cd-${i}"></div>
+        </div>
+        <div id="rec-ctrls-${i}">${this._idleControls(i)}</div>
+        <div class="errbox hide" id="rec-err-${i}" style="margin-top:10px;"></div>
+      </div>
+    </div>`;
+  },
+  _idleControls(i){
+    return `<div class="rec-controls">
+      <button class="btn btn-primary" onclick="App._reqPermission(${i})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="12" cy="12" r="3"/><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3L14.5 4z"/></svg>
+        Mulai Rekam
+      </button>
+    </div>`;
+  },
+  async _reqPermission(i){
+    this._setRecCtrls(i, '<div class="rec-controls"><span class="spin" style="width:14px;height:14px;border-width:2px;margin:0;display:inline-block;vertical-align:middle;"></span>&nbsp;Meminta izin kamera…</div>');
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+      this.recState[i] = {state:'countdown', stream, recorder:null, chunks:[], blob:null, duration:0, startMs:0, timerId:null};
+      const wrap = el(`rec-wrap-${i}`); wrap.classList.add('show');
+      const vid = el(`rec-video-${i}`); vid.srcObject = stream; vid.muted = true;
+      await this._countdown(i);
+      this._startRecording(i);
+    }catch(e){
+      this._recErr(i, 'Izin kamera/mikrofon ditolak. Aktifkan di pengaturan browser Anda.');
+      this._setRecCtrls(i, this._idleControls(i));
+    }
+  },
+  _countdown(i){
+    return new Promise(resolve => {
+      const cd = el(`rec-cd-${i}`); cd.classList.remove('hide');
+      let n = 3; cd.textContent = n;
+      const t = setInterval(()=>{ n--; if(n<=0){ clearInterval(t); cd.classList.add('hide'); resolve(); } else cd.textContent=n; }, 1000);
+    });
+  },
+  _startRecording(i){
+    const st = this.recState[i];
+    st.state = 'recording'; st.chunks = []; st.startMs = Date.now();
+    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus'
+                : MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : '';
+    const rec = new MediaRecorder(st.stream, mime ? {mimeType:mime} : {});
+    st.recorder = rec;
+    rec.ondataavailable = e => { if(e.data.size>0) st.chunks.push(e.data); };
+    rec.onstop = () => this._onRecStop(i);
+    rec.start(1000);
+    el(`rec-timer-${i}`).classList.remove('hide');
+    st.timerId = setInterval(()=>{
+      const secs = Math.floor((Date.now()-st.startMs)/1000);
+      el(`rec-time-${i}`).textContent = `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}`;
+    }, 500);
+    this._setRecCtrls(i, `<div class="rec-controls">
+      <button class="btn" style="background:#BF4A3D;color:#fff;border-color:#BF4A3D;" onclick="App._stopRecording(${i})">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" style="margin-right:4px;"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>Berhenti
+      </button>
+      <span style="font-size:12px;color:var(--ink-soft);line-height:1;">Sedang merekam…</span>
+    </div>`);
+  },
+  _stopRecording(i){
+    const st = this.recState[i];
+    if(!st || st.state!=='recording') return;
+    if(st.timerId){ clearInterval(st.timerId); st.timerId=null; }
+    st.duration = Math.round((Date.now()-st.startMs)/1000);
+    st.recorder.stop();
+  },
+  _onRecStop(i){
+    const st = this.recState[i]; if(!st) return;
+    st.state = 'preview';
+    st.blob = new Blob(st.chunks, {type: st.recorder.mimeType||'video/webm'});
+    el(`rec-timer-${i}`).classList.add('hide');
+    const vid = el(`rec-video-${i}`);
+    vid.srcObject = null; vid.muted = false;
+    vid.src = URL.createObjectURL(st.blob);
+    vid.controls = true; vid.loop = false;
+    const m = Math.floor(st.duration/60), s = String(st.duration%60).padStart(2,'0');
+    this._setRecCtrls(i, `<div class="rec-controls">
+      <button class="btn btn-ghost" onclick="App._retake(${i})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="margin-right:4px;"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>Rekam Ulang
+      </button>
+      <button class="btn btn-primary" onclick="App._submitRecording(${i})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14" style="margin-right:4px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Kirim Video (${m}:${s})
+      </button>
+    </div>`);
+  },
+  _retake(i){
+    const st = this.recState[i];
+    if(st){
+      if(st.stream) st.stream.getTracks().forEach(t=>t.stop());
+      const vid = el(`rec-video-${i}`);
+      if(vid && vid.src) URL.revokeObjectURL(vid.src);
+    }
+    delete this.recState[i];
+    const vid = el(`rec-video-${i}`);
+    if(vid){ vid.src=''; vid.srcObject=null; vid.controls=false; vid.muted=true; }
+    const wrap = el(`rec-wrap-${i}`); if(wrap) wrap.classList.remove('show');
+    el(`rec-timer-${i}`)?.classList.add('hide');
+    this._recErr(i,'');
+    this._setRecCtrls(i, this._idleControls(i));
+  },
+  async _submitRecording(i){
+    const st = this.recState[i];
+    if(!st?.blob) return;
+    const ext = (st.recorder?.mimeType||'video/webm').includes('mp4') ? 'mp4' : 'webm';
+    const fname = `MAXY_Q${i+1}_${Date.now()}.${ext}`;
+    if(this.gClientId && this.gTokenClient){
+      await this._submitViaDrive(i, st, fname);
+    } else {
+      await this._submitViaServer(i, st, ext);
+    }
+  },
+
+  async _submitViaDrive(i, st, fname){
+    this._setRecCtrls(i, this._spin('Meminta izin Google…'));
+    try{
+      const token = await this._getGToken();
+      this._setRecCtrls(i, this._spin('Mengunggah ke Google Drive… <span id="rec-prog-'+i+'">0%</span>'));
+      const fileId = await this._driveUpload(token, st.blob, fname, p=>{
+        const pg = el(`rec-prog-${i}`); if(pg) pg.textContent = Math.round(p*100)+'%';
+      });
+      this._setRecCtrls(i, this._spin('Mengatur izin…'));
+      await this._driveMakePublic(token, fileId);
+      const driveUrl = await this._driveGetLink(token, fileId);
+      this._setRecCtrls(i, this._spin('Menyimpan link…'));
+      const fd = new FormData();
+      fd.append('gdriveUrl', driveUrl); fd.append('qIndex', i); fd.append('duration', st.duration);
+      const res = await fetch(`/api/assessment/${TOKEN}/video`, {method:'POST', body:fd});
+      const data = await res.json();
+      if(!res.ok||!data.success) throw new Error(data.error||'Gagal menyimpan link.');
+      if(st.stream) st.stream.getTracks().forEach(t=>t.stop());
+      this.vDone[i] = {qIndex:i, done:true, url:driveUrl};
+      toast(`Video pertanyaan ${i+1} tersimpan di Google Drive ✓`);
+      this.paintVideo();
+    }catch(e){
+      this._recErr(i, e.message);
+      const m=Math.floor(st.duration/60), s=String(st.duration%60).padStart(2,'0');
+      this._setRecCtrls(i, `<div class="rec-controls">
+        <button class="btn btn-ghost" onclick="App._retake(${i})">Rekam Ulang</button>
+        <button class="btn btn-primary" onclick="App._submitRecording(${i})">Coba Lagi (${m}:${s})</button>
+      </div>`);
+    }
+  },
+
+  async _submitViaServer(i, st, ext){
+    this._setRecCtrls(i, this._spin('Mengunggah video…'));
+    try{
+      const fd = new FormData();
+      fd.append('video', st.blob, `interview_q${i+1}.${ext}`);
+      fd.append('qIndex', i); fd.append('duration', st.duration);
+      const res = await fetch(`/api/assessment/${TOKEN}/video`, {method:'POST', body:fd});
+      const data = await res.json();
+      if(!res.ok||!data.success) throw new Error(data.error||data.message||'Gagal mengunggah.');
+      if(st.stream) st.stream.getTracks().forEach(t=>t.stop());
+      this.vDone[i] = {qIndex:i, done:true, url:data.url||''};
+      toast(`Video pertanyaan ${i+1} diterima ✓`);
+      this.paintVideo();
+    }catch(e){
+      const m=Math.floor(st.duration/60), s=String(st.duration%60).padStart(2,'0');
+      this._recErr(i, 'Gagal mengunggah: '+e.message);
+      this._setRecCtrls(i, `<div class="rec-controls">
+        <button class="btn btn-ghost" onclick="App._retake(${i})">Rekam Ulang</button>
+        <button class="btn btn-primary" onclick="App._submitRecording(${i})">Coba Lagi (${m}:${s})</button>
+      </div>`);
+    }
+  },
+
+  _spin(msg){ return `<div class="rec-controls"><span class="spin" style="width:14px;height:14px;border-width:2px;margin:0;display:inline-block;vertical-align:middle;flex:none;"></span>&nbsp;${msg}</div>`; },
+  _setRecCtrls(i, html){ const c=el(`rec-ctrls-${i}`); if(c) c.innerHTML=html; },
+  _recErr(i, msg){ const e=el(`rec-err-${i}`); if(!e) return; if(msg){e.textContent=msg;e.classList.remove('hide');}else e.classList.add('hide'); },
+
+  /* -- Google Drive helpers -- */
+  _initDrive(clientId){
+    this.gClientId = clientId;
+    const ready = () => {
+      this.gTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'https://www.googleapis.com/auth/drive.file',
+        callback: ()=>{}
+      });
+    };
+    if(window.google?.accounts?.oauth2){ ready(); return; }
+    const t = setInterval(()=>{ if(window.google?.accounts?.oauth2){ clearInterval(t); ready(); } }, 150);
+    setTimeout(()=>clearInterval(t), 8000);
+  },
+  _getGToken(){
+    if(this.gToken && this.gTokenExp > Date.now()) return Promise.resolve(this.gToken);
+    return new Promise((resolve, reject)=>{
+      this.gTokenClient.callback = resp => {
+        if(resp.error) return reject(new Error('Google auth gagal: '+resp.error));
+        this.gToken = resp.access_token;
+        this.gTokenExp = Date.now() + (resp.expires_in - 60) * 1000;
+        resolve(this.gToken);
+      };
+      this.gTokenClient.requestAccessToken();
+    });
+  },
+  async _driveUpload(token, blob, filename, onProgress){
+    const initRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable', {
+      method:'POST',
+      headers:{
+        'Authorization':'Bearer '+token,
+        'Content-Type':'application/json',
+        'X-Upload-Content-Type': blob.type||'video/webm',
+        'X-Upload-Content-Length': blob.size
+      },
+      body: JSON.stringify({name:filename, mimeType:blob.type||'video/webm'})
+    });
+    if(!initRes.ok) throw new Error('Gagal memulai upload ke Drive ('+initRes.status+').');
+    const uploadUrl = initRes.headers.get('Location');
+    return new Promise((resolve, reject)=>{
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', uploadUrl);
+      xhr.setRequestHeader('Content-Type', blob.type||'video/webm');
+      xhr.upload.onprogress = e => { if(e.lengthComputable) onProgress(e.loaded/e.total); };
+      xhr.onload = ()=>{
+        if(xhr.status>=200&&xhr.status<300){ resolve(JSON.parse(xhr.responseText).id); }
+        else reject(new Error('Upload gagal: HTTP '+xhr.status));
+      };
+      xhr.onerror = ()=>reject(new Error('Koneksi terputus saat upload.'));
+      xhr.send(blob);
+    });
+  },
+  async _driveMakePublic(token, fileId){
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body: JSON.stringify({role:'reader', type:'anyone'})
+    });
+    if(!res.ok) throw new Error('Gagal mengatur izin Drive.');
+  },
+  async _driveGetLink(token, fileId){
+    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=webViewLink`,{
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const d = await res.json();
+    if(!d.webViewLink) throw new Error('Gagal mendapatkan link Drive.');
+    return d.webViewLink;
+  },
+
+  /* ---------- completion ---------- */
+  async finish(){
+    this.cur='complete'; this.idx=this.flow.indexOf('complete');
+    show('complete'); this.syncStepper(); this.paintDemoNav();
+    if(!this.completing){ this.completing=true; try{ await API.complete(); }catch(e){} }
+    // Cek jadwal interview setelah selesai
+    this.checkSchedule();
+  },
+
+  async demoSkip(step){
+    try{
+      await API.skip(step);
+      toast(`Langkah demo "${step}" berhasil dilewati ✓`);
+      const fresh = await API.state();
+      this.data = fresh;
+      if(step==='video'){
+        (fresh.videoAnswers||[]).forEach(a=>{
+          this.vDone[a.qIndex]={qIndex:a.qIndex,done:true,url:a.url||''};
+        });
+        this.paintVideo();
+      } else {
+        this.next();
+      }
+    }catch(e){
+      toast('Gagal melewati langkah: '+(e.message||e));
+    }
+  },
+
+  err(id,msg){ const e=el(id); e.textContent=msg; e.classList.remove('hide'); },
+  hideErr(id){ const e=el(id); if(e) e.classList.add('hide'); },
+};
+
+window.addEventListener('DOMContentLoaded', ()=>App.init());
+</script>
+</body>
+</html>

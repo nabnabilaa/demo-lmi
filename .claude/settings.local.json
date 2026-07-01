@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Bash(pip show *)",
+      "Bash(curl -s http://localhost:5050/health)",
+      "Bash(python -c \"from playwright.sync_api import sync_playwright; print\\('playwright OK'\\)\")",
+      "Bash(python -c \"import anthropic; print\\('anthropic OK'\\)\")",
+      "Bash(python -c \"import google.genai; print\\('google.genai OK'\\)\")",
+      "Bash(python -m playwright install chromium)",
+      "Bash(python -m playwright install --dry-run)",
+      "Bash(python cert_verifier.py --test-cv kode_pelaut_test.json --nama \"Budi Santoso\")",
+      "Bash(python -c ' *)",
+      "Bash(python cert_verifier.py --kode 6212316902MC3123)",
+      "PowerShell(Get-ChildItem C:\\\\laragon\\\\www\\\\lmi -Recurse -File | Where-Object { $_.LastWriteTime -gt \\(Get-Date\\).AddHours\\(-3\\) -and $_.Extension -in '.py','.html','.js','.css' } | Sort-Object LastWriteTime -Descending | Select-Object FullName, LastWriteTime | Format-Table -AutoSize)",
+      "Bash(curl -s http://localhost:5050/api/candidates)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(c['id'], c.get\\('track','?'\\), c.get\\('name','?'\\), c.get\\('stage','?'\\)\\) for c in d[:10]]\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); cands=d.get\\('candidates',d\\) if isinstance\\(d,dict\\) else d; print\\(type\\(d\\)\\); [print\\(c.get\\('id','?'\\), c.get\\('track','?'\\), c.get\\('name','?'\\), c.get\\('stage','?'\\)\\) for c in \\(cands if isinstance\\(cands,list\\) else []\\)]\")",
+      "Bash(curl -s \"http://localhost:5050/api/candidates\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); c=d['candidates'][0]; print\\(list\\(c.keys\\(\\)\\)\\)\")",
+      "Bash(pkill -f \"python app.py\")",
+      "Bash(python app.py --port 5050)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(c['name'], c.get\\('track'\\), c.get\\('assessment_url','NO URL'\\)\\) for c in d['candidates'][:4]]\")",
+      "Bash(python *)",
+      "PowerShell(Get-Process *)",
+      "Bash(start http://localhost:5050/)",
+      "Bash(powershell -Command \"Start-Process 'http://localhost:5050/'\")",
+      "Bash(curl *)",
+      "PowerShell(Start-Process \"http://localhost:5050/\")",
+      "PowerShell(New-Item *)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Start-Sleep -Seconds 3; try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:5000/\" -UseBasicParsing -TimeoutSec 5\\).StatusCode } catch { \"Not yet ready: $_\" })",
+      "PowerShell(Start-Sleep -Seconds 4; try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:5000/\" -UseBasicParsing -TimeoutSec 8\\).StatusCode } catch { $_.Exception.Message })",
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:5050/\" -UseBasicParsing -TimeoutSec 5\\).StatusCode } catch { $_.Exception.Message })"
+    ]
+  }
+}

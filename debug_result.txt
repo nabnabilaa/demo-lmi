@@ -1,0 +1,211 @@
+=== INNER TEXT ===
+Beranda /
+Home
+Informasi /
+Information
+MoU Reg I/10 STCW
+Verifikasi /
+Verification
+Verifikasi Nomor Sertifikasi / Number of Certificate Verification
+Data Pelaut / Seafarer Data
+MUHARIA ILHAM PRATAMA
+6212316902
+
+
+BASIC SAFETY TRAINING
+
+Tempat / Tanggal Lahir
+SEMARANG, 06 APRIL 2000
+Place / Date of Birth
+Umur
+26 Tahun / Years Old
+Ages
+Jenis Kelamin
+Laki - laki / Male
+Gender
+Status
+AKTIF / Active
+Status
+
+Dengan ini menyatakan bahwa Pelaut ini terdaftar dalam Data Induk Kepelautan dan memiliki sertifikat dasar dan keahlian tertinggi sebagai berikut :
+
+Hereby Certify that this Seafarer is registered in Indonesian Seafarer Database and have a basic and proficiency certificates as follows:
+
+BASIC SAFETY TRAINING
+No. 6212316902010325
+PIP Semarang
+
+Berlaku Sampai Dengan 24-12-2030
+Valid Until 24-12-2030
+   
+Direktorat Perkapalan dan Kepelautan
+
+Jl. Medan Merdeka Barat No 8
+Jakarta, Indonesia 10110
+Contact Center : 151
+Email : kepelautan@dephub.go.id
+
+
+IMO (International Maritimes Organization)
+ILO (International Labour Organization)
+BPSDM Kemenhub RI
+INSA (Indonesia National Shipowners Association)
+BKI (Biro Klasifikasi Indonesia)
+JDIH Kemenhub
+
+© 2024 Direktorat Perkapalan & Kepelautan, Direktorat Jenderal Perhubungan Laut, Kementerian Perhubungan Republik Indonesia
+
+
+=== TABLE ROWS ===
+['BASIC SAFETY TRAINING\nNo. 6212316902010325\nPIP Semarang']
+['Berlaku Sampai Dengan 24-12-2030\nValid Until 24-12-2030']
+
+=== DIV/P elements ===
+DIV[row gy-4 gy-xl-0]: 'Verifikasi Nomor Sertifikasi / Number of Certificate Verification'
+DIV[col-md-12 f-30 montserrat-800 text-black text-center]: 'Verifikasi Nomor Sertifikasi / Number of Certificate Verification'
+DIV[profile-header]: 'Data Pelaut / Seafarer Data'
+DIV[col-md-4 mb-3]: 'MUHARIA ILHAM PRATAMA\n6212316902\n\n\nBASIC SAFETY TRAINING'
+DIV[card]: 'MUHARIA ILHAM PRATAMA\n6212316902\n\n\nBASIC SAFETY TRAINING'
+DIV[card-body]: 'MUHARIA ILHAM PRATAMA\n6212316902\n\n\nBASIC SAFETY TRAINING'
+DIV[d-flex flex-column align-items-center text-center]: 'MUHARIA ILHAM PRATAMA\n6212316902\n\n\nBASIC SAFETY TRAINING'
+DIV[mt-3]: 'MUHARIA ILHAM PRATAMA\n6212316902\n\n\nBASIC SAFETY TRAINING'
+DIV[row]: 'Jenis Kelamin\nLaki - laki / Male'
+DIV[col-sm-5]: 'Jenis Kelamin'
+DIV[row]: 'Dengan ini menyatakan bahwa Pelaut ini terdaftar dalam Data Induk Kepelautan dan memiliki sertifikat dasar dan keahlian tertinggi sebagai berikut :'
+DIV[col-sm-12]: 'Dengan ini menyatakan bahwa Pelaut ini terdaftar dalam Data Induk Kepelautan dan memiliki sertifikat dasar dan keahlian tertinggi sebagai berikut :'
+P[]: 'Dengan ini menyatakan bahwa Pelaut ini terdaftar dalam Data Induk Kepelautan dan memiliki sertifikat dasar dan keahlian tertinggi sebagai berikut :'
+DIV[row]: 'BASIC SAFETY TRAINING\nNo. 6212316902010325\nPIP Semarang\n\nBerlaku Sampai Dengan 24-12-2030\nValid Until 24-12-2030'
+DIV[col-sm-12]: 'BASIC SAFETY TRAINING\nNo. 6212316902010325\nPIP Semarang\n\nBerlaku Sampai Dengan 24-12-2030\nValid Until 24-12-2030'
+TD[]: 'Berlaku Sampai Dengan 24-12-2030\nValid Until 24-12-2030'
+DIV[col-md-6]: 'Direktorat Perkapalan dan Kepelautan\n\nJl. Medan Merdeka Barat No 8\nJakarta, Indonesia 10110\nContact Center : 151\nEmail : kepelautan@dephub.go.id'
+P[roboto-400]: 'Jl. Medan Merdeka Barat No 8\nJakarta, Indonesia 10110\nContact Center : 151\nEmail : kepelautan@dephub.go.id'
+DIV[row]: '© 2024 Direktorat Perkapalan & Kepelautan, Direktorat Jenderal Perhubungan Laut, Kementerian Perhubungan Republik Indonesia'
+DIV[col-md-12]: '© 2024 Direktorat Perkapalan & Kepelautan, Direktorat Jenderal Perhubungan Laut, Kementerian Perhubungan Republik Indonesia'
+P[roboto-200]: '© 2024 Direktorat Perkapalan & Kepelautan, Direktorat Jenderal Perhubungan Laut, Kementerian Perhubungan Republik Indonesia'
+
+=== RAW HTML ===
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direktorat Perkapalan dan Kepelautan</title>
+    <!-- Style -->
+    <link rel="icon" type="image/png" href="https://pelaut.dephub.go.id/assets/images/fav.png">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/bootstrap@4.5.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/slick-carousel@1.8.1/slick/slick.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/slick-carousel@1.8.1/slick/slick-theme.css">
+    <link rel="stylesheet" href="https://pelaut.dephub.go.id/assets/css/font.css">
+    <link rel="stylesheet" href="https://pelaut.dephub.go.id/assets/css/main.css">
+    <link rel="stylesheet" href="https://pelaut.dephub.go.id/assets/css/style.css">
+    <link rel="stylesheet" href="https://pelaut.dephub.go.id/assets/css/aspiration.css">
+    <link rel="stylesheet" href="https://pelaut.dephub.go.id/assets/css/small-layout.css">
+    <link rel="stylesheet" href="https://pelaut.dephub.go.id/assets/css/gpr.css">
+    <link rel="stylesheet" href="https://pelaut.dephub.go.id/assets/css/pojo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://unpkg.com/jquery@3.5.1/dist/jquery.min.js"></script>
+</head>
+
+<body class="small-layout">
+    <nav id="headtop" class=" navbar navbar-expand-lg fixed-top navbar-dark bg-black-transparent">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="https://pelaut.dephub.go.id">
+            <img height="40" class="navbar-logo-white" src="https://pelaut.dephub.go.id/assets/images/logo-kemenhub1.png" alt="" style="margin-top:0px">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse h-100 d-none d-lg-block">
+            <ul class="navbar-nav mr-auto ml-auto h-100">
+                <li class="nav-item nav-item-top">
+                    <a style="" class="nav-link" href="https://pelaut.dephub.go.id">Beranda / <i>Home</i></a>
+                </li>
+                <li class="nav-item nav-item-top">
+                    <a style="" class="nav-link dropdown-toggle" href="#">Informasi / <i>Information</i></a>
+                    <div class="mega-menu">
+                        <div class="container-fluid">
+                            <div class="row mx-0 w-100">
+                                <div class="col-4 mx-0 px-0">
+                                    <ul class="with-separator">
+                                        <li class="mega-menu-item pl-4">
+                                            <a href="#">DPKP</a>
+                                            <ul class="stick-menu with-separator" style="top: calc(-32px * 0)">
+                                                <li class="mega-menu-item pl-4">
+                                                    <a target="_blank" href="https://pelaut.dephub.go.id/dpkp/sejarah-dpkp">Sejarah</a>
+                                                </li>
+                                                <li class="mega-menu-item pl-4">
+                                                    <a target="_blank" href="https://pelaut.dephub.go.id/dpkp/visi-misi">Visi dan
+                                                        Misi</a>
+                                                </li>
+                                                <li class="mega-menu-item pl-4">
+                                                    <a target="_blank" href="https://pelaut.dephub.go.id/dpkp/struktur-organisasi">Struktur
+                                                        Organisasi</a>
+                                                </li>
+                                                <li class="mega-menu-item pl-4">
+                                                    <a target="_blank" href="https://pelaut.dephub.go.id/dpkp/pengurus">Pengurus</a>
+                                                </li>
+                                                <li class="mega-menu-item pl-4">
+                                                    <a target="_blank" href="https://pelaut.dephub.go.id/dpkp/dafta-pukp">Daftar PUKP
+                                                        dan Sekolah Pelayaran</a>
+                                                </li>
+                                                <li class="mega-menu-item pl-4">
+                                                    <a target="_blank" href="https://pelaut.dephub.go.id/dpkp/hasil-pukp">Hasil
+                                                        Pengumuman UKP</a>
+                                                </li>
+                                                <li class="mega-menu-item pl-4">
+                                                    <a target="_blank" href="https://pelaut.dephub.go.id/dpkp/artikel-kegiatan">Artikel Kegiatan
+                                                        DPKP</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        
+                                        <li class="mega-menu-item pl-4">
+                                            <a href="https://pelaut.dephub.go.id/lokasi">Lokasi Diklat</a>
+                                        </li>
+                                        
+                                        
+                                        <li class="mega-menu-item pl-4">
+                                            <a href="https://pelaut.dephub.go.id/form-verifikasi-dokumen-keabsahan">Pengecekan
+                                                Keabsahan</a>
+                                        </li>
+                                        <li class="mega-menu-item pl-4">
+                                            <a href="https://pelaut.dephub.go.id/login-perusahaan">Akun Perusahaan</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item nav-item-top">
+                    <a style="" class="nav-link" href="https://pelaut.dephub.go.id/negara">MoU Reg I/10 STCW</a>
+                </li>
+                <li class="nav-item nav-item-top">
+                    <a style="" class="nav-link" href="https://pelaut.dephub.go.id/verifikasi">Verifikasi /
+                        <i>Verification</i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    
+    
+    
+    
+    
+
+
+
+    <div class="collapse navbar-collapse d-lg-none mt-3 menu-scrollable" id="navbarSupportedContent">
+        <ul class="navbar-nav ">
+            <li class="nav-item">
+                <a data-toggle="" id="parentdropdown-1" class="nav-link" href="https://pelaut.dephub.go.id">Beranda /
+                    <i>Home</i></a>
+            </li>
+            <li class="nav-item">
+                <a data-toggle="dropdown" id="parentdropdown-68" class="nav-link dropdown-toggle" href="#">Informasi / <i>Information</i></a>
+                <ul class="dropdown-menu" aria-labelledby="parentdropdown-68">
+                    <li class="mega-menu-item pl-4">
+                        <a data-toggle="" class="dropdown-item" href="#">DPKP</a>
+                        <ul class="stick-menu 

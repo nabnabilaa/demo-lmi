@@ -1,0 +1,851 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAXY AI — Alur Rekrutmen Interaktif</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --paper: #ffffff;
+      --inner: #f8fafc;
+      --border: #e2e8f0;
+      --border-md: #cbd5e1;
+      --text: #0f172a;
+      --muted: #475569;
+      --light: #64748b;
+      --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.07);
+      --maritime: #0d9373; --maritime-bg: #e6f9f3;
+      --backoffice: #6366f1; --backoffice-bg: #eef2ff;
+      --hr-color: #d97706; --hr-bg: #fffbeb; --hr-border: #fde68a;
+      --candidate-color: #0ea5e9; --candidate-bg: #f0f9ff; --candidate-border: #bae6fd;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px); background-size: 24px 24px; color: var(--text); min-height: 100vh; }
+    .topbar { position: sticky; top: 0; z-index: 100; width: 100%; max-width: 900px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(255,255,255,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); border-radius: 0 0 16px 16px; box-shadow: var(--shadow-md); }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-icon { width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; box-shadow: 0 4px 10px rgba(59,130,246,.35); }
+    .brand-title { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -.02em; }
+    .brand-sub { font-size: 11px; color: var(--muted); font-weight: 500; }
+    .track-tabs { display: flex; gap: 6px; }
+    .track-tab { padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); color: var(--muted); background: white; transition: all .2s; display: flex; align-items: center; gap: 6px; }
+    .track-tab:hover { background: var(--inner); }
+    .track-tab.active-maritime { background: var(--maritime-bg); border-color: var(--maritime); color: #064e3b; }
+    .track-tab.active-backoffice { background: var(--backoffice-bg); border-color: var(--backoffice); color: #312e81; }
+    .canvas { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; }
+    .page { display: none; animation: fadeIn .3s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .page-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; padding: 10px 16px; background: white; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+    .page-info { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .page-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .page-dots { display: flex; gap: 5px; align-items: center; }
+    .pdot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-md); cursor: pointer; transition: all .2s; border: none; padding: 0; }
+    .pdot.active { width: 18px; border-radius: 4px; background: #3b82f6; }
+    .nav-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--border); background: white; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all .2s; font-family: inherit; }
+    .nav-btn:hover:not(:disabled) { background: var(--inner); border-color: var(--border-md); color: var(--text); }
+    .nav-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .nav-btn.primary { background: #3b82f6; border-color: #3b82f6; color: white; }
+    .nav-btn.primary:hover:not(:disabled) { background: #2563eb; }
+    .perspective-banner { display: flex; gap: 8px; margin-bottom: 16px; }
+    .persp-card { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1.5px solid; display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; }
+    .persp-card.hr { background: var(--hr-bg); border-color: var(--hr-border); color: #92400e; }
+    .persp-card.candidate { background: var(--candidate-bg); border-color: var(--candidate-border); color: #0c4a6e; }
+    .persp-icon { font-size: 18px; }
+    .persp-label { font-size: 10px; opacity: .7; font-weight: 500; display: block; }
+    .flow-section-label { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--light); margin: 18px 0 8px 4px; display: flex; align-items: center; gap: 8px; }
+    .flow-section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .step { border-radius: var(--r-lg); border: 1.5px solid var(--border); background: white; box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 10px; }
+    .step-header { display: flex; align-items: center; gap: 14px; padding: 14px 18px; }
+    .step-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(255,255,255,.6); }
+    .step-meta { flex: 1; }
+    .step-title { font-size: 13px; font-weight: 700; color: var(--text); }
+    .step-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .step-badges { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    .step-body { padding: 16px 18px 18px; background: var(--inner); border-top: 1px solid var(--border); }
+    .step.hr-step { border-left: 4px solid var(--hr-color); }
+    .step.candidate-step { border-left: 4px solid var(--candidate-color); }
+    .step.system-step { border-left: 4px solid #10b981; }
+    .step.both-step { border-left: 4px solid #8b5cf6; }
+    .connector { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 4px 0; color: var(--light); font-size: 11px; font-weight: 600; }
+    .conn-line { width: 1px; height: 18px; background: var(--border-md); }
+    .conn-pill { font-size: 10px; background: white; padding: 3px 12px; border-radius: 20px; border: 1px solid var(--border); color: var(--light); font-weight: 700; box-shadow: var(--shadow-sm); }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .scard { background: white; border-radius: var(--r-md); padding: 12px 14px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+    .scard-title { font-size: 11px; font-weight: 700; color: var(--text); margin-bottom: 5px; display: flex; align-items: center; gap: 5px; }
+    .scard-body { font-size: 11px; color: var(--muted); line-height: 1.55; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: .02em; }
+    .b-ai { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+    .b-rule { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .b-hr { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+    .b-auto { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+    .b-candidate { background: #f0f9ff; color: #0c4a6e; border: 1px solid #bae6fd; }
+    .b-critical { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .legend { display: flex; gap: 12px; flex-wrap: wrap; padding: 10px 14px; background: white; border-radius: var(--r-md); border: 1px solid var(--border); margin-bottom: 16px; }
+    .leg { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--muted); font-weight: 500; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .info-box { border-radius: var(--r-md); padding: 12px 14px; font-size: 11px; line-height: 1.6; font-weight: 500; }
+    .info-box.amber { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .info-box.blue { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+    .info-box.green { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .info-box.red { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border-md); }
+    .score-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .score-lbl { font-size: 11px; font-weight: 600; color: var(--muted); width: 110px; flex-shrink: 0; }
+    .score-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .score-fill { height: 100%; border-radius: 4px; }
+    .score-pct { font-size: 11px; font-weight: 700; color: var(--light); width: 32px; text-align: right; flex-shrink: 0; }
+    .gate { border-radius: 10px; border: 2px dashed; padding: 14px 16px; text-align: center; font-size: 12px; font-weight: 700; margin: 10px 0; }
+    .gate.pass { border-color: #10b981; background: #f0fdf4; color: #065f46; }
+    .gate.fail { border-color: #ef4444; background: #fef2f2; color: #991b1b; }
+    .final-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 12px; }
+    .final-chip { padding: 14px 10px; border-radius: 10px; text-align: center; font-size: 11px; font-weight: 700; border: 1.5px solid; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
+    .fc-hired { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+    .fc-pool { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+    .fc-rej { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+    .final-chip i { font-size: 20px; }
+    .api-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 12px; padding: 16px 20px; color: white; margin-bottom: 10px; }
+    .api-card-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .api-card-sub { font-size: 11px; color: #94a3b8; }
+    .api-endpoint { font-family: 'Courier New', monospace; font-size: 10px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 6px; padding: 8px 12px; margin-top: 10px; color: #7dd3fc; }
+    .api-method { color: #86efac; font-weight: 700; margin-right: 8px; }
+    .cb-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .cb-label { font-size: 11px; font-weight: 600; color: var(--muted); width: 110px; flex-shrink: 0; }
+    .cb-select { font-size: 12px; font-family: inherit; border: 1.5px solid var(--border-md); border-radius: 8px; padding: 6px 10px; background: white; color: var(--text); outline: none; cursor: pointer; font-weight: 600; }
+    @media (max-width: 600px) { .grid2,.grid3,.final-row { grid-template-columns: 1fr; } .perspective-banner { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <div style="display:flex;justify-content:center;">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-icon"><i class="ti ti-sitemap"></i></div>
+        <div>
+          <div class="brand-title">MAXY AI — Alur Rekrutmen</div>
+          <div class="brand-sub">Sistem Rekrutmen Berbasis AI · Demo Interaktif</div>
+        </div>
+      </div>
+      <div class="track-tabs">
+        <div class="track-tab active-maritime" id="tab-maritime" onclick="setTrack('maritime')">
+          <i class="ti ti-anchor"></i> Maritime
+        </div>
+        <div class="track-tab" id="tab-backoffice" onclick="setTrack('backoffice')">
+          <i class="ti ti-building"></i> Back Office
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas">
+    <div class="page-nav">
+      <button class="nav-btn" id="btn-prev" onclick="changePage(-1)" disabled>
+        <i class="ti ti-chevron-left"></i> Sebelumnya
+      </button>
+      <div style="text-align:center;">
+        <div class="page-info" id="page-info">Halaman 1 dari 6</div>
+        <div class="page-title" id="page-title">Trigger &amp; Penerimaan Data</div>
+        <div class="page-dots" style="justify-content:center;margin-top:6px;" id="dots-container"></div>
+      </div>
+      <button class="nav-btn primary" id="btn-next" onclick="changePage(1)">
+        Berikutnya <i class="ti ti-chevron-right"></i>
+      </button>
+    </div>
+    <!-- PAGE 1: Trigger & Penerimaan Data -->
+    <div class="page active" id="page-1">
+      <div class="legend">
+        <div class="leg"><div class="leg-dot" style="background:#10b981;"></div>Sistem Otomatis</div>
+        <div class="leg"><div class="leg-dot" style="background:#3b82f6;"></div>AI Processing</div>
+        <div class="leg"><div class="leg-dot" style="background:#d97706;"></div>Keputusan HR</div>
+        <div class="leg"><div class="leg-dot" style="background:#0ea5e9;"></div>Aksi Kandidat</div>
+        <div class="leg"><div class="leg-dot" style="background:#ef4444;"></div>Hanya di sisi HR</div>
+      </div>
+      <div class="perspective-banner">
+        <div class="persp-card hr">
+          <span class="persp-icon">&#127970;</span>
+          <div><span class="persp-label">SISI HR / SISTEM</span>Menerima data dari API klien, membangun profil, memulai analisis AI secara otomatis</div>
+        </div>
+        <div class="persp-card candidate">
+          <span class="persp-icon">&#128100;</span>
+          <div><span class="persp-label">SISI KANDIDAT</span>Mendaftar di portal klien, menunggu notifikasi link asesmen dari MAXY</div>
+        </div>
+      </div>
+      <div class="flow-section-label">Titik Masuk Kandidat</div>
+      <div class="step candidate-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#f0f9ff;"><i class="ti ti-world" style="color:#0ea5e9;"></i></div>
+          <div class="step-meta">
+            <div class="step-title" id="p1-portal-title">Portal Klien — crewing.lintasmaritim.com</div>
+            <div class="step-sub" id="p1-portal-sub">Kandidat mengisi formulir pendaftaran di website rekrutmen klien yang sudah ada</div>
+          </div>
+          <div class="step-badges"><span class="badge b-candidate"><i class="ti ti-user"></i> Kandidat</span></div>
+        </div>
+        <div class="step-body">
+          <div class="grid2">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-forms" style="color:#3b82f6;"></i> Yang Diisi Kandidat</div>
+              <div class="scard-body" id="p1-form-content">Data diri, riwayat kapal, posisi yang dilamar, upload CV/dokumen, nomor sertifikat pelaut</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-check" style="color:#10b981;"></i> Output Kandidat</div>
+              <div class="scard-body">Data terkirim ke portal klien &rarr; sistem meneruskan ke MAXY secara otomatis via API</div>
+            </div>
+          </div>
+          <div class="tag-row">
+            <span class="badge b-candidate">Formulir Online</span>
+            <span class="badge b-auto">Upload CV / Dokumen</span>
+            <span class="badge b-candidate" id="p1-cert-badge">Nomor Sertifikat Pelaut</span>
+          </div>
+        </div>
+      </div>
+      <div class="connector">
+        <div class="conn-line"></div>
+        <span class="conn-pill">API / Webhook Trigger</span>
+        <div class="conn-line"></div>
+      </div>
+      <div class="flow-section-label">Trigger Sistem &mdash; Sisi HR / MAXY</div>
+      <div class="step system-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#f0fdf4;"><i class="ti ti-bolt" style="color:#10b981;"></i></div>
+          <div class="step-meta">
+            <div class="step-title">MAXY Menerima Data via API &mdash; Profil Dibuat Otomatis</div>
+            <div class="step-sub">Setiap ada pendaftar baru di portal klien, MAXY langsung dipicu secara real-time</div>
+          </div>
+          <div class="step-badges"><span class="badge b-auto"><i class="ti ti-refresh"></i> Auto</span></div>
+        </div>
+        <div class="step-body">
+          <div class="api-card">
+            <div class="api-card-title"><i class="ti ti-plug-connected" style="margin-right:6px;"></i>API Integration &mdash; Real-time Trigger</div>
+            <div class="api-card-sub" id="p1-api-sub">Data mengalir dari portal klien ke MAXY setiap ada pendaftar baru</div>
+            <div class="api-endpoint"><span class="api-method">POST</span><span id="p1-api-url">/api/v1/candidates/new-application</span></div>
+            <div class="api-endpoint" style="margin-top:6px;"><span class="api-method">GET</span><span id="p1-api-url2">/api/v1/jobs/maritime/active-positions</span></div>
+          </div>
+          <div class="grid2" style="margin-top:10px;">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-database" style="color:#6366f1;"></i> Profil Otomatis Dibuat</div>
+              <div class="scard-body">MAXY membangun profil kandidat dari data yang diterima &mdash; tidak perlu input ulang dari HR</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-send" style="color:#0d9373;"></i> Notifikasi Terkirim</div>
+              <div class="scard-body">Link asesmen unik langsung dikirim via WhatsApp &amp; Email ke kandidat secara otomatis</div>
+            </div>
+          </div>
+          <div class="tag-row">
+            <span class="badge b-auto">Real-time Trigger</span>
+            <span class="badge b-auto">Profil Otomatis</span>
+            <span class="badge b-auto">Link Asesmen via WA &amp; Email</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- End Page 1 -->
+
+    <!-- PAGE 2: AI Analisis (Sisi Sistem) -->
+    <div class="page" id="page-2">
+      <div class="info-box amber" style="margin-bottom:16px;">
+        <i class="ti ti-info-circle" style="margin-right:4px;"></i>
+        <strong>Catatan Penting:</strong> Seluruh proses di halaman ini berjalan <strong>otomatis di sisi sistem</strong>, sesaat setelah data kandidat masuk via API. Kandidat tidak melihat hasil ini di sisi mereka.
+      </div>
+      <div class="flow-section-label">Analisis AI Otomatis &mdash; Sisi Sistem</div>
+      <div class="step system-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#eff6ff;"><i class="ti ti-file-text" style="color:#3b82f6;"></i></div>
+          <div class="step-meta">
+            <div class="step-title" id="p2-cv-title">Tahap A &mdash; AI: Ekstraksi &amp; Analisis CV</div>
+            <div class="step-sub" id="p2-cv-sub">AI langsung menganalisis CV begitu data diterima &mdash; tidak perlu tunggu HR</div>
+          </div>
+          <div class="step-badges">
+            <span class="badge b-ai"><i class="ti ti-robot"></i> AI</span>
+            <span class="badge b-auto">Auto</span>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="grid2" id="p2-cv-grid-maritime">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-scan" style="color:#3b82f6;"></i> Ekstraksi Data CV</div>
+              <div class="scard-body">Nama, posisi, pengalaman, jenis kapal, GT, CoC/CoP, OCIMF history &mdash; diekstrak otomatis dari PDF/DOC</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-target" style="color:#8b5cf6;"></i> Job Matching Score</div>
+              <div class="scard-body">AI mencocokkan profil pelaut dengan requirement posisi &rarr; skor 0&ndash;100 untuk ranking kandidat</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-certificate" style="color:#f59e0b;"></i> Validasi Sertifikat</div>
+              <div class="scard-body">Nomor sertifikat pelaut dicek otomatis ke database Kemenhub via RPA Vision &mdash; tanpa intervensi HR</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-chart-bar" style="color:#10b981;"></i> Rekap Hasil Analisis</div>
+              <div class="scard-body">CV Summary, Match Score, Status Sertifikat &mdash; langsung tersedia di dashboard HR</div>
+            </div>
+          </div>
+          <div class="grid2" id="p2-cv-grid-bo" style="display:none;">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-school" style="color:#3b82f6;"></i> Edu &amp; Age Filter</div>
+              <div class="scard-body">Verifikasi kesesuaian gelar, latar belakang pendidikan, dan rentang usia yang disyaratkan</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-certificate" style="color:#f59e0b;"></i> Cert &amp; Salary Check</div>
+              <div class="scard-body">Validasi sertifikat profesional dan perbandingan ekspektasi gaji vs budget posisi</div>
+            </div>
+            <div class="scard" style="grid-column:span 2;">
+              <div class="scard-title"><i class="ti ti-target" style="color:#6366f1;"></i> Competency Matching</div>
+              <div class="scard-body">AI mengurai pengalaman kerja, mencocokkan skills dengan Job Description &rarr; skor kompetensi otomatis</div>
+            </div>
+          </div>
+          <div class="info-box green" style="margin-top:12px;">
+            <i class="ti ti-eye-off" style="margin-right:4px;"></i>
+            <strong>Kandidat tidak melihat ini.</strong> Hasil analisis hanya tampil di dashboard HR untuk pengambilan keputusan.
+          </div>
+          <div id="p2-maritime-params" style="margin-top:10px;">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-anchor" style="color:#0d9373;"></i> Parameter Khusus Maritime</div>
+              <div class="scard-body">Vessel type &middot; GT tonnage &middot; OCIMF experience &middot; CoC/CoP certificates &middot; Sea service record &middot; Joining availability</div>
+            </div>
+          </div>
+          <div class="tag-row">
+            <span class="badge b-ai">CV Match Score 0&ndash;100</span>
+            <span class="badge b-auto">Auto Ranking Dashboard</span>
+            <span class="badge b-hr">HR tetap bisa buka CV asli</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- End Page 2 -->
+
+    <!-- PAGE 3: Portal Kandidat - Asesmen -->
+    <div class="page" id="page-3">
+      <div class="info-box blue" style="margin-bottom:16px;">
+        <i class="ti ti-device-mobile" style="margin-right:4px;"></i>
+        <strong>Portal Kandidat:</strong> Kandidat mengakses link asesmen unik yang dikirim via WhatsApp/Email. Di sinilah mereka <strong>mengisi yang kurang</strong> dari data yang sudah ada &mdash; quiz kualifikasi &amp; video interview asinkronus.
+      </div>
+      <div class="flow-section-label">Portal Kandidat &mdash; Asesmen (Diisi Kandidat)</div>
+      <div class="step candidate-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#f0fdf4;"><i class="ti ti-list-check" style="color:#10b981;"></i></div>
+          <div class="step-meta">
+            <div class="step-title" id="p3-quiz-title">Tahap B &mdash; Kuis Kualifikasi (Diisi Kandidat)</div>
+            <div class="step-sub" id="p3-quiz-sub">Verifikasi syarat mutlak &mdash; kandidat mengisi di portal mereka, sistem evaluasi otomatis</div>
+          </div>
+          <div class="step-badges">
+            <span class="badge b-candidate"><i class="ti ti-user"></i> Kandidat</span>
+            <span class="badge b-rule">Aturan</span>
+          </div>
+        </div>
+        <div class="step-body">
+          <div id="p3-quiz-maritime">
+            <div class="grid2">
+              <div class="scard">
+                <div class="scard-title"><i class="ti ti-anchor" style="color:#0d9373;"></i> Pertanyaan Kualifikasi</div>
+                <div class="scard-body">CoC/CoP tersedia? &middot; Pengalaman minimal berapa tahun? &middot; Ketersediaan join? &middot; Ekspektasi gaji?</div>
+              </div>
+              <div class="scard">
+                <div class="scard-title"><i class="ti ti-check" style="color:#10b981;"></i> Evaluasi Otomatis</div>
+                <div class="scard-body">Jawaban dievaluasi sistem &rarr; Pass/Fail per syarat, Qualification Score dihitung otomatis</div>
+              </div>
+            </div>
+          </div>
+          <div id="p3-quiz-bo" style="display:none;">
+            <div class="grid3">
+              <div class="scard">
+                <div class="scard-title"><i class="ti ti-clipboard-list" style="color:#3b82f6;"></i> Custom Form</div>
+                <div class="scard-body">Kuesioner teknis awal atau portofolio khusus posisi</div>
+              </div>
+              <div class="scard">
+                <div class="scard-title"><i class="ti ti-mood-smile" style="color:#ec4899;"></i> DISC / MBTI</div>
+                <div class="scard-body">Asesmen kepribadian &amp; gaya kerja otomatis</div>
+              </div>
+              <div class="scard">
+                <div class="scard-title"><i class="ti ti-brain" style="color:#8b5cf6;"></i> IQ Test Link</div>
+                <div class="scard-body">Tautan ke platform tes kognitif/IQ eksternal terintegrasi</div>
+              </div>
+            </div>
+          </div>
+          <div class="tag-row">
+            <span class="badge b-rule">Pass / Fail per syarat</span>
+            <span class="badge b-rule">Qualification Score</span>
+            <span class="badge b-candidate">Diisi Mandiri Kandidat</span>
+          </div>
+        </div>
+      </div>
+      <div class="connector">
+        <div class="conn-line"></div>
+        <span class="conn-pill">Setelah Quiz Selesai</span>
+        <div class="conn-line"></div>
+      </div>
+      <div class="step candidate-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#fdf2f8;"><i class="ti ti-video" style="color:#db2777;"></i></div>
+          <div class="step-meta">
+            <div class="step-title" id="p3-video-title">Tahap C &mdash; Video Interview Asinkronus (Diisi Kandidat)</div>
+            <div class="step-sub" id="p3-video-sub">Kandidat merekam jawaban atas pertanyaan terstruktur dari portal mereka &mdash; AI menganalisis hasilnya</div>
+          </div>
+          <div class="step-badges">
+            <span class="badge b-candidate"><i class="ti ti-user"></i> Kandidat</span>
+            <span class="badge b-ai"><i class="ti ti-robot"></i> AI</span>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="grid2" id="p3-video-maritime">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-camera" style="color:#ec4899;"></i> Rekam di Browser</div>
+              <div class="scard-body">Pertanyaan teknis muncul berurutan, kandidat merekam jawaban langsung dari browser tanpa install aplikasi</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-microphone" style="color:#8b5cf6;"></i> AI Speech-to-Text</div>
+              <div class="scard-body">Video ditranskripsi otomatis &rarr; AI menganalisis komunikasi, nada, kepercayaan diri, relevansi jawaban</div>
+            </div>
+          </div>
+          <div class="grid2" id="p3-video-bo" style="display:none;">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-camera" style="color:#ec4899;"></i> Video Qs (Studi Kasus)</div>
+              <div class="scard-body">Kandidat menjawab pertanyaan pra-rekam yang disesuaikan dengan studi kasus posisi manajerial</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-robot" style="color:#3b82f6;"></i> AI Analisis Komunikasi</div>
+              <div class="scard-body">Artikulasi, kejelasan, relevansi taktis manajerial &mdash; skor AI tersedia untuk HR</div>
+            </div>
+          </div>
+          <div class="info-box green" style="margin-top:10px;">
+            <i class="ti ti-shield-check" style="margin-right:4px;"></i>
+            Video tersimpan aman di cloud. Hasil AI (transkrip + skor) langsung tersedia di dashboard HR untuk review.
+          </div>
+          <div class="tag-row">
+            <span class="badge b-ai">AI Video Score</span>
+            <span class="badge b-ai">Transkrip + Summary</span>
+            <span class="badge b-hr">HR wajib review video asli</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- End Page 3 -->
+    <!-- PAGE 4: Dashboard HR & Keputusan -->
+    <div class="page" id="page-4">
+      <div class="flow-section-label">Agregasi Skor Komposit &mdash; Sisi Sistem</div>
+      <div class="step system-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#eef2ff;"><i class="ti ti-trophy" style="color:#4f46e5;"></i></div>
+          <div class="step-meta">
+            <div class="step-title">Skor Komposit Kandidat (Auto Ranking)</div>
+            <div class="step-sub">Sistem menggabungkan semua hasil &rarr; 1 skor akhir, auto-ranking di dashboard</div>
+          </div>
+          <div class="step-badges"><span class="badge b-rule">Aturan</span></div>
+        </div>
+        <div class="step-body">
+          <div id="p4-score-maritime">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px;font-weight:500;">Distribusi Bobot Penilaian (dapat dikonfigurasi per posisi):</div>
+            <div class="score-row"><span class="score-lbl">CV Matching</span><div class="score-track"><div class="score-fill" style="width:40%;background:#3b82f6;"></div></div><span class="score-pct">40%</span></div>
+            <div class="score-row"><span class="score-lbl">Video Analysis</span><div class="score-track"><div class="score-fill" style="width:30%;background:#ec4899;"></div></div><span class="score-pct">30%</span></div>
+            <div class="score-row"><span class="score-lbl">Kuis Kualifikasi</span><div class="score-track"><div class="score-fill" style="width:20%;background:#0d9373;"></div></div><span class="score-pct">20%</span></div>
+            <div class="score-row"><span class="score-lbl">Sertifikasi</span><div class="score-track"><div class="score-fill" style="width:10%;background:#f59e0b;"></div></div><span class="score-pct">10%</span></div>
+          </div>
+          <div id="p4-score-bo" style="display:none;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:12px;font-weight:500;">Distribusi Bobot Penilaian (dapat dikonfigurasi per posisi):</div>
+            <div class="score-row"><span class="score-lbl">CV &amp; Competency</span><div class="score-track"><div class="score-fill" style="width:25%;background:#3b82f6;"></div></div><span class="score-pct">25%</span></div>
+            <div class="score-row"><span class="score-lbl">Personality Test</span><div class="score-track"><div class="score-fill" style="width:20%;background:#10b981;"></div></div><span class="score-pct">20%</span></div>
+            <div class="score-row"><span class="score-lbl">IQ Test</span><div class="score-track"><div class="score-fill" style="width:15%;background:#f59e0b;"></div></div><span class="score-pct">15%</span></div>
+            <div class="score-row"><span class="score-lbl">Video Qs</span><div class="score-track"><div class="score-fill" style="width:25%;background:#ec4899;"></div></div><span class="score-pct">25%</span></div>
+            <div class="score-row"><span class="score-lbl">Custom Form</span><div class="score-track"><div class="score-fill" style="width:15%;background:#8b5cf6;"></div></div><span class="score-pct">15%</span></div>
+          </div>
+          <div class="tag-row">
+            <span class="badge b-rule">Total Score 0&ndash;100</span>
+            <span class="badge b-rule">Auto-Ranking Dashboard</span>
+            <span class="badge b-ai">Bobot dapat dikonfigurasi per posisi</span>
+          </div>
+        </div>
+      </div>
+      <div class="connector">
+        <div class="conn-line"></div>
+        <span class="conn-pill">HR Review</span>
+        <div class="conn-line"></div>
+      </div>
+      <div class="flow-section-label">Dashboard HR &mdash; Review &amp; Keputusan</div>
+      <div class="step hr-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#fffbeb;"><i class="ti ti-layout-dashboard" style="color:#d97706;"></i></div>
+          <div class="step-meta">
+            <div class="step-title" id="p4-hr-title">Dashboard HR &mdash; Review 360&deg; &amp; Keputusan Tahap 1</div>
+            <div class="step-sub" id="p4-hr-sub">HR melihat profil lengkap kandidat: skor, CV, video, transkrip &mdash; lalu memutuskan lanjut atau reject</div>
+          </div>
+          <div class="step-badges"><span class="badge b-hr"><i class="ti ti-user"></i> HR</span></div>
+        </div>
+        <div class="step-body">
+          <div class="grid2">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-user" style="color:#3b82f6;"></i> Profil 360&deg; Kandidat</div>
+              <div class="scard-body">Informasi pribadi, skor komposit, CV asli, video asli, transkrip, AI insights &mdash; semua dalam 1 halaman</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-bulb" style="color:#f59e0b;"></i> AI Insight untuk HR</div>
+              <div class="scard-body">Rangkuman pro &amp; kontra, bendera risiko, dan rekomendasi AI berdasarkan data historis</div>
+            </div>
+            <div class="scard" style="grid-column:span 2;">
+              <div class="scard-title"><i class="ti ti-hand-click" style="color:#6366f1;"></i> Aksi HR di Dashboard</div>
+              <div class="scard-body">Tonton video asli &middot; Baca transkrip &middot; Lihat hasil kuis &middot; Review sertifikat &middot; Putuskan: <strong>Lanjut Interview</strong> atau <strong>Reject</strong></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="gate pass"><i class="ti ti-check" style="margin-right:4px;"></i> Lanjut ke Interview<br><small style="font-weight:500;opacity:.8;">&rarr; Kandidat dijadwalkan</small></div>
+            <div class="gate fail"><i class="ti ti-x" style="margin-right:4px;"></i> Reject / Talent Pool<br><small style="font-weight:500;opacity:.8;">&rarr; Email otomatis terkirim</small></div>
+          </div>
+          <div class="tag-row">
+            <span class="badge b-hr" style="background:white;color:#0f172a;">Keputusan 100% di tangan HR Manusia</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- End Page 4 -->
+
+    <!-- PAGE 5: Jadwal Interview & Background Check -->
+    <div class="page" id="page-5">
+      <div class="info-box amber" style="margin-bottom:16px;">
+        <i class="ti ti-calendar-event" style="margin-right:4px;"></i>
+        <strong>Setelah HR memutuskan lanjut:</strong> Kandidat <strong>diberitahu jadwal wawancara</strong> via sistem. Background Check berjalan di sisi HR &mdash; kandidat <strong>tidak</strong> perlu mengisi apapun untuk proses ini.
+      </div>
+      <div class="flow-section-label">Pemberitahuan Jadwal &mdash; Ke Kandidat</div>
+      <div class="step both-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#faf5ff;"><i class="ti ti-calendar-event" style="color:#8b5cf6;"></i></div>
+          <div class="step-meta">
+            <div class="step-title" id="p5-sched-title">Penjadwalan Interview &mdash; Notifikasi Otomatis ke Kandidat</div>
+            <div class="step-sub">HR mengatur jadwal &rarr; Sistem otomatis kirim undangan ke kandidat via WhatsApp &amp; Email</div>
+          </div>
+          <div class="step-badges">
+            <span class="badge b-hr">HR Sets</span>
+            <span class="badge b-auto">Auto Notif</span>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="grid2">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-calendar" style="color:#8b5cf6;"></i> Sisi HR: Atur Jadwal</div>
+              <div class="scard-body">Integrasi kalender &rarr; HR pilih slot waktu, sistem otomatis kirim undangan beserta link meeting atau lokasi</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-device-mobile" style="color:#0ea5e9;"></i> Sisi Kandidat: Terima Notif</div>
+              <div class="scard-body">Kandidat menerima undangan via WA &amp; Email &mdash; <strong>mereka hanya perlu hadir sesuai jadwal</strong></div>
+            </div>
+          </div>
+          <div class="info-box blue" style="margin-top:10px;">
+            <i class="ti ti-users" style="margin-right:4px;"></i>
+            <strong>Interview User/Manager:</strong> Setelah HR interview, kandidat yang lolos dilanjutkan ke interview dengan user/manager departemen. Formulir rubrik evaluasi teknis tersedia di dashboard HR.
+          </div>
+          <div class="tag-row">
+            <span class="badge b-auto">Kalender Terintegrasi</span>
+            <span class="badge b-candidate">Kandidat Hanya Hadir</span>
+            <span class="badge b-hr">Evaluasi User/Manager</span>
+          </div>
+        </div>
+      </div>
+      <div class="connector">
+        <div class="conn-line"></div>
+        <span class="conn-pill">Paralel / Setelah Interview</span>
+        <div class="conn-line"></div>
+      </div>
+      <div class="flow-section-label">Background Check &mdash; Hanya Sisi HR</div>
+      <div class="step hr-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#fef2f2;"><i class="ti ti-search" style="color:#dc2626;"></i></div>
+          <div class="step-meta">
+            <div class="step-title">Background Check &amp; Verifikasi Referensi</div>
+            <div class="step-sub">Dilakukan HR secara mandiri &mdash; kandidat tidak perlu tahu proses ini berlangsung</div>
+          </div>
+          <div class="step-badges">
+            <span class="badge b-hr"><i class="ti ti-user"></i> HR Only</span>
+            <span class="badge b-critical"><i class="ti ti-eye-off"></i> Hidden dari Kandidat</span>
+          </div>
+        </div>
+        <div class="step-body">
+          <div class="grid2">
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-send" style="color:#dc2626;"></i> Template Kontak Otomatis</div>
+              <div class="scard-body">Sistem menyediakan template pesan WA/Email ke referensi perusahaan sebelumnya &mdash; HR tinggal kirim</div>
+            </div>
+            <div class="scard">
+              <div class="scard-title"><i class="ti ti-shield-check" style="color:#10b981;"></i> Pencatatan Hasil</div>
+              <div class="scard-body">Verifikasi masa kerja, alasan resign, kelayakan rehire &mdash; dicatat langsung di profil kandidat di dashboard</div>
+            </div>
+          </div>
+          <div class="info-box red" style="margin-top:10px;">
+            <i class="ti ti-lock" style="margin-right:4px;"></i>
+            <strong>Privasi proses:</strong> Background check berjalan sepenuhnya di sisi HR. Kandidat tidak mendapat notifikasi apapun selama proses ini.
+          </div>
+          <div class="tag-row">
+            <span class="badge b-hr">Riwayat Kerja Terverifikasi</span>
+            <span class="badge b-hr">Kelayakan Rehire</span>
+            <span class="badge b-auto">Template Otomatis</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- End Page 5 -->
+    <!-- PAGE 6: MCU + Final Decision + Kontrak -->
+    <div class="page" id="page-6">
+      <div id="p6-mcu-section">
+        <div class="flow-section-label">Medical Check-Up &mdash; Setelah Diterima Interview (Maritime Only)</div>
+        <div class="step hr-step" id="p6-mcu-card">
+          <div class="step-header">
+            <div class="step-icon" style="background:#f0fdf4;"><i class="ti ti-stethoscope" style="color:#10b981;"></i></div>
+            <div class="step-meta">
+              <div class="step-title">Medical Check-Up (MCU) &mdash; Pelaut</div>
+              <div class="step-sub">MCU muncul hanya setelah kandidat dinyatakan <strong>diterima pasca-interview</strong> &mdash; bukan bagian dari asesmen awal</div>
+            </div>
+            <div class="step-badges">
+              <span class="badge b-hr">HR</span>
+              <span class="badge b-auto">Maritime Only</span>
+            </div>
+          </div>
+          <div class="step-body">
+            <div class="grid2">
+              <div class="scard">
+                <div class="scard-title"><i class="ti ti-check" style="color:#0d9373;"></i> Validasi MCU Aktif</div>
+                <div class="scard-body">Kandidat mengunggah hasil MCU yang masih berlaku untuk diverifikasi oleh HR &mdash; setelah keputusan diterima</div>
+              </div>
+              <div class="scard">
+                <div class="scard-title"><i class="ti ti-file-medical" style="color:#3b82f6;"></i> Status Fit for Duty</div>
+                <div class="scard-body">Pencatatan tanggal kadaluarsa MCU dan status kelayakan medis akhir sebagai syarat embarkasi</div>
+              </div>
+            </div>
+            <div class="info-box amber" style="margin-top:10px;">
+              <i class="ti ti-alert-triangle" style="margin-right:4px;"></i>
+              <strong>Urutan penting:</strong> MCU dilakukan SETELAH interview dinyatakan lulus &mdash; bukan bagian dari asesmen awal kandidat.
+            </div>
+          </div>
+        </div>
+        <div class="connector">
+          <div class="conn-line"></div>
+          <span class="conn-pill">Semua Tahap Selesai</span>
+          <div class="conn-line"></div>
+        </div>
+      </div>
+
+      <div class="flow-section-label">Keputusan Hiring Final</div>
+      <div class="step hr-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#f0fdf4;"><i class="ti ti-scale" style="color:#10b981;"></i></div>
+          <div class="step-meta">
+            <div class="step-title">Keputusan Hiring Final</div>
+            <div class="step-sub">Berdasarkan: Skor AI, Interview, Background Check, dan MCU (maritime)</div>
+          </div>
+          <div class="step-badges"><span class="badge b-hr">HR Final</span></div>
+        </div>
+        <div class="step-body">
+          <div class="final-row">
+            <div class="final-chip fc-hired"><i class="ti ti-check"></i>Diterima<br>(Hired)</div>
+            <div class="final-chip fc-pool"><i class="ti ti-folder"></i>Talent<br>Pool</div>
+            <div class="final-chip fc-rej"><i class="ti ti-x"></i>Ditolak<br>(Rejected)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connector">
+        <div class="conn-line"></div>
+        <span class="conn-pill">Jika Diterima &rarr; Generate Kontrak</span>
+        <div class="conn-line"></div>
+      </div>
+
+      <div class="flow-section-label">Generate Kontrak Kerja</div>
+      <div class="step system-step">
+        <div class="step-header">
+          <div class="step-icon" style="background:#eef2ff;"><i class="ti ti-file-description" style="color:#4f46e5;"></i></div>
+          <div class="step-meta">
+            <div class="step-title">Generate Kontrak Kerja Otomatis</div>
+            <div class="step-sub">Dokumen kontrak dibuat otomatis sesuai template klien, posisi, dan jenis kontrak</div>
+          </div>
+          <div class="step-badges"><span class="badge b-rule">Aturan</span></div>
+        </div>
+        <div class="step-body">
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:10px;"><i class="ti ti-settings" style="margin-right:4px;"></i>Konfigurasi Kontrak (Simulasi)</div>
+            <div class="cb-row">
+              <span class="cb-label">Jenis Kontrak</span>
+              <select class="cb-select" id="sel-contract" onchange="updateContract()">
+                <option value="pkwt">PKWT (Kontrak Waktu Tertentu)</option>
+                <option value="pkwtt">PKWTT (Karyawan Tetap + Probasi)</option>
+              </select>
+            </div>
+            <div class="cb-row" id="row-pkwt-dur" style="display:none;">
+              <span class="cb-label">Durasi PKWT</span>
+              <select class="cb-select" id="sel-pkwt-dur" onchange="updateContract()">
+                <option value="1">1 Bulan</option>
+                <option value="3">3 Bulan</option>
+                <option value="6">6 Bulan</option>
+                <option value="12">12 Bulan</option>
+              </select>
+            </div>
+          </div>
+          <div id="cb-result-area"></div>
+          <div class="tag-row">
+            <span class="badge b-rule">Multi-Klien Support</span>
+            <span class="badge b-auto">Export PDF &amp; DOCX</span>
+            <span class="badge b-hr">Tanda Tangan Digital</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- End Page 6 -->
+
+  </div><!-- End Canvas -->
+
+  <script>
+    var currentTrack = 'maritime';
+    var currentPage = 1;
+    var totalPages = 6;
+    var pageNames = [
+      'Trigger & Penerimaan Data',
+      'AI Analisis Otomatis (Sistem)',
+      'Portal Kandidat — Asesmen',
+      'Dashboard HR & Keputusan',
+      'Jadwal Interview & Background Check',
+      'MCU, Final Decision & Kontrak'
+    ];
+
+    function buildDots() {
+      var c = document.getElementById('dots-container');
+      c.innerHTML = '';
+      for (var i = 1; i <= totalPages; i++) {
+        var btn = document.createElement('button');
+        btn.className = 'pdot' + (i === currentPage ? ' active' : '');
+        btn.title = pageNames[i - 1];
+        btn.setAttribute('data-page', i);
+        (function(p) { btn.onclick = function() { goToPage(p); }; })(i);
+        c.appendChild(btn);
+      }
+    }
+
+    function goToPage(p) {
+      document.getElementById('page-' + currentPage).classList.remove('active');
+      currentPage = p;
+      document.getElementById('page-' + currentPage).classList.add('active');
+      document.getElementById('page-info').textContent = 'Halaman ' + currentPage + ' dari ' + totalPages;
+      document.getElementById('page-title').textContent = pageNames[currentPage - 1];
+      document.getElementById('btn-prev').disabled = (currentPage === 1);
+      var btnNext = document.getElementById('btn-next');
+      btnNext.disabled = false;
+      btnNext.innerHTML = currentPage === totalPages
+        ? 'Selesai <i class="ti ti-check"></i>'
+        : 'Berikutnya <i class="ti ti-chevron-right"></i>';
+      if (currentPage === totalPages) btnNext.disabled = true;
+      buildDots();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changePage(dir) {
+      var newPage = currentPage + dir;
+      if (newPage < 1 || newPage > totalPages) return;
+      goToPage(newPage);
+    }
+
+    function setTrack(track) {
+      currentTrack = track;
+      document.getElementById('tab-maritime').className = 'track-tab' + (track === 'maritime' ? ' active-maritime' : '');
+      document.getElementById('tab-backoffice').className = 'track-tab' + (track === 'backoffice' ? ' active-backoffice' : '');
+
+      // Page 1
+      document.getElementById('p1-portal-title').textContent = track === 'maritime'
+        ? 'Portal Klien — crewing.lintasmaritim.com'
+        : 'Portal Klien — rekrutmen.lintasmaritim.com';
+      document.getElementById('p1-portal-sub').textContent = track === 'maritime'
+        ? 'Kandidat mengisi formulir pendaftaran di website crewing klien yang sudah ada'
+        : 'Kandidat mengisi formulir pendaftaran di portal rekrutmen klien yang sudah ada';
+      document.getElementById('p1-form-content').textContent = track === 'maritime'
+        ? 'Data diri, riwayat kapal, posisi yang dilamar, upload CV/dokumen, nomor sertifikat pelaut'
+        : 'Data diri, riwayat kerja, posisi yang dilamar, upload CV, ekspektasi gaji, portofolio';
+      document.getElementById('p1-cert-badge').textContent = track === 'maritime' ? 'Nomor Sertifikat Pelaut' : 'Portofolio Kerja';
+      document.getElementById('p1-api-sub').textContent = track === 'maritime'
+        ? 'Data mengalir dari crewing portal ke MAXY setiap ada pelaut baru mendaftar'
+        : 'Data mengalir dari recruitment portal ke MAXY setiap ada pelamar baru';
+      document.getElementById('p1-api-url2').textContent = track === 'maritime'
+        ? '/api/v1/jobs/maritime/active-positions'
+        : '/api/v1/jobs/backoffice/active-positions';
+
+      // Page 2
+      document.getElementById('p2-cv-title').textContent = track === 'maritime'
+        ? 'Tahap A — AI: Ekstraksi CV & Verifikasi Sertifikat'
+        : 'Tahap A — AI: Intelligent Screening & Competency Matching';
+      document.getElementById('p2-cv-sub').textContent = track === 'maritime'
+        ? 'AI langsung menganalisis CV + cek sertifikat Kemenhub begitu data masuk — otomatis'
+        : 'AI otomatis filter Edu, Age, Cert, Salary, dan Competency Matching dari CV';
+      document.getElementById('p2-cv-grid-maritime').style.display = track === 'maritime' ? 'grid' : 'none';
+      document.getElementById('p2-cv-grid-bo').style.display = track === 'backoffice' ? 'grid' : 'none';
+      document.getElementById('p2-maritime-params').style.display = track === 'maritime' ? 'block' : 'none';
+
+      // Page 3
+      document.getElementById('p3-quiz-title').textContent = track === 'maritime'
+        ? 'Tahap B — Kuis Kualifikasi (Diisi Kandidat)'
+        : 'Tahap B — Async Bundle: Form, DISC/MBTI & IQ (Diisi Kandidat)';
+      document.getElementById('p3-quiz-sub').textContent = track === 'maritime'
+        ? 'Verifikasi syarat mutlak via form online — otomatis dievaluasi sistem'
+        : 'Form kustom, asesmen kepribadian, dan tes IQ terintegrasi — kandidat isi sendiri';
+      document.getElementById('p3-quiz-maritime').style.display = track === 'maritime' ? 'block' : 'none';
+      document.getElementById('p3-quiz-bo').style.display = track === 'backoffice' ? 'block' : 'none';
+      document.getElementById('p3-video-title').textContent = track === 'maritime'
+        ? 'Tahap C — Video Interview Terstruktur (Diisi Kandidat)'
+        : 'Tahap C — Async Video Questions (Diisi Kandidat)';
+      document.getElementById('p3-video-sub').textContent = track === 'maritime'
+        ? 'Kandidat merekam jawaban teknis maritim dari browser — AI menganalisis'
+        : 'Kandidat menjawab pertanyaan studi kasus manajerial — AI menilai';
+      document.getElementById('p3-video-maritime').style.display = track === 'maritime' ? 'grid' : 'none';
+      document.getElementById('p3-video-bo').style.display = track === 'backoffice' ? 'grid' : 'none';
+
+      // Page 4
+      document.getElementById('p4-score-maritime').style.display = track === 'maritime' ? 'block' : 'none';
+      document.getElementById('p4-score-bo').style.display = track === 'backoffice' ? 'block' : 'none';
+      document.getElementById('p4-hr-title').textContent = track === 'maritime'
+        ? 'Dashboard HR — Review 360° & Keputusan Tahap 1'
+        : 'Dashboard HR — Review Dossier Lengkap & Keputusan';
+      document.getElementById('p4-hr-sub').textContent = track === 'maritime'
+        ? 'HR melihat: skor, CV, video, transkrip, status sertifikat — lalu memutuskan lanjut/reject'
+        : 'HR me-review Combined Scorecard (IQ, DISC/MBTI, Video, Custom Form) — lalu memutuskan';
+
+      // Page 5
+      document.getElementById('p5-sched-title').textContent = track === 'maritime'
+        ? 'Penjadwalan Interview — Notifikasi Otomatis ke Kandidat Pelaut'
+        : 'Penjadwalan Interview — Notifikasi Otomatis ke Kandidat';
+
+      // Page 6 — MCU Maritime Only
+      document.getElementById('p6-mcu-section').style.display = track === 'maritime' ? 'block' : 'none';
+
+      updateContract();
+    }
+
+    var contractData = {
+      pkwt: { label: 'PKWT — Perjanjian Kerja Waktu Tertentu', note: 'Kontrak berdurasi tetap. Berakhir sesuai kesepakatan waktu. Dapat diperpanjang sesuai kebutuhan operasional.', color: '#eff6ff', textColor: '#1e40af', borderColor: '#bfdbfe' },
+      pkwtt: { label: 'PKWTT — Perjanjian Kerja Waktu Tidak Tertentu', note: 'Karyawan tetap dengan masa probasi evaluasi sebelum pengangkatan penuh.', color: '#f0fdf4', textColor: '#166534', borderColor: '#bbf7d0' }
+    };
+    var probDurations = {
+      maritime: { dur: 6, note: 'Orang Kapal — Probasi 6 bulan (Evaluasi teknis & operasional kapal)' },
+      backoffice: { dur: 3, note: 'Back Office — Probasi 3 bulan (Adaptasi sistem & lingkungan kantor)' }
+    };
+
+    function updateContract() {
+      var ct = document.getElementById('sel-contract').value;
+      var tt = currentTrack;
+      document.getElementById('row-pkwt-dur').style.display = ct === 'pkwt' ? 'flex' : 'none';
+      var area = document.getElementById('cb-result-area');
+      var data = contractData[ct];
+      var trackLabel = tt === 'maritime' ? 'Maritime / Crewing' : 'Back Office Administration';
+      var html = '<div style="background:' + data.color + ';border:1.5px solid ' + data.borderColor + ';border-radius:10px;padding:14px 16px;">';
+      html += '<div style="font-size:13px;font-weight:700;color:' + data.textColor + ';margin-bottom:10px;">' + data.label + '</div>';
+      if (ct === 'pkwt') {
+        var dur = document.getElementById('sel-pkwt-dur').value;
+        html += '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:#64748b;font-weight:500;">Durasi Kontrak</span><span style="font-weight:700;color:' + data.textColor + ';">' + dur + ' Bulan</span></div>';
+        html += '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:#64748b;font-weight:500;">Jalur Rekrutmen</span><span style="font-weight:700;color:' + data.textColor + ';">' + trackLabel + '</span></div>';
+      } else {
+        var prob = probDurations[tt] || probDurations['backoffice'];
+        html += '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:#64748b;font-weight:500;">Masa Probasi</span><span style="font-weight:700;color:' + data.textColor + ';">' + prob.dur + ' Bulan</span></div>';
+        html += '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;"><span style="color:#64748b;font-weight:500;">Jalur Rekrutmen</span><span style="font-weight:700;color:' + data.textColor + ';">' + trackLabel + '</span></div>';
+      }
+      html += '<div style="font-size:11px;color:' + data.textColor + ';opacity:.8;margin-top:10px;padding-top:10px;border-top:1px dashed ' + data.borderColor + ';">';
+      html += (ct === 'pkwt') ? data.note : (probDurations[tt] || probDurations['backoffice']).note;
+      html += '</div></div>';
+      area.innerHTML = html;
+    }
+
+    // Init
+    buildDots();
+    goToPage(1);
+    updateContract();
+  </script>
+</body>
+</html>

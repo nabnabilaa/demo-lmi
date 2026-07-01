@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAXY — Sistem Rekrutmen AI · PT Lintas Maritim Indonesia</title>
+<meta name="description" content="Platform rekrutmen berbasis AI untuk Maritime Crew dan Back Office — otomatis dari API, asesmen mandiri, hingga generate kontrak.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF3F5; --card:#fff; --ink:#16222B; --ink-soft:#56666F; --ink-faint:#8B98A1;
+  --line:#DCE3E6; --hull:#0C2233;
+  --teal:#168E7F; --teal-light:#E3F3F0; --teal-dark:#2BB3A0;
+  --amber:#C8821F; --amber-light:#FBF0DE; --amber-dark:#EAAE4F;
+  --green:#3C8C4A; --green-light:#E7F4E9;
+  --red:#BF4A3D; --red-light:#FBEAE7;
+  --font-display:'Fraunces',serif; --font-head:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  --shadow-s:0 1px 3px rgba(16,30,40,.06),0 1px 2px rgba(16,30,40,.04);
+  --shadow-m:0 6px 20px rgba(16,30,40,.10),0 2px 6px rgba(16,30,40,.06);
+  --shadow-l:0 16px 40px rgba(8,16,24,.18);
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100vh;}
+body{
+  font-family:var(--font-body);color:var(--ink);
+  background:var(--bg);
+  background-image:radial-gradient(1200px 500px at 50% -200px,#fff 0%,var(--bg) 60%);
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:var(--font-head);letter-spacing:-.01em;}
+
+/* ---- layout ---- */
+.page{max-width:960px;margin:0 auto;padding:48px 24px 80px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:960px;margin:0 auto;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(155deg,var(--teal),#0e5f54);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 20px rgba(22,142,127,.3);}
+.brand-mark svg{width:24px;height:24px;}
+.brand-word{font-family:var(--font-display);font-weight:600;font-size:24px;line-height:1;}
+.brand-sub{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);letter-spacing:.03em;margin-top:2px;}
+.topbar-actions{display:flex;gap:10px;align-items:center;}
+
+/* ---- hero ---- */
+.hero{text-align:center;padding:32px 0 40px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--teal-light);color:#0e5f54;border:1px solid #C8E6DF;border-radius:99px;padding:6px 14px;font-size:12px;font-weight:700;font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase;margin-bottom:20px;}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:99px;background:#0e5f54;animation:blink 1.8s infinite;}
+@keyframes blink{0%,100%{opacity:.3;}50%{opacity:1;}}
+.hero h1{font-family:var(--font-display);font-size:52px;font-weight:600;line-height:1.08;letter-spacing:-.02em;margin-bottom:16px;}
+.hero h1 .accent{color:var(--teal);}
+.hero-lead{color:var(--ink-soft);font-size:17px;max-width:520px;margin:0 auto 32px;line-height:1.65;}
+
+/* ---- stat bar ---- */
+.stat-bar{display:flex;gap:1px;background:var(--line);border-radius:14px;overflow:hidden;margin-bottom:36px;border:1px solid var(--line);}
+.stat-item{flex:1;background:var(--card);padding:14px 20px;text-align:center;}
+.stat-item:first-child{border-radius:13px 0 0 13px;}
+.stat-item:last-child{border-radius:0 13px 13px 0;}
+.stat-num{font-family:var(--font-mono);font-size:24px;font-weight:600;color:var(--ink);}
+.stat-lbl{font-size:11px;color:var(--ink-faint);margin-top:3px;font-weight:500;}
+
+/* ---- main cards ---- */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow-s);transition:.18s;}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-m);}
+.card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+.card-icon svg{width:22px;height:22px;}
+.card h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+.card p{font-size:13px;color:var(--ink-soft);line-height:1.55;margin-bottom:14px;}
+.card-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--teal);text-decoration:none;font-family:var(--font-mono);}
+.card-link:hover{opacity:.75;}
+.card-link svg{width:14px;height:14px;}
+.card.teal-card{background:linear-gradient(135deg,#0e5f54,var(--teal));color:#fff;border-color:transparent;}
+.card.teal-card p{color:rgba(255,255,255,.75);}
+.card.teal-card .card-link{color:#fff;opacity:.85;}
+.card.teal-card .card-link:hover{opacity:1;}
+.card.dark-card{background:var(--hull);color:#E7EEF2;border-color:transparent;}
+.card.dark-card p{color:rgba(231,238,242,.65);}
+.card.dark-card .card-link{color:var(--teal-dark);}
+
+/* ---- demo section ---- */
+.demo-section{background:var(--hull);border-radius:20px;padding:30px 28px;margin-bottom:24px;position:relative;overflow:hidden;}
+.demo-section::before{content:'';position:absolute;inset:0;background:radial-gradient(600px 300px at 80% 50%,rgba(22,142,127,.12),transparent);}
+.demo-section > *{position:relative;}
+.demo-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--teal-dark);background:rgba(43,179,160,.12);border:1px solid rgba(43,179,160,.2);border-radius:99px;padding:5px 12px;margin-bottom:16px;}
+.demo-title{font-size:21px;font-weight:700;color:#E7EEF2;margin-bottom:6px;}
+.demo-sub{font-size:13.5px;color:#7FA8C2;margin-bottom:22px;line-height:1.5;}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.demo-btn{border:none;border-radius:12px;padding:16px 18px;text-align:left;cursor:pointer;transition:.18s;font-family:var(--font-body);position:relative;overflow:hidden;}
+.demo-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.25);}
+.demo-btn:active{transform:scale(.98);}
+.demo-btn.maritime{background:linear-gradient(135deg,#0e5f54,#1a7a6b);}
+.demo-btn.backoffice{background:linear-gradient(135deg,#1e3a5f,#28496a);}
+.demo-btn .db-icon{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.demo-btn .db-icon svg{width:20px;height:20px;color:#fff;}
+.demo-btn .db-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;}
+.demo-btn .db-sub{font-size:12px;color:rgba(255,255,255,.6);}
+.demo-btn .db-badge{position:absolute;top:12px;right:12px;font-size:10px;font-family:var(--font-mono);background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);border-radius:99px;padding:3px 9px;letter-spacing:.04em;}
+.demo-btn .db-spin{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:99px;animation:spin .7s linear infinite;position:absolute;bottom:14px;right:14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.demo-btn.loading .db-spin{display:block;}
+.demo-btn.loading .db-sub{opacity:.5;}
+
+/* ---- portal quick-access ---- */
+.portal-access{border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:var(--card);margin-bottom:24px;}
+.portal-access h3{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.portal-access h3 svg{width:18px;height:18px;color:var(--teal);}
+.token-row{display:flex;gap:10px;align-items:center;}
+.token-row input{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:14px;font-family:var(--font-mono);color:var(--ink);outline:none;transition:.15s;}
+.token-row input:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-light);}
+.token-row input::placeholder{color:var(--ink-faint);font-family:var(--font-body);}
+
+/* ---- flow viz ---- */
+.flow-strip{display:flex;align-items:center;gap:0;margin-bottom:32px;overflow-x:auto;padding:0 2px;}
+.fs-node{display:flex;align-items:center;gap:0;}
+.fs-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;color:var(--ink-soft);white-space:nowrap;display:flex;align-items:center;gap:7px;}
+.fs-box.sys{border-color:var(--teal-light);background:var(--teal-light);color:#0e5f54;}
+.fs-box.cand{border-color:#DBEAFE;background:#EFF6FF;color:#1e3a8a;}
+.fs-box.hr{border-color:#FDE68A;background:#FFFBEB;color:#92400e;}
+.fs-box svg{width:13px;height:13px;flex-shrink:0;}
+.fs-arr{font-size:14px;color:var(--ink-faint);padding:0 6px;}
+
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:99px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:var(--font-body);}
+.btn-primary{background:var(--ink);color:#fff;}
+.btn-primary:hover{background:#26343f;}
+.btn-teal{background:var(--teal);color:#fff;}
+.btn-teal:hover{background:#127667;}
+.btn-ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line);}
+.btn-ghost:hover{border-color:var(--ink-faint);}
+.btn svg{width:15px;height:15px;}
+
+/* ---- result toast ---- */
+#sim-result{display:none;border-radius:14px;padding:16px 20px;margin-top:14px;border:1px solid;}
+#sim-result.ok{background:var(--green-light);border-color:#CDE7D2;}
+#sim-result.err{background:var(--red-light);border-color:#EFC9C3;}
+#sim-result .sr-title{font-size:14px;font-weight:700;margin-bottom:4px;}
+#sim-result.ok .sr-title{color:#1b5e36;}
+#sim-result.err .sr-title{color:#8e3429;}
+#sim-result .sr-sub{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+#sim-result .sr-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:12.5px;font-weight:700;color:var(--teal);text-decoration:none;font-family:var(--font-mono);}
+
+/* ---- footer ---- */
+.foot{text-align:center;font-size:12px;color:var(--ink-faint);font-family:var(--font-mono);line-height:1.7;padding-top:12px;border-top:1px solid var(--line);}
+.foot code{background:#fff;border:1px solid var(--line);border-radius:5px;padding:2px 8px;color:var(--ink-soft);}
+
+@media(max-width:640px){
+  .card-grid,.demo-grid{grid-template-columns:1fr;}
+  .hero h1{font-size:36px;}
+  .stat-bar{flex-wrap:wrap;}
+  .stat-item{min-width:50%;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8m0 0 8 4-8 4-8-4 8-4Z"/><path d="M4 14v4l8 4 8-4v-4"/></svg>
+    </div>
+    <div>
+      <div class="brand-word">MAXY</div>
+      <div class="brand-sub">PT LINTAS MARITIM INDONESIA · AI RECRUITMENT</div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow"><span class="dot"></span>Live System</div>
+    <h1>Rekrutmen Otomatis<br>Bertenaga <span class="accent">AI</span></h1>
+    <p class="hero-lead">Dari API pendaftaran hingga kontrak kerja — MAXY mengelola seluruh alur seleksi maritime &amp; back office secara otomatis untuk PT Lintas Maritim Indonesia.</p>
+  </div>
+
+  <!-- STAT BAR -->
+  <div class="stat-bar" id="stat-bar">
+    <div class="stat-item"><div class="stat-num" id="s-total">—</div><div class="stat-lbl">Total Kandidat</div></div>
+    <div class="stat-item"><div class="stat-num" id="s-maritime">—</div><div class="stat-lbl">Maritime Crew</div></div>
+    <div class="stat-item"><div class="stat-num" id="s-backoffice">—</div><div class="stat-lbl">Back Office</div></div>
+    <div class="stat-item"><div class="stat-num" id="s-hired">—</div><div class="stat-lbl">Diterima (Hired)</div></div>
+  </div>
+
+  <!-- FLOW VIZ -->
+  <div class="flow-strip">
+    <div class="fs-node">
+      <div class="fs-box cand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        Portal Klien
+      </div>
+      <span class="fs-arr">→</span>
+    </div>
+    <div class="fs-node">
+      <div class="fs-box sys">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
+        API Trigger → AI Analisis
+      </div>
+      <span class="fs-arr">→</span>
+    </div>
+    <div class="fs-node">
+      <div class="fs-box cand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-4 3.2-6.5 7-6.5s7 2.5 7 6.5"/></svg>
+        Kandidat: Quiz &amp; Video
+      </div>
+      <span class="fs-arr">→</span>
+    </div>
+    <div class="fs-node">
+      <div class="fs-box hr">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        HR Review &amp; Interview
+      </div>
+      <span class="fs-arr">→</span>
+    </div>
+    <div class="fs-node">
+      <div class="fs-box hr">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3Z"/></svg>
+        BG Check
+      </div>
+      <span class="fs-arr">→</span>
+    </div>
+    <div class="fs-node">
+      <div class="fs-box sys">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+        Generate Kontrak
+      </div>
+    </div>
+  </div>
+
+  <!-- DEMO SECTION -->
+  <div class="demo-section">
+    <div class="demo-eyebrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></svg>
+      Demo Mode
+    </div>
+    <div class="demo-title">Simulasikan Kandidat Baru Masuk via API</div>
+    <div class="demo-sub">Klik salah satu tombol di bawah untuk meniru webhook dari portal klien (<code style="color:var(--teal-dark);font-family:var(--font-mono);font-size:12px;">crewing.lintasmaritim.com</code>). Kandidat akan muncul otomatis di Dashboard HR.</div>
+    <div class="demo-grid">
+      <button class="demo-btn maritime" id="btn-sim-maritime" onclick="simulate('maritime')">
+        <div class="db-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.2"/><path d="M12 7.2V21"/><path d="M5 13a7 7 0 0 0 14 0"/><path d="M3 13h4M17 13h4"/></svg>
+        </div>
+        <div class="db-title">Simulasi Maritime Crew</div>
+        <div class="db-sub">Pelaut — Able Seaman · Product Tanker</div>
+        <div class="db-badge">POST /webhook/crewing</div>
+        <div class="db-spin"></div>
+      </button>
+      <button class="demo-btn backoffice" id="btn-sim-bo" onclick="simulate('backoffice')">
+        <div class="db-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M9 16h2M13 16h2"/></svg>
+        </div>
+        <div class="db-title">Simulasi Back Office</div>
+        <div class="db-sub">Finance Staff · Jakarta HQ</div>
+        <div class="db-badge">POST /webhook/crewing</div>
+        <div class="db-spin"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN LINK -->
+  <a class="card teal-card" href="/hr" style="text-decoration:none;display:flex;align-items:center;gap:16px;padding:20px 24px;margin-bottom:24px;">
+    <div class="card-icon" style="background:rgba(255,255,255,.15);margin-bottom:0;flex-shrink:0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    </div>
+    <div style="flex:1;">
+      <h3 style="color:#fff;margin-bottom:4px;">Dashboard HR</h3>
+      <p style="margin-bottom:0;">Tinjau kandidat, skor AI, rekaman video, background check, dan generate kontrak.</p>
+    </div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;flex-shrink:0;"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+  </a>
+
+  <div class="foot">
+    Pendaftar masuk via portal klien — <code>crewing.lintasmaritim.com/apply</code> &amp; <code>rekrutmen.lintasmaritim.com</code><br>
+    Setiap pendaftar menerima tautan asesmen unik: <code>/a/&lt;token&gt;</code> · Dashboard HR: <code>/hr</code>
+  </div>
+
+</div>
+
+<script>
+async function loadStats(){
+  try{
+    const r = await fetch('/api/stats');
+    const d = await r.json();
+    document.getElementById('s-total').textContent = d.total ?? '0';
+    document.getElementById('s-maritime').textContent = d.by_track?.maritime ?? '0';
+    document.getElementById('s-backoffice').textContent = d.by_track?.backoffice ?? '0';
+    document.getElementById('s-hired').textContent = d.hired ?? '0';
+  }catch(e){
+    ['s-total','s-maritime','s-backoffice','s-hired'].forEach(id=>{
+      document.getElementById(id).textContent='—';
+    });
+  }
+}
+
+const MARITIME_PAYLOAD = {
+  nomor_ktp:'3174060101900002', nama_lengkap:'Budi Santoso',
+  no_telepon:'081234567890', email:'budi.santoso'+Date.now()+'@example.com',
+  tempat_lahir:'Semarang', tanggal_lahir:'1990-01-01', jenis_kelamin:'LAKI-LAKI',
+  domisili:'Jakarta Utara', kode_pelaut:'6211123456789',
+  jenis_kapal_terakhir:'TANKER', jabatan_terakhir:'Able Seaman',
+  posisi_dilamar:'Able Seaman', jenis_kapal_dilamar:'TANKER',
+  sertifikat:'RATING AS ABLE DECK',
+  cv_text:'Pelaut berpengalaman 3 tahun di Product Tanker (GT 12.000). Memegang STCW Basic Safety Training dan CoP. Terbiasa watchkeeping & mooring.'
+};
+const BACKOFFICE_PAYLOAD = {
+  nomor_ktp:'3174065502950003', nama_lengkap:'Dewi Anggraini',
+  no_telepon:'081322119087', email:'dewi.anggraini'+Date.now()+'@example.com',
+  tempat_lahir:'Bandung', tanggal_lahir:'1998-02-15', jenis_kelamin:'PEREMPUAN',
+  domisili:'Jakarta Selatan', posisi_dilamar:'Finance Staff',
+  pendidikan:'S1', jurusan:'Akuntansi', usia:27,
+  cv_text:'Lulusan S1 Akuntansi (usia 27). Pengalaman 2 tahun sebagai staf keuangan. Menguasai Excel/Spreadsheet, Accounting Software, dan SAP.'
+};
+
+async function simulate(track){
+  const btnId = track==='maritime' ? 'btn-sim-maritime' : 'btn-sim-bo';
+  const btn = document.getElementById(btnId);
+  btn.classList.add('loading');
+  btn.disabled = true;
+  const payload = track==='maritime'
+    ? {...MARITIME_PAYLOAD, email:'budi.santoso'+Date.now()+'@example.com'}
+    : {...BACKOFFICE_PAYLOAD, email:'dewi.anggraini'+Date.now()+'@example.com'};
+  try{
+    const r = await fetch('/api/simulate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error || d.message || 'Error '+r.status);
+    window.location.href = d.assessment_url || '/a/'+d.maxy_id;
+  }catch(e){
+    alert('Gagal: '+( e.message||String(e)));
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+function escHtml(s){
+  return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+document.addEventListener('DOMContentLoaded', loadStats);
+</script>
+</body>
+</html>

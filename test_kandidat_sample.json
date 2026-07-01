@@ -1,0 +1,37 @@
+{
+  "nama_lengkap": "Ahmad Fauzi",
+  "nomor_ktp": "3274010101900001",
+  "no_telepon": "081298765432",
+  "email": "ahmad.fauzi@example.com",
+  "kode_pelaut": "6212316902",
+  "jabatan_terakhir": "Able Seaman",
+  "jenis_kapal_terakhir": "TANKER",
+  "posisi_dilamar": "Able Seaman",
+  "jenis_kapal_dilamar": "TANKER",
+  "sertifikat": [
+    {
+      "judul": "RATING AS ABLE DECK WATCH",
+      "nomor_sertifikat": "6212316902MC3123"
+    },
+    {
+      "judul": "BASIC SAFETY TRAINING",
+      "nomor_sertifikat": "6200268614060408"
+    },
+    {
+      "judul": "SCRB",
+      "nomor_sertifikat": "6212100702340623"
+    },
+    {
+      "judul": "ADVANCED FIRE FIGHTING",
+      "nomor_sertifikat": "6212413249350424"
+    },
+    {
+      "judul": "PROFICIENCY IN SURVIVAL CRAFT AND RESCUE BOAT",
+      "nomor_sertifikat": "6212407569017624"
+    },
+    {
+      "judul": "RATING AS ABLE SEAFARER ENGINE WATCH",
+      "nomor_sertifikat": "6211546170340218"
+    }
+  ]
+}
