@@ -31,7 +31,14 @@
       "PowerShell(Stop-Process *)",
       "PowerShell(Start-Sleep -Seconds 3; try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:5000/\" -UseBasicParsing -TimeoutSec 5\\).StatusCode } catch { \"Not yet ready: $_\" })",
       "PowerShell(Start-Sleep -Seconds 4; try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:5000/\" -UseBasicParsing -TimeoutSec 8\\).StatusCode } catch { $_.Exception.Message })",
-      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:5050/\" -UseBasicParsing -TimeoutSec 5\\).StatusCode } catch { $_.Exception.Message })"
+      "PowerShell(try { \\(Invoke-WebRequest -Uri \"http://127.0.0.1:5050/\" -UseBasicParsing -TimeoutSec 5\\).StatusCode } catch { $_.Exception.Message })",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git filter-branch *)",
+      "Bash(git stash *)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter \"git rm --cached --ignore-unmatch .env\" --prune-empty --tag-name-filter cat -- --all)",
+      "Bash(git push *)"
     ]
   }
 }
