@@ -224,6 +224,13 @@ def create_token(maxy_id: str, ttl_days: int = 30) -> str:
     return token
 
 
+def count_candidates() -> int:
+    conn = get_conn()
+    row = conn.execute("SELECT COUNT(*) FROM candidates").fetchone()
+    conn.close()
+    return row[0] if row else 0
+
+
 def resolve_token(token: str) -> str | None:
     """Kembalikan maxy_id bila token valid & belum kedaluwarsa."""
     conn = get_conn()
