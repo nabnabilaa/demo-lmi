@@ -773,7 +773,7 @@ function seedCandidates(){
   c4.selfServeDone=true; recompute(c4);
   c4.hr.stage1='advance'; c4.hr.stage1At=daysAgo(7); c4.hr.stage1Notes='Pengalaman rekrutmen sangat relevan.';
   c4.hr.interview={ scheduledAt:daysAgo(3), mode:'Offline', location:'Kantor HQ Jakarta', done:true, eval:{komunikasi:4,teknis:4,sikap:5,notes:'Sangat percaya diri, paham proses end-to-end.'} };
-  c4.hr.bgCheck={ ref1Name:'Citra (Atasan Langsung)', ref1Result:'Positif — kinerja baik', ref2Name:'HRD Perusahaan Sebelumnya', ref2Result:'Positif — eligible rehire', lastTenure:'2 tahun 4 bulan', resignReason:'Mencari jenjang karir lebih luas', rehire:'Ya', done:true };
+  c4.hr.bgCheck={ ref1Name:'Citra Wulandari (Manajer HR)', ref1Email:'citra.w@prevcompany.co.id', ref1Phone:'081298765432', ref1ContactStatus:'balas', ref1Result:'Positif — disiplin tinggi, mudah berkolaborasi, selalu menyelesaikan tugas tepat waktu.', ref2Name:'Bapak Hendra (Direktur Operasional)', ref2Email:'hendra@prevcompany.co.id', ref2Phone:'08118889900', ref2ContactStatus:'balas', ref2Result:'Positif — eligible rehire, manajemen waktu sangat baik.', companyName:'PT Maju Bersama Sejahtera', lastPosition:'HR Recruitment Staff', periodFrom:'2022-03', periodTo:'2024-07', lastTenure:'2 tahun 4 bulan', resignReason:'Mencari jenjang karir lebih luas dan tantangan baru di industri maritim', rehire:'Ya', done:true };
   logEmail(c4,'Link Asesmen Anda — Rekrutmen Lintas Maritim','Email berisi tautan asesmen unik dikirim otomatis setelah pendaftaran.');
   logEmail(c4,'Selamat! Anda Lolos ke Tahap Interview','Notifikasi kelulusan tahap screening & jadwal interview dikirim ke kandidat.');
   CANDIDATES.push(c4);
@@ -1978,9 +1978,14 @@ function hrTabProfil(c){
 
   return `<div>
     ${aksiBlock}
-    ${scoreBlock}
+    <div class="grid-2" style="align-items:start; margin-bottom:16px;">
+      <div>${leftCol}</div>
+      <div>
+        ${scoreBlock}
+        ${rightCol}
+      </div>
+    </div>
     ${asmBlock}
-    <div class="grid-2">${leftCol}${rightCol}</div>
   </div>`;
 }
 
@@ -2116,6 +2121,13 @@ function hrTabVideo(c){
       ${isGdrive?`<div class="card-flat" style="margin-bottom:12px;display:flex;align-items:center;gap:12px;">
         ${icon('video',20)}<div><div class="small" style="font-weight:600;">Video tersimpan di Google Drive kandidat</div><div class="small muted">Klik untuk menonton langsung dari Drive</div></div>
         <a href="${escapeHtml(a.videoUrl)}" target="_blank" class="btn btn-teal btn-sm" style="margin-left:auto;">${icon('eye',13)} Tonton ${icon('chev',13)}</a>
+      </div>`:''}
+      ${(!isGdrive && !isLocal)?`<div style="width:100%;aspect-ratio:16/9;border-radius:10px;background:#16222B;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;margin-bottom:12px;box-shadow:inset 0 0 40px rgba(0,0,0,0.5);border:1px solid #26343F;">
+        <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:rgba(255,255,255,0.7);">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style="margin-left:3px;"><path d="M5 3l14 9-14 9z"/></svg>
+        </div>
+        <div style="font-weight:600;font-size:14px;letter-spacing:0.02em;">Simulasi Video Tersimpan</div>
+        <div class="small" style="color:rgba(255,255,255,0.45);margin-top:4px;">Tidak ada akses kamera pada mode demo</div>
       </div>`:''}
       <div style="margin-bottom:10px;">
         <span class="tag tag-auto">${isGdrive?(icon('folder',11)+' Google Drive'):isLocal?(icon('camera',11)+' Upload Server'):isDemo?(icon('sparkle',11)+' Demo Skip'):(a.mode==='real'?icon('camera',11)+' Rekaman Nyata':icon('sparkle',11)+' Simulasi')}</span>
@@ -2307,89 +2319,180 @@ function hrTabInterview(c){
 }
 
 /* ---- Tab: Background Check ---- */
+function _bgTpl(nm, pos, refName){
+  return 'Kepada Yth.\n'+refName+',\n\nPerkenalkan, kami dari Tim Rekrutmen PT Lintas Maritim Indonesia.\n\n'
+    +'Saat ini kami sedang memproses lamaran dari '+nm+' untuk posisi '+pos+'. '
+    +'Beliau mencantumkan nama Bapak/Ibu sebagai referensi profesional.\n\n'
+    +'Mohon kesediaan Bapak/Ibu menjawab beberapa pertanyaan berikut:\n\n'
+    +'1. Bagaimana performa dan etos kerja '+nm+' selama bersama Bapak/Ibu?\n'
+    +'2. Apa kelebihan utama yang beliau tunjukkan di lingkungan kerja?\n'
+    +'3. Apakah ada area yang menurut Bapak/Ibu perlu ditingkatkan?\n'
+    +'4. Apakah Bapak/Ibu akan merekomendasikan beliau untuk bekerja kembali (eligible rehire)?\n'
+    +'5. Apakah ada informasi lain yang penting untuk kami ketahui?\n\n'
+    +'Informasi yang Bapak/Ibu berikan bersifat rahasia dan hanya digunakan untuk keperluan evaluasi rekrutmen internal.\n\n'
+    +'Terima kasih atas waktu dan kerjasamanya.\n\nHormat kami,\nTim Rekrutmen\nPT Lintas Maritim Indonesia\nrecruitment@lintasmaritim.com';
+}
+
+function hrBgCopyTemplate(refNum, cid){
+  const c = CANDIDATES.find(x=>x.id===cid); if(!c) return;
+  const nm = c.name||'Kandidat'; const pos = c.jobTitle||'posisi yang dilamar';
+  const refName = refNum===1 ? (document.getElementById('hr-bg-r1n')?.value||'Bapak/Ibu') : (document.getElementById('hr-bg-r2n')?.value||'Bapak/Ibu');
+  navigator.clipboard.writeText(_bgTpl(nm,pos,refName)).then(()=>toast('Template disalin ke clipboard.','success','check'));
+}
+
+function hrBgOpenMailto(refNum, cid){
+  const c = CANDIDATES.find(x=>x.id===cid); if(!c) return;
+  const nm = c.name||'Kandidat'; const pos = c.jobTitle||'posisi yang dilamar';
+  const emailEl = document.getElementById(refNum===1?'hr-bg-r1e':'hr-bg-r2e');
+  const nameEl  = document.getElementById(refNum===1?'hr-bg-r1n':'hr-bg-r2n');
+  const toEmail = emailEl?.value||'';
+  const refName = nameEl?.value||'Bapak/Ibu';
+  const subj = encodeURIComponent('Pengecekan Referensi — '+nm+' untuk Posisi '+pos);
+  const body = encodeURIComponent(_bgTpl(nm,pos,refName));
+  window.open('mailto:'+toEmail+'?subject='+subj+'&body='+body);
+  if(toEmail){ toast('Membuka email client...','success','send'); } else { toast('Isi email referensi terlebih dahulu.','','info'); }
+}
+
+function _bgContactBadge(status){
+  if(status==='balas') return '<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(25,135,84,.12);color:var(--green-dark);font-weight:600;">Sudah Balas</span>';
+  if(status==='email') return '<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(13,110,253,.1);color:#0d6efd;font-weight:600;">Email Terkirim</span>';
+  if(status==='wa')    return '<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(25,135,84,.1);color:var(--green-dark);font-weight:600;">WA Terkirim</span>';
+  return '<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:var(--hull-2);color:var(--hr-text-soft);font-weight:600;">Belum Dihubungi</span>';
+}
+
+function _bgRefCard(bg, num){
+  const n = bg['ref'+num+'Name']||''; const e = bg['ref'+num+'Email']||''; const p = bg['ref'+num+'Phone']||'';
+  const s = bg['ref'+num+'ContactStatus']||'belum'; const r = bg['ref'+num+'Result']||'';
+  if(!n) return '';
+  let h = '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:14px;margin-bottom:10px;">';
+  h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
+  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);">Referensi '+num+'</div>';
+  h += _bgContactBadge(s)+'</div>';
+  h += '<div style="font-weight:600;font-size:13px;margin-bottom:4px;">'+escapeHtml(n)+'</div>';
+  if(e||p){
+    h += '<div class="small muted" style="margin-bottom:8px;">';
+    if(e) h += icon('send',10)+' <a href="mailto:'+escapeHtml(e)+'" style="color:var(--teal);">'+escapeHtml(e)+'</a>';
+    if(e&&p) h += ' &nbsp;·&nbsp; ';
+    if(p) h += icon('user',10)+' '+escapeHtml(p);
+    h += '</div>';
+  }
+  if(r) h += '<div style="background:var(--hull-1);border-radius:6px;padding:10px;font-size:12px;line-height:1.65;color:var(--hr-text);">'+escapeHtml(r)+'</div>';
+  h += '</div>';
+  return h;
+}
+
+function _bgRefForm(bg, num, nm, pos){
+  const p = num===1?'1':'2';
+  const opt = s => v => '<option value="'+v+'"'+(bg['ref'+p+'ContactStatus']===v?' selected':'')+'>'+s+'</option>';
+  let h = '<div class="card" style="margin-bottom:12px;border-left:3px solid var(--bridge-line);">';
+  h += '<div class="eyebrow" style="margin-bottom:12px;">'+icon('user',11)+' Referensi '+p+(num===2?' <span class="small muted" style="text-transform:none;font-weight:400;">(opsional)</span>':'')+'</div>';
+  h += '<div class="grid-3" style="margin-bottom:12px;">';
+  h += '<div class="field"><label>Nama &amp; Jabatan</label><input class="input" id="hr-bg-r'+p+'n" placeholder="Nama + jabatan / relasi" value="'+escapeHtml(bg['ref'+p+'Name']||'')+'"></div>';
+  h += '<div class="field"><label>Email</label><input class="input" type="email" id="hr-bg-r'+p+'e" placeholder="email@domain.com" value="'+escapeHtml(bg['ref'+p+'Email']||'')+'"></div>';
+  h += '<div class="field"><label>No. HP / WA</label><input class="input" id="hr-bg-r'+p+'p" placeholder="08xx..." value="'+escapeHtml(bg['ref'+p+'Phone']||'')+'"></div>';
+  h += '</div>';
+  h += '<div class="grid-2" style="margin-bottom:12px;">';
+  h += '<div class="field"><label>Status Kontak</label><select class="select" id="hr-bg-r'+p+'s">';
+  h += '<option value="belum"'+(!bg['ref'+p+'ContactStatus']||bg['ref'+p+'ContactStatus']==='belum'?' selected':'')+'>Belum dihubungi</option>';
+  h += '<option value="email"'+(bg['ref'+p+'ContactStatus']==='email'?' selected':'')+'>Email terkirim, menunggu balasan</option>';
+  h += '<option value="wa"'+(bg['ref'+p+'ContactStatus']==='wa'?' selected':'')+'>WA terkirim, menunggu balasan</option>';
+  h += '<option value="balas"'+(bg['ref'+p+'ContactStatus']==='balas'?' selected':'')+'>Sudah dapat balasan</option>';
+  h += '</select></div>';
+  h += '<div class="field"><label>Hasil / Catatan dari Referensi</label><input class="input" id="hr-bg-r'+p+'r" placeholder="Ringkasan balasan referensi" value="'+escapeHtml(bg['ref'+p+'Result']||'')+'"></div>';
+  h += '</div>';
+  // Template email panel
+  const refName = bg['ref'+p+'Name']||'Bapak/Ibu';
+  const tplText = _bgTpl(nm,pos,refName);
+  const tplEsc = escapeHtml(tplText);
+  h += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:8px;padding:12px;">';
+  h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);margin-bottom:8px;">'+icon('send',10)+' Template Email untuk Referensi</div>';
+  h += '<div style="font-size:11.5px;line-height:1.75;color:var(--hr-text);white-space:pre-wrap;max-height:130px;overflow-y:auto;background:var(--hull-1);border-radius:6px;padding:10px;border:1px solid var(--bridge-line);">'+tplEsc+'</div>';
+  h += '<div style="display:flex;gap:8px;margin-top:10px;">';
+  h += '<button class="btn btn-ghost btn-sm" onclick="hrBgCopyTemplate('+num+',\''+/* cid placeholder */'{CID}\')">'+icon('copy',11)+' Salin Template</button>';
+  h += '<button class="btn btn-ghost btn-sm" onclick="hrBgOpenMailto('+num+',\''+'{CID}\')">'+icon('send',11)+' Kirim via Email Client</button>';
+  h += '</div></div>';
+  h += '</div>';
+  return h;
+}
+
 function hrTabBgCheck(c){
   const bg = c.hr.bgCheck;
+  const nm  = c.name||'Kandidat';
+  const pos = c.jobTitle||'posisi yang dilamar';
   let html = hrPipelineStrip(c);
 
-  html += '<div class="card">'
-    +'<div class="eyebrow" style="margin-bottom:12px;">'+icon('search',12)+' Background Check &amp; Referensi'
-    +'<span class="tag tag-hr" style="margin-left:10px;font-size:10px;">'+icon('eye',10)+' HR Only</span></div>';
-
   if(!bg.done){
-    html += '<div class="card-flat" style="margin-bottom:16px;background:rgba(200,130,31,.07);border-color:rgba(200,130,31,.2);">'
-      +'<div class="small" style="line-height:1.65;">'+icon('info',12)+' <b>Bagian ini eksklusif HR.</b> '
-      +'Hubungi referensi kandidat dan isi hasil pengecekan di bawah. '
-      +'Data ini tidak ditampilkan ke kandidat.</div></div>';
+    // Notice
+    html += '<div class="card-flat" style="margin-bottom:14px;background:rgba(200,130,31,.07);border-color:rgba(200,130,31,.2);">'
+      +'<div class="small" style="line-height:1.65;">'+icon('info',12)+' <b>Bagian ini eksklusif HR</b> — data tidak ditampilkan ke kandidat. '
+      +'Isi informasi kontak referensi, kirim template email, dan catat hasilnya di sini.</div></div>';
 
-    html += '<div class="eyebrow" style="margin-bottom:8px;font-size:11px;">'+icon('user',11)+' Referensi 1</div>'
-      +'<div class="grid-2" style="margin-bottom:16px;">'
-      +'<div class="field"><label>Nama &amp; Jabatan</label><input class="input" id="hr-bg-r1n" placeholder="Nama lengkap + jabatan / relasi" value="'+escapeHtml(bg.ref1Name||'')+'"></div>'
-      +'<div class="field"><label>Hasil Pengecekan</label><input class="input" id="hr-bg-r1r" placeholder="Positif / negatif / catatan singkat" value="'+escapeHtml(bg.ref1Result||'')+'"></div>'
-      +'</div>';
+    // Reference forms (replace CID placeholder with actual id)
+    html += _bgRefForm(bg,1,nm,pos).split('{CID}').join(c.id);
+    html += _bgRefForm(bg,2,nm,pos).split('{CID}').join(c.id);
 
-    html += '<div class="eyebrow" style="margin-bottom:8px;font-size:11px;">'+icon('user',11)+' Referensi 2 (opsional)</div>'
-      +'<div class="grid-2" style="margin-bottom:16px;">'
-      +'<div class="field"><label>Nama &amp; Jabatan</label><input class="input" id="hr-bg-r2n" placeholder="Nama lengkap + jabatan / relasi" value="'+escapeHtml(bg.ref2Name||'')+'"></div>'
-      +'<div class="field"><label>Hasil Pengecekan</label><input class="input" id="hr-bg-r2r" placeholder="Positif / negatif / catatan singkat" value="'+escapeHtml(bg.ref2Result||'')+'"></div>'
-      +'</div>';
-
-    html += '<div class="eyebrow" style="margin-bottom:8px;font-size:11px;">'+icon('file',11)+' Riwayat Kerja Terakhir</div>'
-      +'<div class="grid-2" style="margin-bottom:16px;">'
-      +'<div class="field"><label>Durasi Masa Kerja</label><input class="input" id="hr-bg-ten" placeholder="misal: 2 tahun 4 bulan" value="'+escapeHtml(bg.lastTenure||'')+'"></div>'
-      +'<div class="field"><label>Alasan Resign / Keluar</label><input class="input" id="hr-bg-res" placeholder="misal: kontrak selesai, relokasi..." value="'+escapeHtml(bg.resignReason||'')+'"></div>'
-      +'<div class="field" style="grid-column:span 2"><label>Eligible Rehire?</label>'
-      +'<select class="select" id="hr-bg-reh">'
-      +'<option value="">Pilih...</option>'
-      +'<option value="Ya"'+(bg.rehire==='Ya'?' selected':'')+'>Ya — direkomendasikan kembali</option>'
-      +'<option value="Tidak"'+(bg.rehire==='Tidak'?' selected':'')+'>Tidak — tidak disarankan</option>'
-      +'<option value="Pertimbangan"'+(bg.rehire==='Pertimbangan'?' selected':'')+'>Dengan Pertimbangan</option>'
-      +'</select></div></div>';
+    // Riwayat kerja
+    html += '<div class="card" style="margin-bottom:14px;">';
+    html += '<div class="eyebrow" style="margin-bottom:12px;">'+icon('file',11)+' Riwayat Kerja Terakhir yang Dikonfirmasi</div>';
+    html += '<div class="grid-2" style="margin-bottom:12px;">';
+    html += '<div class="field"><label>Nama Perusahaan</label><input class="input" id="hr-bg-co" placeholder="PT / CV / nama instansi" value="'+escapeHtml(bg.companyName||'')+'"></div>';
+    html += '<div class="field"><label>Jabatan Terakhir</label><input class="input" id="hr-bg-lpos" placeholder="misal: Staff Keuangan, Deck Officer..." value="'+escapeHtml(bg.lastPosition||'')+'"></div>';
+    html += '</div>';
+    html += '<div class="grid-3" style="margin-bottom:12px;">';
+    html += '<div class="field"><label>Periode Dari</label><input class="input" type="month" id="hr-bg-pfrom" value="'+escapeHtml(bg.periodFrom||'')+'"></div>';
+    html += '<div class="field"><label>Periode Sampai</label><input class="input" type="month" id="hr-bg-pto" value="'+escapeHtml(bg.periodTo||'')+'"></div>';
+    html += '<div class="field"><label>Total Durasi</label><input class="input" id="hr-bg-ten" placeholder="misal: 2 tahun 4 bulan" value="'+escapeHtml(bg.lastTenure||'')+'"></div>';
+    html += '</div>';
+    html += '<div class="field" style="margin-bottom:12px;"><label>Alasan Resign / Keluar (hasil konfirmasi)</label>';
+    html += '<textarea class="textarea" id="hr-bg-res" style="min-height:56px;" placeholder="Sesuai keterangan referensi / konfirmasi perusahaan...">'+escapeHtml(bg.resignReason||'')+'</textarea></div>';
+    html += '<div class="field"><label>Eligible Rehire?</label><select class="select" id="hr-bg-reh">';
+    html += '<option value="">Pilih...</option>';
+    html += '<option value="Ya"'+(bg.rehire==='Ya'?' selected':'')+'>Ya — direkomendasikan kembali</option>';
+    html += '<option value="Tidak"'+(bg.rehire==='Tidak'?' selected':'')+'>Tidak — tidak disarankan</option>';
+    html += '<option value="Pertimbangan"'+(bg.rehire==='Pertimbangan'?' selected':'')+'>Dengan Pertimbangan</option>';
+    html += '</select></div>';
+    html += '</div>';
 
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
       +'<button class="btn btn-primary btn-sm" onclick="hrSaveBgCheck(\''+c.id+'\')">'+icon('check',13)+' Simpan &amp; Tandai Selesai</button>'
-      +'<button class="btn btn-demo btn-sm" onclick="hrDemoSkip(\''+c.id+'\',\'bgcheck\')" title="Demo: isi hasil background check otomatis">⚡ Demo Auto-fill</button>'
+      +'<button class="btn btn-demo btn-sm" onclick="hrDemoSkip(\''+c.id+'\',\'bgcheck\')" title="Demo: isi semua field otomatis">⚡ Demo Auto-fill</button>'
       +'</div>';
+
   } else {
+    // Done state
     const rehireCol = bg.rehire==='Ya'?'var(--green-dark)':bg.rehire==='Tidak'?'var(--red)':'var(--amber)';
     const rehireIcon = bg.rehire==='Ya'?icon('check',11):bg.rehire==='Tidak'?icon('x',11):icon('clock',11);
 
+    html += '<div class="card">';
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">'
-      +'<span class="tag tag-rule">'+icon('check',11)+' Selesai</span>'
-      +'</div>';
+      +'<span class="tag tag-rule">'+icon('check',11)+' Background Check Selesai</span>';
+    if(bg.companyName) html += '<span class="small muted">'+escapeHtml(bg.companyName)+(bg.lastPosition?' · '+escapeHtml(bg.lastPosition):'')+'</span>';
+    html += '</div>';
 
-    html += '<div style="display:grid;gap:10px;">';
-
-    // Reference 1
-    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:14px;">'
-      +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);margin-bottom:8px;">Referensi 1</div>'
-      +'<div style="font-weight:600;font-size:13px;margin-bottom:3px;">'+escapeHtml(bg.ref1Name||'—')+'</div>'
-      +'<div class="small muted">'+escapeHtml(bg.ref1Result||'—')+'</div></div>';
-
-    // Reference 2 (if present)
-    if(bg.ref2Name){
-      html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:14px;">'
-        +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);margin-bottom:8px;">Referensi 2</div>'
-        +'<div style="font-weight:600;font-size:13px;margin-bottom:3px;">'+escapeHtml(bg.ref2Name)+'</div>'
-        +'<div class="small muted">'+escapeHtml(bg.ref2Result||'—')+'</div></div>';
-    }
+    // Reference cards
+    html += _bgRefCard(bg,1);
+    if(bg.ref2Name) html += _bgRefCard(bg,2);
 
     // Summary row
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;">'
-      +'<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;margin-top:4px;">';
+    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+      +'<div class="small muted" style="margin-bottom:3px;">Perusahaan</div>'
+      +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.companyName||'—')+'</div></div>';
+    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
       +'<div class="small muted" style="margin-bottom:3px;">Masa Kerja</div>'
-      +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.lastTenure||'—')+'</div></div>'
-      +'<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
-      +'<div class="small muted" style="margin-bottom:3px;">Alasan Resign</div>'
-      +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.resignReason||'—')+'</div></div>'
-      +'<div style="background:var(--hull-2);border:2px solid '+rehireCol+';border-radius:10px;padding:12px;text-align:center;min-width:100px;">'
-      +'<div class="small muted" style="margin-bottom:3px;">Rehire</div>'
-      +'<div style="font-weight:700;font-size:13px;color:'+rehireCol+';">'+rehireIcon+' '+escapeHtml(bg.rehire||'—')+'</div></div>'
+      +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.lastTenure||'—')+'</div>'
+      +(bg.periodFrom?'<div class="small muted">'+escapeHtml(bg.periodFrom)+(bg.periodTo?' – '+escapeHtml(bg.periodTo):'')+'</div>':'')
       +'</div>';
-
+    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+      +'<div class="small muted" style="margin-bottom:3px;">Alasan Resign</div>'
+      +'<div style="font-size:12px;line-height:1.5;color:var(--hr-text);">'+escapeHtml(bg.resignReason||'—')+'</div></div>';
+    html += '<div style="background:var(--hull-2);border:2px solid '+rehireCol+';border-radius:10px;padding:12px;text-align:center;min-width:90px;">'
+      +'<div class="small muted" style="margin-bottom:3px;">Rehire</div>'
+      +'<div style="font-weight:700;font-size:13px;color:'+rehireCol+';">'+rehireIcon+' '+escapeHtml(bg.rehire||'—')+'</div></div>';
+    html += '</div>';
     html += '</div>';
   }
 
-  html += '</div>';
   return html;
 }
 
@@ -2657,16 +2760,20 @@ function hrFinishInterview(id){
 
 function hrSaveBgCheck(id){
   const c = CANDIDATES.find(c=>c.id===id);
+  const g = id => document.getElementById(id)?.value||'';
   c.hr.bgCheck = {
-    ref1Name:     document.getElementById('hr-bg-r1n')?.value||'',
-    ref1Result:   document.getElementById('hr-bg-r1r')?.value||'',
-    ref2Name:     document.getElementById('hr-bg-r2n')?.value||'',
-    ref2Result:   document.getElementById('hr-bg-r2r')?.value||'',
-    lastTenure:   document.getElementById('hr-bg-ten')?.value||'',
-    resignReason: document.getElementById('hr-bg-res')?.value||'',
-    rehire:       document.getElementById('hr-bg-reh')?.value||'',
-    done: true,
+    ref1Name:          g('hr-bg-r1n'), ref1Email:         g('hr-bg-r1e'),
+    ref1Phone:         g('hr-bg-r1p'), ref1ContactStatus: g('hr-bg-r1s'),
+    ref1Result:        g('hr-bg-r1r'),
+    ref2Name:          g('hr-bg-r2n'), ref2Email:         g('hr-bg-r2e'),
+    ref2Phone:         g('hr-bg-r2p'), ref2ContactStatus: g('hr-bg-r2s'),
+    ref2Result:        g('hr-bg-r2r'),
+    companyName:       g('hr-bg-co'),  lastPosition:      g('hr-bg-lpos'),
+    periodFrom:        g('hr-bg-pfrom'),periodTo:         g('hr-bg-pto'),
+    lastTenure:        g('hr-bg-ten'), resignReason:      g('hr-bg-res'),
+    rehire:            g('hr-bg-reh'), done: true,
   };
+  saveCandidateById(id);
   toast('Background check tersimpan.', 'success', 'check');
   renderAll();
 }
@@ -2921,9 +3028,13 @@ function hrDemoSkip(id, step){
     logEmail(c,'Jadwal Interview Dikonfirmasi','Interview '+fmtDateTime(d)+' via Online (Google Meet).');
   } else if(step==='bgcheck'){
     c.hr.bgCheck={
-      ref1Name:'Atasan Langsung (Demo)', ref1Result:'Positif — performa dan integritas baik',
-      ref2Name:'HRD Perusahaan Sebelumnya (Demo)', ref2Result:'Positif — eligible rehire',
-      lastTenure:'2 tahun 3 bulan', resignReason:'Mencari tantangan dan jenjang karier lebih baik', rehire:'Ya', done:true
+      ref1Name:'Rina Hartati (Manajer Langsung)', ref1Email:'rina.h@prevco.co.id', ref1Phone:'082198765400',
+      ref1ContactStatus:'balas', ref1Result:'Positif — dedikasi tinggi, hasil kerja konsisten, komunikasi baik dengan tim.',
+      ref2Name:'Bapak Doni (HRD Perusahaan Sebelumnya)', ref2Email:'hrd@prevco.co.id', ref2Phone:'0215559900',
+      ref2ContactStatus:'balas', ref2Result:'Positif — eligible rehire tanpa catatan negatif.',
+      companyName:'PT Karya Maju Indonesia', lastPosition:c.jobTitle||'Staf',
+      periodFrom:'2022-01', periodTo:'2024-06', lastTenure:'2 tahun 6 bulan',
+      resignReason:'Mencari tantangan dan jenjang karier lebih baik di industri maritim.', rehire:'Ya', done:true
     };
   } else if(step==='mcu'){
     const exp=new Date(); exp.setFullYear(exp.getFullYear()+1);
