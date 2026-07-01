@@ -493,16 +493,18 @@ def demo_skip(token):
     elif step == "video":
         stub_answers = []
         for qi, q in enumerate(vq):
+            transcript = "Selamat pagi. Terkait pertanyaan ini, saya selalu memastikan semua perlengkapan keselamatan (PPE) sudah lengkap sebelum mulai bekerja. Saya pernah menghadapi situasi darurat di kapal sebelumnya, dan hal pertama yang saya lakukan adalah membunyikan alarm, melapor ke anjungan, dan mengikuti muster list sesuai prosedur perusahaan. Saya memprioritaskan keselamatan kru dan kapal."
+            summary = "Kandidat merespons dengan tenang, runut, dan sangat percaya diri. Pengetahuan teknis terkait prosedur keselamatan (penggunaan PPE dan Muster List) sangat baik dan diartikulasikan dengan jelas. Bahasa tubuh menunjukkan sikap profesional dan antusiasme tinggi."
             stub_answers.append({
-                "question": q, "mode": "demo", "durationSec": 0,
-                "transcript": "[Demo] Jawaban video dilewati.",
-                "summary": "Demo — langkah video dilewati.", "aiScore": 80, "videoUrl": None,
+                "question": q, "mode": "demo", "durationSec": 45,
+                "transcript": transcript,
+                "summary": summary, "aiScore": 85, "videoUrl": None,
             })
-            db.save_video_answer(doc["id"], qi, q, None, 0,
-                                 "[Demo] Jawaban video dilewati.",
-                                 "Demo — langkah video dilewati.", 80)
+            db.save_video_answer(doc["id"], qi, q, None, 45,
+                                 transcript,
+                                 summary, 85)
         doc["video"]["answers"] = stub_answers
-        doc["video"]["aiScore"] = 80
+        doc["video"]["aiScore"] = 85
 
     else:
         abort(400, f"Step '{step}' tidak dikenal atau tidak sesuai jalur.")

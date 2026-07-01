@@ -1990,105 +1990,219 @@ function hrTabProfil(c){
 }
 
 /* ---- Tab: Screening ---- */
+function _scoreCard(score, color, w, titleHtml){
+  // Returns an open .card div — caller appends extra content then closes with '</div>'
+  let h = '<div class="card" style="min-width:0;">';
+  h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">';
+  h += '<div class="eyebrow" style="font-size:10.5px;">'+titleHtml+'</div>';
+  h += '<span style="font-size:10px;padding:2px 7px;border-radius:99px;background:'+color+'22;color:'+color+';font-weight:700;flex-shrink:0;">bobot '+Math.round(w*100)+'%</span>';
+  h += '</div>';
+  h += '<div class="mono" style="font-size:38px;font-weight:800;line-height:1;color:'+scoreColor(Math.round(score||0))+'">'+Math.round(score||0)+'</div>';
+  h += '<div style="height:5px;border-radius:3px;background:var(--hull-1);margin:10px 0;overflow:hidden;">';
+  h += '<div style="height:100%;width:'+Math.round(score||0)+'%;background:'+color+';border-radius:3px;transition:width .5s;"></div>';
+  h += '</div>';
+  h += '<div class="small muted">kontribusi ke total: <b style="color:var(--hr-text);">+'+Math.round((score||0)*w)+'</b> poin</div>';
+  return h;
+}
+
 function hrTabScreening(c){
+  const isMar = c.track==='maritime';
+  const cvScore  = c.cv.matchScore||0;
+  const vidScore = c.video.aiScore||0;
   let html = '';
 
-  if(c.track==='maritime'){
-    html += `<div class="card" style="margin-bottom:14px;">
-      <div class="eyebrow" style="margin-bottom:12px;">${icon('file',12)} CV Matching — Maritime</div>
-      <div class="small" style="line-height:2.2;">
-        <b>Jenis Kapal:</b> ${escapeHtml(c.cv.fields.vessel||'-')} &nbsp;&middot;&nbsp;
-        <b>Pengalaman:</b> ${c.cv.fields.expYears||0} tahun &nbsp;&middot;&nbsp;
-        <b>GT:</b> ${(c.cv.fields.gt||0).toLocaleString('id-ID')} &nbsp;&middot;&nbsp;
-        <b>OCIMF:</b> ${c.cv.fields.ocimf?'Ya':'Tidak'}
-      </div>
-      <div style="margin-top:10px;">${(c.cv.fields.certs||[]).map(ct=>`<span class="pill" style="margin:2px;">${escapeHtml(ct)}</span>`).join('')}</div>
-      <hr class="divider">
-      <div class="flex-between">
-        <span class="small muted">CV Match Score</span>
-        <span class="mono" style="font-weight:700;font-size:20px;color:${scoreColor(c.cv.matchScore)}">${c.cv.matchScore}</span>
-      </div>
-    </div>`;
+  // build component list
+  let comps;
+  if(isMar){
+    comps = [
+      {label:'CV Matching',      score:cvScore,             w:0.40, color:'#2A8FD8'},
+      {label:'Video Analysis',   score:vidScore,            w:0.30, color:'#D43F8D'},
+      {label:'Kuis Kualifikasi', score:c.quiz.qualScore||0, w:0.20, color:'#3C8C4A'},
+      {label:'Sertifikasi',      score:certSubscore(c.cert.status), w:0.10, color:'#C8821F'},
+    ];
+  } else {
+    comps = [
+      {label:'CV & Competency',  score:cvScore,                   w:0.25, color:'#2A8FD8'},
+      {label:'Video Analysis',   score:vidScore,                  w:0.25, color:'#D43F8D'},
+      {label:'Personality DISC', score:c.bundle.disc.fitScore||0, w:0.20, color:'#3C8C4A'},
+      {label:'IQ Test',          score:c.bundle.iq.score||0,      w:0.15, color:'#C8821F'},
+      {label:'Custom Form',      score:c.bundle.formScore||0,     w:0.15, color:'#8B5CF6'},
+    ];
+  }
 
-    html += `<div class="card" style="margin-bottom:14px;">
-      <div class="eyebrow" style="margin-bottom:12px;">${icon('bars',12)} Kuis Kualifikasi Minimum</div>
-      <div class="small" style="line-height:2.2;">
-        <b>CoC/CoP Aktif:</b> ${escapeHtml(c.quiz.answers.q1||'-')}<br>
-        <b>Ketersediaan Join:</b> ${escapeHtml(c.quiz.answers.q2||'-')}<br>
-        <b>Ekspektasi Gaji:</b> USD ${escapeHtml(String(c.quiz.answers.q3||'-'))}<br>
-        <b>Bersedia Penempatan:</b> ${escapeHtml(c.quiz.answers.q4||'-')}
-      </div>
-      <div style="margin-top:10px;display:flex;gap:10px;align-items:center;">
-        <span class="tag ${c.quiz.passFail?'tag-rule':'tag-red'}">${c.quiz.passFail?icon('check',11)+' Pass':icon('x',11)+' Fail'}</span>
-        <span class="small muted">Qual Score: <b style="color:${scoreColor(c.quiz.qualScore)}">${c.quiz.qualScore}</b></span>
-      </div>
-    </div>`;
+  // ── Composite Hero ──
+  html += '<div class="card" style="margin-bottom:14px;">';
+  html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;">';
+  html += '<div>';
+  html += '<div class="eyebrow" style="margin-bottom:6px;">'+icon('bars',11)+' Composite Score</div>';
+  html += '<div class="mono" style="font-size:56px;font-weight:800;line-height:1;color:'+scoreColor(c.composite)+'">'+c.composite+'</div>';
+  html += '<div class="small muted" style="margin-top:4px;">dari 100 poin</div>';
+  html += '</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;">';
+  comps.forEach(function(cp){
+    html += '<div style="text-align:center;background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:8px;padding:8px 10px;min-width:58px;">';
+    html += '<div class="mono" style="font-size:18px;font-weight:700;color:'+scoreColor(cp.score)+'">'+Math.round(cp.score)+'</div>';
+    html += '<div style="font-size:9px;color:var(--hr-text-soft);margin-top:1px;text-transform:uppercase;letter-spacing:.04em;">\xd7'+Math.round(cp.w*100)+'%</div>';
+    html += '<div style="font-size:10px;font-weight:600;color:var(--hr-text-soft);">+'+Math.round(cp.score*cp.w)+'</div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  // segmented bar
+  html += '<div style="display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:8px;">';
+  comps.forEach(function(cp){
+    html += '<div style="flex:'+Math.round(cp.w*100)+';background:var(--hull-1);overflow:hidden;" title="'+cp.label+': '+Math.round(cp.score)+'">';
+    html += '<div style="height:100%;width:'+Math.round(cp.score)+'%;background:'+cp.color+';transition:width .5s;"></div></div>';
+  });
+  html += '</div>';
+  // legend
+  html += '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+  comps.forEach(function(cp){
+    html += '<div style="display:flex;align-items:center;gap:5px;">';
+    html += '<div style="width:8px;height:8px;border-radius:2px;background:'+cp.color+';flex-shrink:0;"></div>';
+    html += '<span style="font-size:10.5px;color:var(--hr-text-soft);">'+cp.label+' ('+Math.round(cp.w*100)+'%)</span></div>';
+  });
+  html += '</div></div>'; // end hero card
+
+  // ── AI Summary ──
+  if(c.cv.summary){
+    html += '<div class="card-flat" style="margin-bottom:14px;border-left:3px solid var(--teal);">';
+    html += '<div class="eyebrow" style="margin-bottom:6px;font-size:10px;">'+icon('sparkle',10)+' Ringkasan AI</div>';
+    html += '<div class="small" style="line-height:1.72;">'+escapeHtml(c.cv.summary)+'</div>';
+    html += '</div>';
+  }
+
+  // ── Component Detail Cards ──
+  if(isMar){
+    const f = c.cv.fields;
+    const qDone   = c.quiz.passFail !== null;
+    const crtStat  = c.cert.status;
+    const crtScore = certSubscore(crtStat);
+    const crtColor = crtStat==='valid'?'#3C8C4A':crtStat==='expired'?'#C8821F':'#CC3B3B';
+    const crtLabel = ({valid:'Valid ✓',expired:'Kadaluarsa ⚠',not_found:'Tidak Ditemukan ✗',error:'Error Jaringan'})[crtStat]||'Belum Diverifikasi';
+
+    // row 1: CV | Quiz
+    html += '<div class="grid-2" style="margin-bottom:14px;align-items:start;">';
+    html += _scoreCard(cvScore,'#2A8FD8',0.40,icon('file',11)+' CV Matching');
+    html += '<hr class="divider" style="margin:12px 0;">';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+    html += '<div><div class="small muted">Jenis Kapal</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+escapeHtml(f.vessel||'—')+'</div></div>';
+    html += '<div><div class="small muted">Pengalaman</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+(f.expYears||0)+' tahun</div></div>';
+    html += '<div><div class="small muted">Gross Tonnage</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+(f.gt?Number(f.gt).toLocaleString('id-ID'):'—')+' GT</div></div>';
+    html += '<div><div class="small muted">OCIMF</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+(f.ocimf?'✓ Ya':'✗ Tidak')+'</div></div>';
+    html += '</div>';
+    if((f.certs||[]).length) html += '<div style="margin-top:8px;">'+f.certs.map(function(ct){return '<span class="pill" style="margin:2px 2px 0;font-size:10px;">'+escapeHtml(ct)+'</span>';}).join('')+'</div>';
+    html += '</div>'; // close CV card
+
+    html += _scoreCard(c.quiz.qualScore||0,'#3C8C4A',0.20,icon('bars',11)+' Kuis Kualifikasi');
+    if(qDone){
+      const qa = c.quiz.answers;
+      html += '<span class="tag '+(c.quiz.passFail?'tag-rule':'tag-red')+'" style="margin-top:8px;display:inline-flex;">'+(c.quiz.passFail?icon('check',11)+' Pass':icon('x',11)+' Fail — syarat tidak terpenuhi')+'</span>';
+      html += '<hr class="divider" style="margin:12px 0;">';
+      html += '<div style="display:grid;gap:7px;">';
+      html += '<div class="small"><span class="muted">CoC/CoP Aktif: </span><b>'+escapeHtml(qa.q1||'—')+'</b></div>';
+      html += '<div class="small"><span class="muted">Ketersediaan Join: </span><b>'+escapeHtml(qa.q2||'—')+'</b></div>';
+      html += '<div class="small"><span class="muted">Ekspektasi Gaji: </span><b>USD '+escapeHtml(String(qa.q3||'—'))+'</b></div>';
+      html += '<div class="small"><span class="muted">Bersedia Penempatan: </span><b>'+escapeHtml(qa.q4||'—')+'</b></div>';
+      html += '</div>';
+    } else {
+      html += '<div class="small muted" style="margin-top:8px;">Kuis belum dikerjakan.</div>';
+    }
+    html += '</div>'; // close Quiz card
+    html += '</div>'; // end row 1
+
+    // row 2: Video | Cert
+    html += '<div class="grid-2" style="align-items:start;">';
+    html += _scoreCard(vidScore,'#D43F8D',0.30,icon('video',11)+' Video Analysis');
+    html += '<div class="small muted" style="margin-top:6px;">'+c.video.answers.length+' jawaban video terekam</div>';
+    html += '</div>';
+
+    html += _scoreCard(crtScore,crtColor,0.10,icon('shield',11)+' Sertifikasi Kemenhub');
+    html += '<span style="display:inline-block;margin-top:8px;font-size:11px;padding:3px 9px;border-radius:99px;background:'+crtColor+'22;color:'+crtColor+';font-weight:600;">'+crtLabel+'</span>';
+    if(c.cert.number) html += '<div class="small muted" style="margin-top:6px;">No: '+escapeHtml(c.cert.number)+'</div>';
+    html += '</div>';
+    html += '</div>'; // end row 2
 
   } else {
-    html += `<div class="card" style="margin-bottom:14px;">
-      <div class="eyebrow" style="margin-bottom:12px;">${icon('file',12)} CV Matching — Back Office</div>
-      <div class="small" style="line-height:2.2;">
-        <b>Pendidikan:</b> ${escapeHtml(c.cv.fields.edu||'-')} &nbsp;&middot;&nbsp;
-        <b>Usia:</b> ${c.cv.fields.age||'-'} tahun &nbsp;&middot;&nbsp;
-        <b>Pengalaman:</b> ${c.cv.fields.expYears||0} tahun
-      </div>
-      <div style="margin-top:10px;">${(c.cv.fields.tools||[]).map(t=>`<span class="pill" style="margin:2px;">${escapeHtml(t)}</span>`).join('')}</div>
-      <hr class="divider">
-      <div class="flex-between">
-        <span class="small muted">CV &amp; Competency Score</span>
-        <span class="mono" style="font-weight:700;font-size:20px;color:${scoreColor(c.cv.matchScore)}">${c.cv.matchScore}</span>
-      </div>
-    </div>`;
-
+    const f = c.cv.fields;
+    const discScore = c.bundle.disc.fitScore||0;
+    const iqScore   = c.bundle.iq.score||0;
+    const frmScore  = c.bundle.formScore||0;
+    const discCounts = c.bundle.disc.counts||{};
     const src = c.bundle.testSource;
-    const srcBadge = src ? `<span class="tag ${src==='api'?'tag-auto':'tag-hr'}" style="margin-left:8px;">${src==='api'?'Sinkron API':'Upload kandidat'}</span>` : '';
-    const discFile = (c.bundle.disc && c.bundle.disc.resultUrl) ? c.bundle.disc.resultUrl : null;
-    const iqFile   = (c.bundle.iq && c.bundle.iq.resultUrl) ? c.bundle.iq.resultUrl : null;
-    if(c.bundle.disc.type || src || discFile || iqFile){
-      html += `<div class="grid-2" style="margin-bottom:14px;">
-        <div class="card">
-          <div class="eyebrow" style="margin-bottom:10px;">${icon('user',12)} DISC / MBTI ${srcBadge}</div>
-          <div class="mono" style="font-size:28px;font-weight:700;">${c.bundle.disc.type||'—'}</div>
-          <div class="small muted" style="margin-top:4px;">${escapeHtml(c.bundle.disc.label||'Tipe belum dilaporkan')}</div>
-          <hr class="divider">
-          <div class="flex-between">
-            <span class="small muted">Fit Score</span>
-            <span class="mono" style="font-weight:700;color:${scoreColor(c.bundle.disc.fitScore)}">${c.bundle.disc.fitScore}</span>
-          </div>
-          ${discFile?`<a class="btn btn-ghost btn-sm" style="margin-top:12px;" href="${discFile}" target="_blank">${icon('file',13)} Lihat Berkas Hasil DISC</a>`:''}
-        </div>
-        <div class="card">
-          <div class="eyebrow" style="margin-bottom:10px;">${icon('sparkle',12)} IQ Test</div>
-          <div class="mono" style="font-size:28px;font-weight:700;">${(c.bundle.iq.score!=null?c.bundle.iq.score:'—')}</div>
-          <div class="small muted" style="margin-top:4px;">${(c.bundle.iq.correct!=null&&c.bundle.iq.total!=null)?(c.bundle.iq.correct+' benar dari '+c.bundle.iq.total+' soal'):'Skor dari platform tes eksternal'}</div>
-          <hr class="divider">
-          <div class="flex-between">
-            <span class="small muted">IQ Score</span>
-            <span class="mono" style="font-weight:700;color:${scoreColor(c.bundle.iq.score)}">${c.bundle.iq.score}</span>
-          </div>
-          ${iqFile?`<a class="btn btn-ghost btn-sm" style="margin-top:12px;" href="${iqFile}" target="_blank">${icon('file',13)} Lihat Berkas Hasil IQ</a>`:''}
-        </div>
-      </div>`;
-    }
+    const srcLabel = src ? (src==='api'?'Sinkron API':'Upload kandidat') : '';
 
-    if(c.bundle.story || c.bundle.availabilityJoin || c.bundle.salaryExpIdr){
-      const job = jobById(c.jobId);
-      const salaryOk = job && c.bundle.salaryExpIdr && c.bundle.salaryExpIdr <= (job.salaryMaxIdr||Infinity);
-      html += `<div class="card">
-        <div class="eyebrow" style="margin-bottom:10px;">${icon('file',12)} Custom Form — Tambahan Kandidat</div>
-        ${c.bundle.story?`<p class="small" style="line-height:1.7;margin-bottom:10px;">${escapeHtml(c.bundle.story)}</p>`:''}
-        <div>${(c.bundle.tools||[]).map(t=>`<span class="pill" style="margin:2px;">${escapeHtml(t)}</span>`).join('')}</div>
-        <hr class="divider">
-        <div class="grid-2" style="gap:10px;">
-          ${c.bundle.availabilityJoin?`<div><div class="small muted" style="margin-bottom:3px;">Ketersediaan Bergabung</div><div style="font-weight:700;font-size:13px;">${escapeHtml(c.bundle.availabilityJoin)}</div></div>`:''}
-          ${c.bundle.salaryExpIdr?`<div>
-            <div class="small muted" style="margin-bottom:3px;">Ekspektasi Gaji</div>
-            <div style="font-weight:700;font-size:13px;color:${salaryOk?'var(--green-dark)':'var(--red-dark)'};">${fmtIDR(c.bundle.salaryExpIdr)}/bln</div>
-            ${job&&job.salaryMaxIdr?`<div style="font-size:11px;color:var(--hr-text-soft);">Budget: hingga ${fmtIDR(job.salaryMaxIdr)} ${salaryOk?'✓ Sesuai':'⚠ Melebihi budget'}</div>`:''}
-          </div>`:''}
-        </div>
-      </div>`;
+    // row 1: CV | Video
+    html += '<div class="grid-2" style="margin-bottom:14px;align-items:start;">';
+    html += _scoreCard(cvScore,'#2A8FD8',0.25,icon('file',11)+' CV & Competency');
+    html += '<hr class="divider" style="margin:12px 0;">';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+    html += '<div><div class="small muted">Pendidikan</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+escapeHtml(f.edu||'—')+'</div></div>';
+    html += '<div><div class="small muted">Usia</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+(f.age||'—')+' tahun</div></div>';
+    html += '<div style="grid-column:span 2"><div class="small muted">Pengalaman</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+(f.expYears||0)+' tahun</div></div>';
+    html += '</div>';
+    if((f.tools||[]).length) html += '<div style="margin-top:8px;">'+f.tools.map(function(t){return '<span class="pill" style="margin:2px 2px 0;font-size:10px;">'+escapeHtml(t)+'</span>';}).join('')+'</div>';
+    html += '</div>';
+
+    html += _scoreCard(vidScore,'#D43F8D',0.25,icon('video',11)+' Video Analysis');
+    html += '<div class="small muted" style="margin-top:6px;">'+c.video.answers.length+' jawaban video terekam</div>';
+    html += '</div>';
+    html += '</div>'; // end row 1
+
+    // row 2: DISC | IQ
+    html += '<div class="grid-2" style="margin-bottom:14px;align-items:start;">';
+    html += _scoreCard(discScore,'#3C8C4A',0.20,icon('user',11)+' Personality DISC');
+    if(c.bundle.disc.type){
+      html += '<div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">';
+      html += '<span class="mono" style="font-size:24px;font-weight:800;">'+escapeHtml(c.bundle.disc.type)+'</span>';
+      if(c.bundle.disc.label) html += '<span class="small muted">'+escapeHtml(c.bundle.disc.label)+'</span>';
+      html += '</div>';
     }
+    if(Object.keys(discCounts).length){
+      const tot = Object.values(discCounts).reduce(function(a,b){return a+b;},0)||1;
+      ['D','I','S','C'].forEach(function(k){
+        const pct = Math.round(((discCounts[k]||0)/tot)*100);
+        const bc  = {D:'#CC3B3B',I:'#C8821F',S:'#3C8C4A',C:'#2A8FD8'}[k];
+        html += '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;">';
+        html += '<div style="font-size:10px;font-weight:700;width:10px;flex-shrink:0;color:'+bc+';">'+k+'</div>';
+        html += '<div style="flex:1;height:5px;background:var(--hull-1);border-radius:3px;overflow:hidden;">';
+        html += '<div style="height:100%;width:'+pct+'%;background:'+bc+';border-radius:3px;"></div></div>';
+        html += '<div style="font-size:10px;color:var(--hr-text-soft);width:28px;text-align:right;">'+pct+'%</div></div>';
+      });
+    }
+    if(srcLabel) html += '<div class="small muted" style="margin-top:8px;">Sumber: '+srcLabel+'</div>';
+    const discFile = (c.bundle.disc&&c.bundle.disc.resultUrl)?c.bundle.disc.resultUrl:'';
+    if(discFile) html += '<a class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;" href="'+escapeHtml(discFile)+'" target="_blank">'+icon('file',13)+' Lihat Hasil DISC</a>';
+    html += '</div>'; // close DISC card
+
+    html += _scoreCard(iqScore,'#C8821F',0.15,icon('sparkle',11)+' IQ Test');
+    if(c.bundle.iq.correct!=null&&c.bundle.iq.total!=null){
+      html += '<div class="small muted" style="margin-top:6px;">'+c.bundle.iq.correct+' benar dari '+c.bundle.iq.total+' soal</div>';
+    } else {
+      html += '<div class="small muted" style="margin-top:6px;">Skor dari platform tes eksternal</div>';
+    }
+    if(srcLabel) html += '<div class="small muted" style="margin-top:4px;">Sumber: '+srcLabel+'</div>';
+    const iqFile = (c.bundle.iq&&c.bundle.iq.resultUrl)?c.bundle.iq.resultUrl:'';
+    if(iqFile) html += '<a class="btn btn-ghost btn-sm" style="margin-top:10px;display:inline-flex;" href="'+escapeHtml(iqFile)+'" target="_blank">'+icon('file',13)+' Lihat Hasil IQ</a>';
+    html += '</div>'; // close IQ card
+    html += '</div>'; // end row 2
+
+    // row 3: Custom Form
+    const job = jobById(c.jobId);
+    const salaryOk = job&&c.bundle.salaryExpIdr&&c.bundle.salaryExpIdr<=(job.salaryMaxIdr||Infinity);
+    html += _scoreCard(frmScore,'#8B5CF6',0.15,icon('file',11)+' Custom Form');
+    html += '<hr class="divider" style="margin:12px 0;">';
+    html += '<div style="display:grid;gap:8px;">';
+    if(c.bundle.availabilityJoin) html += '<div><div class="small muted">Ketersediaan Bergabung</div><div style="font-weight:600;font-size:12px;margin-top:2px;">'+escapeHtml(c.bundle.availabilityJoin)+'</div></div>';
+    if(c.bundle.salaryExpIdr){
+      html += '<div><div class="small muted">Ekspektasi Gaji</div>';
+      html += '<div style="font-weight:600;font-size:12px;margin-top:2px;color:'+(salaryOk?'var(--green-dark)':'var(--red)')+'">'+fmtIDR(c.bundle.salaryExpIdr)+'/bln '+(salaryOk?'✓':'⚠')+'</div>';
+      if(job&&job.salaryMaxIdr) html += '<div style="font-size:10.5px;color:var(--hr-text-soft);">Budget: hingga '+fmtIDR(job.salaryMaxIdr)+'</div>';
+      html += '</div>';
+    }
+    if(c.bundle.story) html += '<div><div class="small muted">Cerita Singkat</div><div class="small" style="margin-top:3px;line-height:1.6;">'+escapeHtml(c.bundle.story.slice(0,150))+(c.bundle.story.length>150?'…':'')+'</div></div>';
+    if((c.bundle.tools||[]).length) html += '<div><div class="small muted">Tools</div><div style="margin-top:4px;">'+c.bundle.tools.map(function(t){return '<span class="pill" style="margin:2px 2px 0;font-size:10px;">'+escapeHtml(t)+'</span>';}).join('')+'</div></div>';
+    html += '</div>';
+    html += '</div>'; // close Form card
   }
 
   return html;
@@ -2404,7 +2518,7 @@ function _bgRefForm(bg, num, nm, pos){
   const refName = bg['ref'+p+'Name']||'Bapak/Ibu';
   const tplText = _bgTpl(nm,pos,refName);
   const tplEsc = escapeHtml(tplText);
-  h += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:8px;padding:12px;overflow:hidden;">';
+  h += '<div style="background:var(--bg);border:1px solid var(--bridge-line);border-radius:8px;padding:12px;overflow:hidden;">';
   h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);margin-bottom:8px;">'+icon('send',10)+' Template Email untuk Referensi</div>';
   h += '<textarea id="hr-bg-tpl'+p+'" class="textarea" style="font-size:11.5px;line-height:1.7;min-height:120px;max-height:180px;resize:vertical;width:100%;box-sizing:border-box;font-family:inherit;">'+tplEsc+'</textarea>';
   h += '<div style="display:flex;gap:8px;margin-top:8px;">';
@@ -2475,18 +2589,18 @@ function hrTabBgCheck(c){
 
     // Summary row
     html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;margin-top:4px;">';
-    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+    html += '<div style="background:var(--bg);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
       +'<div class="small muted" style="margin-bottom:3px;">Perusahaan</div>'
       +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.companyName||'—')+'</div></div>';
-    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+    html += '<div style="background:var(--bg);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
       +'<div class="small muted" style="margin-bottom:3px;">Masa Kerja</div>'
       +'<div style="font-weight:600;font-size:13px;">'+escapeHtml(bg.lastTenure||'—')+'</div>'
       +(bg.periodFrom?'<div class="small muted">'+escapeHtml(bg.periodFrom)+(bg.periodTo?' – '+escapeHtml(bg.periodTo):'')+'</div>':'')
       +'</div>';
-    html += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
+    html += '<div style="background:var(--bg);border:1px solid var(--bridge-line);border-radius:10px;padding:12px;">'
       +'<div class="small muted" style="margin-bottom:3px;">Alasan Resign</div>'
       +'<div style="font-size:12px;line-height:1.5;color:var(--hr-text);">'+escapeHtml(bg.resignReason||'—')+'</div></div>';
-    html += '<div style="background:var(--hull-2);border:2px solid '+rehireCol+';border-radius:10px;padding:12px;text-align:center;min-width:90px;">'
+    html += '<div style="background:var(--bg);border:2px solid '+rehireCol+';border-radius:10px;padding:12px;text-align:center;min-width:90px;">'
       +'<div class="small muted" style="margin-bottom:3px;">Rehire</div>'
       +'<div style="font-weight:700;font-size:13px;color:'+rehireCol+';">'+rehireIcon+' '+escapeHtml(bg.rehire||'—')+'</div></div>';
     html += '</div>';
@@ -2540,87 +2654,123 @@ function hrTabMcu(c){
 /* ---- Tab: Keputusan Final & Kontrak ---- */
 function hrTabKeputusan(c){
   const isMaritime = c.track==='maritime';
+  const rec = aiRecommendation(c.composite);
   let html = hrPipelineStrip(c);
 
   if(!c.hr.final){
     const ready = !!(c.hr.bgCheck.done && (!isMaritime || c.hr.mcu.done));
-    const border = ready ? 'var(--green)' : 'var(--line)';
     let notice = '';
     if(!ready){
       const missing = 'Background Check' + (isMaritime ? ' &amp; MCU' : '');
-      notice = '<div class="card-flat" style="margin-bottom:14px;background:rgba(200,130,31,.07);border-color:rgba(200,130,31,.2);">'
-        +'<div class="small" style="line-height:1.65;">'+icon('info',12)+' Idealnya selesaikan tahap <b>'+missing+'</b> sebelum keputusan final. '
-        +'Untuk demo, Anda tetap dapat mengambil keputusan sekarang.</div></div>';
+      notice = '<div class="card-flat" style="margin-bottom:16px;background:rgba(200,130,31,.07);border-color:rgba(200,130,31,.2);">'
+        +'<div class="small" style="line-height:1.65;color:var(--amber-dark);">'+icon('info',12)+' <b>Perhatian:</b> Idealnya selesaikan tahap '+missing+' sebelum menetapkan keputusan final. (Abaikan peringatan ini untuk keperluan demo)</div></div>';
     }
-    html += '<div class="card" style="border-left:3px solid '+border+'">'
-      +'<div class="eyebrow" style="margin-bottom:12px;">'+icon('award',12)+' Keputusan Final</div>'
-      +notice
-      +'<div class="field"><label>Catatan untuk Kandidat</label>'
-      +'<textarea class="textarea" id="hr-final-notes" style="min-height:66px;" placeholder="Tuliskan catatan keputusan akhir…"></textarea></div>'
-      +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
-      +'<button class="btn btn-success btn-sm" onclick="hrSetFinal(\''+c.id+'\',\'hired\')">'+icon('check',13)+' Terima (Hired)</button>'
-      +'<button class="btn btn-sm" style="background:rgba(43,179,160,.18);color:var(--teal-dark);" onclick="hrSetFinal(\''+c.id+'\',\'pool\')">'+icon('folder',13)+' Talent Pool</button>'
-      +'<button class="btn btn-danger btn-sm" onclick="hrSetFinal(\''+c.id+'\',\'rejected\')">'+icon('x',13)+' Tolak</button>'
-      +'<button class="btn btn-demo btn-sm" onclick="hrDemoSkip(\''+c.id+'\',\'final_hire\')" title="Demo: terima kandidat otomatis">⚡ Demo Hired</button>'
-      +'</div></div>';
+
+    html += notice;
+    
+    // Premium Recommendation Banner
+    let bannerGrad = 'linear-gradient(135deg, #323842, #1d2127)'; // Default
+    if (c.composite >= 80) bannerGrad = 'linear-gradient(135deg, #2b7a3d, #143d1d)'; // Green (Good)
+    else if (c.composite >= 60) bannerGrad = 'linear-gradient(135deg, #d97706, #78350f)'; // Orange/Amber (Consider)
+    else bannerGrad = 'linear-gradient(135deg, #b91c1c, #7f1d1d)'; // Red (Reject)
+
+    html += `<div style="background:${bannerGrad}; color:#fff; padding:24px; border-radius:16px; margin-bottom:20px; box-shadow:var(--shadow-m); display:flex; gap:24px; align-items:center; border:1px solid rgba(255,255,255,0.08);">
+      <div style="flex:none; text-align:center;">
+        <div style="font-size:48px; font-weight:700; line-height:1; font-family:var(--font-mono);">${c.composite}</div>
+        <div style="font-size:11px; opacity:0.6; text-transform:uppercase; letter-spacing:1px; margin-top:6px;">Composite Score</div>
+      </div>
+      <div style="width:1px; background:rgba(255,255,255,0.15); align-self:stretch;"></div>
+      <div style="flex:1;">
+        <div style="font-size:11px; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">Rekomendasi AI MAXY</div>
+        <div style="font-size:22px; font-weight:700; font-family:var(--font-display);">${rec.label}</div>
+      </div>
+    </div>`;
+
+    html += `<div class="card" style="margin-bottom:20px; border:1px solid var(--bridge-line);">
+      <div class="eyebrow" style="margin-bottom:12px;">Catatan Keputusan Final (Opsional)</div>
+      <textarea class="textarea" id="hr-final-notes" style="min-height:70px; font-size:13px;" placeholder="Tuliskan ringkasan atau alasan pengambilan keputusan final untuk arsip internal..."></textarea>
+    </div>`;
+
+    html += `<div class="grid-3" style="margin-bottom:16px; gap:16px;">
+      <div class="card" style="background:#f8f9fa; border:1px solid #e2e5e9; text-align:center; cursor:pointer; transition:all 0.2s; border-radius:16px; padding:24px 16px; box-shadow:none;" 
+           onmouseover="this.style.borderColor='var(--green)';this.style.boxShadow='var(--shadow-m)';this.style.background='#fff';" 
+           onmouseout="this.style.borderColor='#e2e5e9';this.style.boxShadow='none';this.style.background='#f8f9fa';"
+           onclick="hrSetFinal('${c.id}','hired')">
+        <div style="width:52px; height:52px; border-radius:50%; background:var(--green-light); color:var(--green-dark); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">${icon('check',24)}</div>
+        <div style="font-weight:700; font-size:16px; margin-bottom:6px;">Terima (Hired)</div>
+        <div class="small muted" style="line-height:1.5;">Kandidat lolos dan masuk tahap PKWT</div>
+      </div>
+      
+      <div class="card" style="background:#f8f9fa; border:1px solid #e2e5e9; text-align:center; cursor:pointer; transition:all 0.2s; border-radius:16px; padding:24px 16px; box-shadow:none;" 
+           onmouseover="this.style.borderColor='var(--teal)';this.style.boxShadow='var(--shadow-m)';this.style.background='#fff';" 
+           onmouseout="this.style.borderColor='#e2e5e9';this.style.boxShadow='none';this.style.background='#f8f9fa';"
+           onclick="hrSetFinal('${c.id}','pool')">
+        <div style="width:52px; height:52px; border-radius:50%; background:var(--teal-light); color:var(--teal-dark); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">${icon('folder',24)}</div>
+        <div style="font-weight:700; font-size:16px; margin-bottom:6px;">Talent Pool</div>
+        <div class="small muted" style="line-height:1.5;">Simpan profil untuk peluang berikutnya</div>
+      </div>
+      
+      <div class="card" style="background:#f8f9fa; border:1px solid #e2e5e9; text-align:center; cursor:pointer; transition:all 0.2s; border-radius:16px; padding:24px 16px; box-shadow:none;" 
+           onmouseover="this.style.borderColor='var(--red)';this.style.boxShadow='var(--shadow-m)';this.style.background='#fff';" 
+           onmouseout="this.style.borderColor='#e2e5e9';this.style.boxShadow='none';this.style.background='#f8f9fa';"
+           onclick="hrSetFinal('${c.id}','rejected')">
+        <div style="width:52px; height:52px; border-radius:50%; background:var(--red-light); color:var(--red); display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">${icon('x',24)}</div>
+        <div style="font-weight:700; font-size:16px; margin-bottom:6px;">Tolak Kandidat</div>
+        <div class="small muted" style="line-height:1.5;">Kandidat tidak memenuhi kriteria</div>
+      </div>
+    </div>
+    
+    <div style="text-align:center; margin-top:10px;">
+      <button class="btn btn-demo btn-sm" onclick="hrDemoSkip('${c.id}','final_hire')" title="Demo: Isi catatan dan terima kandidat otomatis">⚡ Auto-Hire (Demo)</button>
+    </div>`;
 
   } else if(c.hr.final==='hired'){
     const contractBtn = c.contractGenerated
-      ? '<button class="btn btn-ghost btn-sm" onclick="openContractView(\''+c.id+'\')">'+icon('printer',13)+' Lihat &amp; Cetak Kontrak</button>'
-      : '<button class="btn btn-primary btn-sm" onclick="generateContract(\''+c.id+'\')">'+icon('file',13)+' Generate Kontrak PKWT</button>';
+      ? `<button class="btn btn-primary" onclick="openContractView('${c.id}')">${icon('file',16)} Cetak &amp; Lihat PKWT</button>`
+      : `<button class="btn btn-primary" onclick="generateContract('${c.id}')">${icon('file',16)} Generate Kontrak PKWT</button>`;
     const notesHtml = c.hr.finalNotes
-      ? '<div class="card-flat" style="margin-bottom:14px;"><div class="small muted" style="line-height:1.65;">'+escapeHtml(c.hr.finalNotes)+'</div></div>'
+      ? `<div style="margin-top:20px; font-size:13px; color:rgba(60,140,74,0.9); background:rgba(255,255,255,0.6); padding:12px 16px; border-radius:8px; display:inline-block; text-align:left;"><b>Catatan HR:</b> ${escapeHtml(c.hr.finalNotes)}</div>`
       : '';
-    html += '<div class="card" style="border-left:4px solid var(--green)">'
-      +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
-      +'<div style="width:44px;height:44px;border-radius:50%;background:var(--green-light);border:2px solid var(--green-dark);display:flex;align-items:center;justify-content:center;flex:none;">'+icon('check',20)+'</div>'
-      +'<div><div style="font-weight:700;font-size:18px;color:var(--green-dark);">Diterima (Hired)</div>'
-      +'<div class="small muted">Keputusan ditetapkan '+fmtDate(c.hr.finalAt)+'</div></div></div>'
-      +notesHtml
-      +'<div class="eyebrow" style="margin-bottom:10px;">'+icon('chev',12)+' Langkah Selanjutnya</div>'
-      +'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
-      +contractBtn
-      +'<button class="btn btn-teal btn-sm" onclick="prefillNotif(2,\''+c.id+'\');STATE.hrDetailTab=\'komunikasi\';renderAll();">'+icon('send',13)+' Kirim Notifikasi Penerimaan</button>'
-      +'</div></div>';
+    html += `<div style="background:var(--green-light); border:1px solid rgba(60, 140, 74, 0.2); color:var(--green-dark); padding:40px 24px; border-radius:16px; margin-bottom:16px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+      <div style="width:72px; height:72px; border-radius:50%; background:var(--green); color:#fff; display:flex; align-items:center; justify-content:center; margin-bottom:20px; box-shadow:0 8px 24px rgba(60, 140, 74, 0.4);">
+        ${icon('check',36)}
+      </div>
+      <div style="font-size:28px; font-weight:700; font-family:var(--font-display); margin-bottom:8px;">Kandidat Diterima (Hired)</div>
+      <div style="font-size:14px; opacity:0.85; max-width:480px; line-height:1.6; margin-bottom:28px;">Keputusan final telah ditetapkan pada ${fmtDate(c.hr.finalAt)}. Langkah selanjutnya adalah membuat draft kontrak dan mengirimkan notifikasi.</div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+        ${contractBtn}
+        <button class="btn btn-teal" onclick="prefillNotif(2,'${c.id}');STATE.hrDetailTab='komunikasi';renderAll();">${icon('send',16)} Kirim Email Penerimaan</button>
+      </div>
+      ${notesHtml}
+    </div>`;
 
   } else if(c.hr.final==='pool'){
-    const notesHtml = c.hr.finalNotes
-      ? '<br><br><span class="muted">Catatan: '+escapeHtml(c.hr.finalNotes)+'</span>'
-      : '';
-    html += '<div class="card" style="border-left:4px solid var(--teal)">'
-      +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
-      +'<div style="width:44px;height:44px;border-radius:50%;background:var(--teal-light);border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;flex:none;">'+icon('folder',20)+'</div>'
-      +'<div><div style="font-weight:700;font-size:18px;color:var(--teal-dark);">Masuk Talent Pool</div>'
-      +'<div class="small muted">Keputusan ditetapkan '+fmtDate(c.hr.finalAt)+'</div></div></div>'
-      +'<div class="card-flat" style="margin-bottom:14px;">'
-      +'<div class="small" style="line-height:1.75;">Profil <b>'+escapeHtml(c.name)+'</b> disimpan dalam talent pool dan akan '
-      +'dipertimbangkan untuk kebutuhan rekrutmen berikutnya yang sesuai.'+notesHtml+'</div></div>'
-      +'<button class="btn btn-teal btn-sm" onclick="prefillNotif(3,\''+c.id+'\');STATE.hrDetailTab=\'komunikasi\';renderAll();">'+icon('send',13)+' Kirim Notifikasi ke Kandidat</button>'
-      +'</div>';
+    const notesHtml = c.hr.finalNotes ? `<div style="margin-top:20px; font-size:13px; color:rgba(22,142,127,0.9); background:rgba(255,255,255,0.6); padding:12px 16px; border-radius:8px; display:inline-block; text-align:left;"><b>Catatan HR:</b> ${escapeHtml(c.hr.finalNotes)}</div>` : '';
+    html += `<div style="background:var(--teal-light); border:1px solid rgba(22,142,127,0.2); color:var(--teal-dark); padding:40px 24px; border-radius:16px; margin-bottom:16px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+      <div style="width:72px; height:72px; border-radius:50%; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; margin-bottom:20px; box-shadow:0 8px 24px rgba(22,142,127,0.4);">
+        ${icon('folder',36)}
+      </div>
+      <div style="font-size:28px; font-weight:700; font-family:var(--font-display); margin-bottom:8px;">Masuk Talent Pool</div>
+      <div style="font-size:14px; opacity:0.85; max-width:480px; line-height:1.6; margin-bottom:28px;">Profil <b>${escapeHtml(c.name)}</b> telah disimpan dalam database Talent Pool pada ${fmtDate(c.hr.finalAt)} untuk dipertimbangkan di masa mendatang.</div>
+      <button class="btn btn-teal" onclick="prefillNotif(3,'${c.id}');STATE.hrDetailTab='komunikasi';renderAll();">${icon('send',16)} Beritahu Kandidat</button>
+      ${notesHtml}
+    </div>`;
 
   } else {
     // rejected
-    const notesHtml = c.hr.finalNotes
-      ? '<br><span style="color:var(--hr-text-soft);">Catatan internal: '+escapeHtml(c.hr.finalNotes)+'</span>'
-      : '';
-    html += '<div class="card" style="border-left:4px solid var(--red)">'
-      +'<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">'
-      +'<div style="width:44px;height:44px;border-radius:50%;background:var(--red-light);border:2px solid var(--red);display:flex;align-items:center;justify-content:center;flex:none;">'+icon('x',20)+'</div>'
-      +'<div><div style="font-weight:700;font-size:18px;color:var(--red);">Tidak Diterima</div>'
-      +'<div class="small muted">Keputusan ditetapkan '+fmtDate(c.hr.finalAt)+'</div></div></div>'
-      +'<div class="card-flat" style="margin-bottom:16px;background:rgba(220,53,69,.05);border-color:rgba(220,53,69,.15);">'
-      +'<div class="small" style="line-height:1.75;">'
-      +'Proses seleksi untuk <b>'+escapeHtml(c.name)+'</b> pada posisi <b>'+escapeHtml(c.jobTitle)+'</b> '
-      +'telah selesai. Kandidat dinyatakan <b>tidak lolos</b> tahap ini.'+notesHtml+'</div></div>'
-      +'<div class="eyebrow" style="margin-bottom:10px;">'+icon('send',12)+' Langkah Selanjutnya</div>'
-      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">'
-      +'<button class="btn btn-primary btn-sm" onclick="prefillNotif(4,\''+c.id+'\');STATE.hrDetailTab=\'komunikasi\';renderAll();">'+icon('send',13)+' Kirim Notifikasi Penolakan ke Kandidat</button>'
-      +'<button class="btn btn-sm" style="background:rgba(43,179,160,.18);color:var(--teal-dark);" onclick="hrOverrideFinal(\''+c.id+'\',\'pool\')">'+icon('folder',13)+' Pindahkan ke Talent Pool</button>'
-      +'</div>'
-      +'<div class="small muted" style="line-height:1.65;">'
-      +icon('info',11)+' Notifikasi penolakan yang dikirim bersifat profesional dan tidak menyertakan alasan internal. '
-      +'Kandidat dapat melamar kembali di masa mendatang.</div>'
-      +'</div>';
+    const notesHtml = c.hr.finalNotes ? `<div style="margin-top:20px; font-size:13px; color:rgba(191,74,61,0.9); background:rgba(255,255,255,0.6); padding:12px 16px; border-radius:8px; display:inline-block; text-align:left;"><b>Catatan HR:</b> ${escapeHtml(c.hr.finalNotes)}</div>` : '';
+    html += `<div style="background:var(--red-light); border:1px solid rgba(191,74,61,0.2); color:var(--red); padding:40px 24px; border-radius:16px; margin-bottom:16px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+      <div style="width:72px; height:72px; border-radius:50%; background:var(--red); color:#fff; display:flex; align-items:center; justify-content:center; margin-bottom:20px; box-shadow:0 8px 24px rgba(191,74,61,0.4);">
+        ${icon('x',36)}
+      </div>
+      <div style="font-size:28px; font-weight:700; font-family:var(--font-display); margin-bottom:8px;">Tidak Diterima</div>
+      <div style="font-size:14px; opacity:0.85; max-width:480px; line-height:1.6; margin-bottom:28px;">Kandidat dinyatakan tidak lolos seleksi final pada ${fmtDate(c.hr.finalAt)}.</div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+        <button class="btn btn-primary" onclick="prefillNotif(4,'${c.id}');STATE.hrDetailTab='komunikasi';renderAll();">${icon('send',16)} Kirim Email Penolakan</button>
+        <button class="btn btn-ghost" onclick="hrOverrideFinal('${c.id}','pool')">${icon('folder',16)} Ubah ke Talent Pool</button>
+      </div>
+      ${notesHtml}
+    </div>`;
   }
 
   return html;
@@ -2648,38 +2798,65 @@ function hrVerifyCert(id){
 
 /* ---- Tab: Komunikasi ---- */
 function hrTabKomunikasi(c){
-  return `<div>
-    <div class="card" style="margin-bottom:14px;">
-      <div class="eyebrow" style="margin-bottom:12px;">${icon('send',12)} Kirim Notifikasi Manual</div>
-      <div class="field"><label>Template Cepat</label>
-        <select class="select" id="notif-tpl" onchange="prefillNotif(this.value,'${c.id}')">
-          <option value="">— Pilih template —</option>
-          <option value="0">Link Asesmen</option>
-          <option value="1">Undangan Interview</option>
-          <option value="2">Diterima (Hired)</option>
-          <option value="3">Talent Pool</option>
-          <option value="4">Tidak Lanjut</option>
-        </select>
+  return `<div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:24px; align-items:start;">
+    
+    <!-- Left Pane: Composer -->
+    <div class="card" style="padding:0; overflow:hidden; border:1px solid var(--bridge-line); box-shadow:var(--shadow-s);">
+      <div style="background:var(--bg); padding:16px 24px; border-bottom:1px solid var(--bridge-line); display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-weight:700; font-size:15px; color:var(--hull); display:flex; align-items:center; gap:8px;">${icon('send',16)} Tulis Pesan Baru</div>
+        <div>
+          <select class="select" id="notif-tpl" onchange="prefillNotif(this.value,'${c.id}')" style="padding:6px 32px 6px 14px; font-size:12px; height:auto; min-height:32px; border-radius:20px; font-weight:600; cursor:pointer;">
+            <option value="">⚡ Pilih Template Cepat...</option>
+            <option value="0">Link Asesmen (Tahap 1)</option>
+            <option value="1">Undangan Interview</option>
+            <option value="2">Diterima (Hired)</option>
+            <option value="3">Masuk Talent Pool</option>
+            <option value="4">Penolakan (Tidak Lanjut)</option>
+          </select>
+        </div>
       </div>
-      <div class="field"><label>Subjek</label><input class="input" id="notif-subj" value="" placeholder="Subjek notifikasi…"></div>
-      <div class="field"><label>Pesan</label><textarea class="textarea" id="notif-body" style="min-height:180px;font-size:13px;line-height:1.6;" placeholder="Isi pesan…"></textarea></div>
-      <button class="btn btn-primary btn-sm" onclick="hrSendNotif('${c.id}')">${icon('send',13)} Kirim via Email &amp; WhatsApp</button>
+      
+      <div style="padding:24px;">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">Subjek Email</div>
+          <input class="input" id="notif-subj" value="" placeholder="Ketik subjek notifikasi..." style="font-size:14px; font-weight:600; padding:12px 16px; border-color:#e2e8f0; box-shadow:none; border-radius:8px; background:#fafafa;">
+        </div>
+        
+        <div style="margin-bottom:20px;">
+          <div style="font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">Isi Pesan (Terkirim via Email &amp; WhatsApp)</div>
+          <textarea class="textarea" id="notif-body" style="min-height:260px; font-size:13.5px; line-height:1.7; padding:16px; border-color:#e2e8f0; box-shadow:none; border-radius:8px; background:#fafafa; resize:vertical;" placeholder="Ketik isi pesan di sini..."></textarea>
+        </div>
+        
+        <div style="display:flex; justify-content:flex-end;">
+          <button class="btn btn-primary" onclick="hrSendNotif('${c.id}')" style="padding:10px 24px; border-radius:24px; font-weight:600; font-size:14px; letter-spacing:0.3px;">${icon('send',14)} Kirim Sekarang</button>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="eyebrow" style="margin-bottom:12px;">${icon('mail',12)} Riwayat Notifikasi (${c.emailLog.length})</div>
-      ${c.emailLog.length===0
-        ?`<div class="small muted">Belum ada notifikasi dikirim.</div>`
-        :c.emailLog.slice().reverse().map(e=>`
-          <div class="envelope" style="margin-bottom:10px;">
-            <div class="envelope-head">
-              <div class="r"><span class="k">Subjek</span><span style="font-weight:600;">${escapeHtml(e.subject)}</span></div>
+    <!-- Right Pane: History -->
+    <div class="card" style="border:1px solid var(--bridge-line); box-shadow:var(--shadow-s); padding:24px;">
+      <div class="eyebrow" style="margin-bottom:24px; display:flex; align-items:center; gap:8px; font-size:12px;">${icon('clock',14)} Riwayat Komunikasi (${c.emailLog.length})</div>
+      
+      ${c.emailLog.length===0 
+        ? `<div style="text-align:center; padding:60px 0; color:var(--muted);">
+             <div style="margin-bottom:16px; opacity:0.3;">${icon('mail',40)}</div>
+             <div style="font-size:14px; font-weight:500;">Belum ada riwayat komunikasi.</div>
+             <div style="font-size:12.5px; margin-top:4px;">Pesan yang Anda kirim akan muncul di sini.</div>
+           </div>`
+        : `<div style="display:flex; flex-direction:column; gap:16px;">` + 
+          c.emailLog.slice().reverse().map(e => `
+          <div style="background:#f8f9fa; border:1px solid #e2e8f0; border-radius:12px; padding:16px; transition:all 0.2s;" onmouseover="this.style.borderColor='#cbd5e1';this.style.background='#fff';" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#f8f9fa';">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+              <div style="font-weight:700; font-size:13.5px; color:var(--hull); line-height:1.4;">${escapeHtml(e.subject)}</div>
+              <div class="tag tag-rule" style="font-size:9.5px; padding:2px 8px; border-radius:12px; background:var(--green-light); color:var(--green-dark); border:1px solid rgba(60,140,74,0.2);">Terkirim</div>
             </div>
-            <div class="envelope-body" style="font-size:12.5px;padding:12px 16px;white-space:pre-wrap;line-height:1.65;">
-${escapeHtml(e.body)}
-              <div class="small muted" style="margin-top:10px;white-space:normal;">${fmtDateTime(e.sentAt)} &middot; ${escapeHtml(e.channel||'Email & WhatsApp')}</div>
+            <div style="font-size:12.5px; color:var(--hr-text-soft); line-height:1.6; margin-bottom:14px; white-space:pre-wrap; max-height:160px; overflow-y:auto; padding-right:4px;">${escapeHtml(e.body)}</div>
+            <div style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); font-weight:500;">
+              ${icon('calendar',11)} ${fmtDateTime(e.sentAt)} &middot; ${escapeHtml(e.channel||'Email & WA')}
             </div>
-          </div>`).join('')}
+          </div>`).join('') + 
+          `</div>`
+      }
     </div>
   </div>`;
 }
