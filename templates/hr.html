@@ -2334,22 +2334,22 @@ function _bgTpl(nm, pos, refName){
 }
 
 function hrBgCopyTemplate(refNum, cid){
-  const c = CANDIDATES.find(x=>x.id===cid); if(!c) return;
-  const nm = c.name||'Kandidat'; const pos = c.jobTitle||'posisi yang dilamar';
-  const refName = refNum===1 ? (document.getElementById('hr-bg-r1n')?.value||'Bapak/Ibu') : (document.getElementById('hr-bg-r2n')?.value||'Bapak/Ibu');
-  navigator.clipboard.writeText(_bgTpl(nm,pos,refName)).then(()=>toast('Template disalin ke clipboard.','success','check'));
+  const tpl = document.getElementById('hr-bg-tpl'+refNum);
+  const text = tpl ? tpl.value : '';
+  if(!text){ toast('Template tidak ditemukan.','','info'); return; }
+  navigator.clipboard.writeText(text).then(()=>toast('Template disalin ke clipboard.','success','check'));
 }
 
 function hrBgOpenMailto(refNum, cid){
   const c = CANDIDATES.find(x=>x.id===cid); if(!c) return;
-  const nm = c.name||'Kandidat'; const pos = c.jobTitle||'posisi yang dilamar';
+  const nm  = c.name||'Kandidat';
+  const pos = c.jobTitle||'posisi yang dilamar';
   const emailEl = document.getElementById(refNum===1?'hr-bg-r1e':'hr-bg-r2e');
-  const nameEl  = document.getElementById(refNum===1?'hr-bg-r1n':'hr-bg-r2n');
+  const tpl     = document.getElementById('hr-bg-tpl'+refNum);
   const toEmail = emailEl?.value||'';
-  const refName = nameEl?.value||'Bapak/Ibu';
-  const subj = encodeURIComponent('Pengecekan Referensi — '+nm+' untuk Posisi '+pos);
-  const body = encodeURIComponent(_bgTpl(nm,pos,refName));
-  window.open('mailto:'+toEmail+'?subject='+subj+'&body='+body);
+  const body    = tpl ? tpl.value : _bgTpl(nm, pos, 'Bapak/Ibu');
+  const subj    = encodeURIComponent('Pengecekan Referensi — '+nm+' untuk Posisi '+pos);
+  window.open('mailto:'+toEmail+'?subject='+subj+'&body='+encodeURIComponent(body));
   if(toEmail){ toast('Membuka email client...','success','send'); } else { toast('Isi email referensi terlebih dahulu.','','info'); }
 }
 
@@ -2404,11 +2404,11 @@ function _bgRefForm(bg, num, nm, pos){
   const refName = bg['ref'+p+'Name']||'Bapak/Ibu';
   const tplText = _bgTpl(nm,pos,refName);
   const tplEsc = escapeHtml(tplText);
-  h += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:8px;padding:12px;">';
+  h += '<div style="background:var(--hull-2);border:1px solid var(--bridge-line);border-radius:8px;padding:12px;overflow:hidden;">';
   h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--hr-text-soft);margin-bottom:8px;">'+icon('send',10)+' Template Email untuk Referensi</div>';
-  h += '<div style="font-size:11.5px;line-height:1.75;color:var(--hr-text);white-space:pre-wrap;max-height:130px;overflow-y:auto;background:var(--hull-1);border-radius:6px;padding:10px;border:1px solid var(--bridge-line);">'+tplEsc+'</div>';
-  h += '<div style="display:flex;gap:8px;margin-top:10px;">';
-  h += '<button class="btn btn-ghost btn-sm" onclick="hrBgCopyTemplate('+num+',\''+/* cid placeholder */'{CID}\')">'+icon('copy',11)+' Salin Template</button>';
+  h += '<textarea id="hr-bg-tpl'+p+'" class="textarea" style="font-size:11.5px;line-height:1.7;min-height:120px;max-height:180px;resize:vertical;width:100%;box-sizing:border-box;font-family:inherit;">'+tplEsc+'</textarea>';
+  h += '<div style="display:flex;gap:8px;margin-top:8px;">';
+  h += '<button class="btn btn-ghost btn-sm" onclick="hrBgCopyTemplate('+num+',\''+'{CID}\')">'+icon('copy',11)+' Salin Template</button>';
   h += '<button class="btn btn-ghost btn-sm" onclick="hrBgOpenMailto('+num+',\''+'{CID}\')">'+icon('send',11)+' Kirim via Email Client</button>';
   h += '</div></div>';
   h += '</div>';
