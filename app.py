@@ -64,36 +64,6 @@ logging.basicConfig(level=logging.INFO,
 log = logging.getLogger("maxy.app")
 
 
-def _seed_demo_candidates():
-    """Isi DB dengan 2 kandidat demo jika masih kosong (untuk Vercel / demo bersih)."""
-    if db.count_candidates() > 0:
-        return
-    demos = [
-        {
-            "nomor_ktp": "3174060101900001", "nama_lengkap": "Budi Santoso (Demo)",
-            "no_telepon": "081234567890", "email": "budi.demo@example.com",
-            "posisi_dilamar": "Able Seaman", "jenis_kapal_terakhir": "TANKER",
-            "jabatan_terakhir": "Able Seaman", "kode_pelaut": "6211123456789",
-            "cv_text": "Pelaut berpengalaman 3 tahun di Product Tanker (GT 12.000). "
-                       "Memegang BST, SCRB, AFF. Terbiasa watchkeeping & mooring.",
-        },
-        {
-            "nomor_ktp": "3174065502950002", "nama_lengkap": "Dewi Anggraini (Demo)",
-            "no_telepon": "081322119087", "email": "dewi.demo@example.com",
-            "posisi_dilamar": "Finance Staff",
-            "pendidikan": "S1", "jurusan": "Akuntansi", "usia": 27,
-            "cv_text": "Lulusan S1 Akuntansi. Pengalaman 2 tahun staf keuangan. "
-                       "Menguasai Excel, SAP, dan Accounting Software.",
-        },
-    ]
-    for payload in demos:
-        try:
-            doc = ingest.ingest_payload(payload, send_link=False, verify_cert=False)
-            token = db.token_for(doc["id"])
-            url = links.assessment_url(token)
-            log.info(f"[DEMO SEED] {doc['name']} → {url}")
-        except Exception as e:
-            log.warning(f"[DEMO SEED] gagal: {e}")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TPL_DIR = os.path.join(BASE_DIR, "templates")
@@ -101,7 +71,6 @@ TPL_DIR = os.path.join(BASE_DIR, "templates")
 app = Flask(__name__, static_folder=os.path.join(BASE_DIR, "static"))
 app.secret_key = config.SECRET_KEY
 db.init_db()
-_seed_demo_candidates()
 
 
 @app.after_request
@@ -211,6 +180,40 @@ def api_simulate():
     return jsonify({"success": True, "maxy_id": doc["id"],
                     "assessment_url": links.assessment_url(db.token_for(doc["id"])),
                     "candidate": doc}), 201
+
+
+# ===========================================================================
+# DEMO SHORTCUTS
+# ===========================================================================
+
+_DEMO_PAYLOADS = {
+    "crew": {
+        "nama_lengkap": "Budi Santoso", "no_telepon": "081234567890",
+        "email": "budi.demo@example.com", "posisi_dilamar": "Able Seaman",
+        "jenis_kapal_terakhir": "TANKER", "jabatan_terakhir": "Able Seaman",
+        "kode_pelaut": "6211123456789",
+        "cv_text": "Pelaut berpengalaman 3 tahun di Product Tanker (GT 12.000). "
+                   "Memegang BST, SCRB, AFF. Terbiasa watchkeeping & mooring.",
+    },
+    "backoffice": {
+        "nama_lengkap": "Dewi Anggraini", "no_telepon": "081322119087",
+        "email": "dewi.demo@example.com", "posisi_dilamar": "Finance Staff",
+        "pendidikan": "S1", "jurusan": "Akuntansi", "usia": 27,
+        "cv_text": "Lulusan S1 Akuntansi. Pengalaman 2 tahun staf keuangan. "
+                   "Menguasai Excel, SAP, dan Accounting Software.",
+    },
+}
+
+@app.route("/candidates/<track>")
+def demo_candidate(track):
+    """Buat kandidat demo baru dan langsung redirect ke portalnya."""
+    payload = _DEMO_PAYLOADS.get(track)
+    if not payload:
+        abort(404)
+    doc = ingest.ingest_payload(payload, send_link=False, verify_cert=False)
+    token = db.token_for(doc["id"])
+    from flask import redirect
+    return redirect(f"/a/{token}")
 
 
 # ===========================================================================
